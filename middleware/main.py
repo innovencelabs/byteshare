@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from mangum import Mangum
 import boto3
 
 
@@ -29,6 +30,9 @@ def health_check():
     Returns:
     - Status of application and external services
     """
-    
 
     return {"status": "ok", "details": "Service is running"}
+
+
+# Create a Handler from FastAPI for lambda.
+handler = Mangum(app)

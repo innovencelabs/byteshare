@@ -1,0 +1,12 @@
+version = 0.1
+[default]
+[default.global]
+[default.global.parameters]
+stack_name = "sam-byteshare-prod"
+resolve_s3 = true
+s3_prefix = "sam-byteshare-prod"
+region = "us-west-1"
+confirm_changeset = false
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "LamdbaLayerName=\"byteshare-dependencies\""
+image_repositories = []

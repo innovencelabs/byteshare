@@ -1,0 +1,59 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Parameters:
+  LamdbaLayerName:
+    Type: String
+    Default: byteshare-dependencies
+Globals:
+  Function:
+    Timeout: 900
+  Api:
+    Cors: "'*'"
+Resources:
+  ByteShareFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: byteshare-api
+      MemorySize: 2048
+      Handler: main.handler
+      Runtime: python3.10
+      CodeUri: .
+      Layers:
+        - Ref: SitePackagesLayer
+      Tracing: Active
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AmazonS3FullAccess
+        - AWSLambdaDynamoDBExecutionRole
+        - AWSXrayWriteOnlyAccess
+      Events:
+        ApiEventWithProxy:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: ByteShareAPIGW
+            Path: /{proxy+}
+            Method: any
+  ByteShareAPIGW:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      OpenApiVersion: "3.0.0"
+      TracingEnabled: true
+      Cors: "'*'"
+
+  SitePackagesLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName:
+        Ref: LamdbaLayerName
+      Description: python site packages for byteshare app
+      ContentUri: ./python-site-packages.zip
+      CompatibleRuntimes:
+        - python3.10
+      LicenseInfo: "MIT"
+      RetentionPolicy: Retain
+Outputs:
+  ByteShareAPIRes:
+    Description: "API Gateway endpoint URL for prod stage of byteshare function"
+    Value: !Sub "https://${ByteShareAPIGW}.execute-api.${AWS::Region}.amazonaws.com/prod/"
