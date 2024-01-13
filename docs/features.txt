@@ -1,4 +1,0 @@
-- large file can be sent seemlessly
-- user will get a QR and a sharing link which it can share to people
-- link expiry time
-- file security
