@@ -1,0 +1,5 @@
+uvicorn==0.25.0
+fastapi==0.106.0
+boto3==1.34.7
+botocore==1.34.7
+six==1.16.0
