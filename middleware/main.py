@@ -97,11 +97,11 @@ def post_upload_return_link_qr(upload_id: str):
     img_bytes_io = io.BytesIO()
     img.save(img_bytes_io)
 
-    qr_s3_file_name = upload_id + '/QRCode.png'
+    qr_s3_file_name = upload_id + "/QRCode.png"
 
     # Upload the QR code to S3
     try:
-        s3_client.upload_file(img_bytes_io, S3_BUCKET_NAME, qr_s3_file_name)
+        s3_client.upload_fileobj(img_bytes_io, S3_BUCKET_NAME, qr_s3_file_name)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
