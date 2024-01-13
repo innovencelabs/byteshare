@@ -4,7 +4,7 @@ from mangum import Mangum
 import boto3
 import uuid
 import qrcode
-import io
+import os
 
 
 app = FastAPI()
@@ -94,16 +94,19 @@ def post_upload_return_link_qr(upload_id: str):
 
     img = qr.make_image(fill_color="black", back_color="white")
 
-    img_bytes_io = io.BytesIO()
-    img.save(img_bytes_io)
+    temp_qr_path = "{}.png".format(upload_id)
+    img.save(temp_qr_path)
 
     qr_s3_file_name = upload_id + "/QRCode.png"
 
     # Upload the QR code to S3
     try:
-        s3_client.upload_fileobj(img_bytes_io, S3_BUCKET_NAME, qr_s3_file_name)
+        s3_client.upload_file(temp_qr_path, S3_BUCKET_NAME, qr_s3_file_name)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
+
+    # Remove the local file
+    os.remove(temp_qr_path)
 
     # Generate presigned URL for the uploaded QR code
     qr_presigned_url = s3_client.generate_presigned_url(
