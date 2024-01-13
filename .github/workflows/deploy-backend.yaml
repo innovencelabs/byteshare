@@ -18,7 +18,7 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-west-1
+        aws-region: us-east-2
     
     - name: Set up SAM CLI
       uses: aws-actions/setup-sam@v1
@@ -40,4 +40,4 @@ jobs:
         rm python-site-packages.zip
 
       env:
-        AWS_DEFAULT_REGION: us-west-1
+        AWS_DEFAULT_REGION: us-east-2
