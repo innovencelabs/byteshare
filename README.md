@@ -39,5 +39,17 @@ uvicorn main:app --reload
 
 #### By default, UI runs on port **3000** and Middleware runs on port **8000**
 
+## Tech stack
+- **UI**: ReactJS
+- **Middleware**: FastAPI
+- **DB**: AWS DynamoDB
+- **Storage**: AWS S3
+- **Logging**: AWS Cloudwatch
+
+## Deployment
+- **UI**: Vercel
+- **Middleware**: AWS API Gateway and Lambda via SAM deployment
+- **CI/CD**: Github actions
+
 ## Deployed version
 ### Frontend - https://byteshare-ui.vercel.app/
