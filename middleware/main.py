@@ -97,7 +97,7 @@ def post_upload_return_link_qr(upload_id: str):
     img_bytes_io = io.BytesIO()
     img.save(img_bytes_io)
 
-    qr_s3_file_name = upload_id + "/" + "QRCode.png"
+    qr_s3_file_name = upload_id + '/QRCode.png'
 
     # Upload the QR code to S3
     try:
