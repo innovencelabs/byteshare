@@ -1,8 +1,8 @@
 # ByteShare
 
-### File sharing app that can share large files to N number of people
+##### File sharing app that can share large files to N number of people
 
-## Features
+## Highlights
 - Large files can be shared seamlessly
 - User will get a QR and a sharing link which they can share
 - Active link expiry time
@@ -52,11 +52,11 @@ uvicorn main:app --reload
 #### By default, UI runs on port **3000** and Middleware runs on port **8000**
 
 ## Tech stack
-- **UI**: ReactJS
-- **Middleware**: FastAPI
-- **DB**: AWS DynamoDB
-- **Storage**: AWS S3
-- **Logging**: AWS Cloudwatch
+- 🖥️ **UI**: ReactJS
+- ⚙️ **Middleware**: FastAPI
+- 💾 **DB**: AWS DynamoDB
+- 📦 **Storage**: AWS S3
+- 📒 **Logging**: AWS Cloudwatch
 
 ## Deployment
 - **UI**: Vercel
