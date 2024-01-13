@@ -3,3 +3,7 @@ middleware/.venv
 ui/node_modules
 middleware/.aws-sam
 middleware/python-site-packages.zip
+.terraform
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.backup
