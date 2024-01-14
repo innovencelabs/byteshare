@@ -1,4 +1,6 @@
-# ByteShare
+<div align="center">
+    <img src="https://github.com/ambujraj/ByteShare/assets/29935993/94a01fc5-a75f-4e46-a163-a0443f234da3" alt="logo">
+</div>
 
 ##### File sharing app that can share large files to N number of people
 
