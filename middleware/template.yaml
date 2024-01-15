@@ -8,7 +8,10 @@ Globals:
   Function:
     Timeout: 900
   Api:
-    Cors: "'*'"
+    Cors:
+      AllowMethods: "'OPTIONS,GET,POST,PUT,DELETE'"
+      AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+      AllowOrigin: "'*'"
 Resources:
   ByteShareFunction:
     Type: AWS::Serverless::Function
@@ -40,7 +43,10 @@ Resources:
       StageName: prod
       OpenApiVersion: "3.0.0"
       TracingEnabled: true
-      Cors: "'*'"
+      Cors:
+        AllowMethods: "'OPTIONS,GET,POST,PUT,DELETE'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+        AllowOrigin: "'*'"
 
   SitePackagesLayer:
     Type: AWS::Serverless::LayerVersion
