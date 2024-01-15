@@ -1,12 +1,21 @@
+import React from 'react';
 import './App.css';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import ComingSoon from './pages/ComingSoon';
+import NotFound from './pages/NotFound';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <h6>Hi from ByteShare</h6>
-      </header>
-    </div>
+    <Router>
+      <div>
+        
+        <Routes>
+          <Route exact path="/" element={<ComingSoon />}></Route>
+          <Route path="*" element={<NotFound />}></Route>
+        </Routes>
+        
+      </div>
+    </Router>
   );
 }
 
