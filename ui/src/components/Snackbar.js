@@ -6,7 +6,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-export default function DoyoSnackbar({open, handleClose, message, variant}) {
+export default function ByteShareSnackbar({open, handleClose, message, variant}) {
     const [isOpen, setIsOpen] = useState(open);
 
   useEffect(() => {

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import './css/ComingSoon.css';
-import DoyoSnackbar from '../components/Snackbar';
+import ByteShareSnackbar from '../components/Snackbar';
 
 const ComingSoon = () => {
     const [email, setEmail] = useState('');
@@ -59,7 +59,7 @@ const ComingSoon = () => {
         <input type="email" placeholder="Email Address" value={email} onChange={(e) => setEmail(e.target.value)} />
         <input type="submit" value="Go" />
       </form>
-      <DoyoSnackbar open={openSnackbar} handleClose={handleCloseSnackbar} message="Joined the waitlist!" variant="success"/>
+      <ByteShareSnackbar open={openSnackbar} handleClose={handleCloseSnackbar} message="Joined the waitlist!" variant="success"/>
     </div>
   );
 }
