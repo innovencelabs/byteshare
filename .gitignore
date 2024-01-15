@@ -7,3 +7,4 @@ middleware/python-site-packages.zip
 .terraform.lock.hcl
 terraform.tfstate
 terraform.tfstate.backup
+ui/.env

@@ -6,6 +6,10 @@ import DoyoSnackbar from '../components/Snackbar';
 const ComingSoon = () => {
     const [email, setEmail] = useState('');
     const [openSnackbar, setOpenSnackbar] = useState(false);
+  
+    const axiosClient = axios.create({
+      baseURL: process.env.REACT_APP_API_BASE_URL
+    });
 
 
   const handleCloseSnackbar = () => {
@@ -18,14 +22,15 @@ const ComingSoon = () => {
     if(email === "") {
       return;
     }
+
     try {
-      await axios.post('http://localhost:8000/subscribe', { email }, {
+      const response = await axiosClient.post('/subscribe', { email }, {
           headers: {
             'Content-Type': 'application/json'
           }
         });
 
-      // console.log('API Response:', response.data);
+      console.log('Email added:', response.status===200);
 
       setEmail('');
       setOpenSnackbar(true);
