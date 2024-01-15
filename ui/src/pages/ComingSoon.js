@@ -47,7 +47,7 @@ const ComingSoon = () => {
       </div>
 
       <div id="text-container">
-        <p id="first-para">BYTESHARE</p>
+        <p id="first-para">BYTE SHARE</p>
         <p id="second-para">COMING</p>
         <p id="third-para">SOON</p>
         <p>
