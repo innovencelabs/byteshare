@@ -12,7 +12,7 @@ class DynamoDBManager:
             response = self.table.put_item(Item=item)
             print(f"Item created successfully: {response}")
         except Exception as e:
-            print(f"Error in adding new row: {e}")
+            print(f"Error in adding new row for item: {item}\nError: {e}")
 
     def read_item(self, key):
         try:
@@ -23,7 +23,7 @@ class DynamoDBManager:
             else:
                 print("Item not found.")
         except Exception as e:
-            print(f"Error in reading row: {e}")
+            print(f"Error in reading row for key: {key}\nError: {e}")
 
     def update_item(self, key, update_data):
         try:
@@ -46,11 +46,11 @@ class DynamoDBManager:
             )
             print(f"Item updated successfully: {response}")
         except Exception as e:
-            print(f"Error in updating row: {e}")
+            print(f"Error in updating row for key: {key} and update_date: {update_data}\nError: {e}")
 
     def delete_item(self, key):
         try:
             response = self.table.delete_item(Key=key)
             print(f"Item deleted successfully: {response}")
         except Exception as e:
-            print(f"Error in reading row: {e}")
+            print(f"Error in deleting row for key {key}\nError: {e}")
