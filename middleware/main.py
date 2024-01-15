@@ -14,7 +14,7 @@ import os
 app = FastAPI()
 
 # CORS (Cross Origin Resource Sharing)
-origins = ["*"]
+origins = ["http://localhost:3000", "https://byteshare-ui.vercel.app"]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
