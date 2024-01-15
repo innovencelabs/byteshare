@@ -4,6 +4,7 @@ from mangum import Mangum
 from db import DynamoDBManager
 from enum import Enum as PythonEnum
 from datetime import datetime, timedelta, timezone
+from pydantic import BaseModel
 import boto3
 import uuid
 import qrcode
@@ -28,12 +29,18 @@ S3_BUCKET_NAME = "byteshare-blob"
 
 # DynamoDB
 table_name = "byteshare-upload-metadata"
+subscriber_table_name = "byteshare-subscriber"
 dynamodb = DynamoDBManager(table_name)
+subscriber_dynamodb = DynamoDBManager(subscriber_table_name)
 
 
 class StatusEnum(PythonEnum):
     initiated = "initiated"
     uploaded = "uploaded"
+
+
+class Subscribe(BaseModel):
+    email: str
 
 
 @app.get("/health")
@@ -63,6 +70,17 @@ def health_check():
         raise HTTPException(status_code=503, detail="S3 connection failed")
 
     return {"status": "ok", "details": "Service is running"}
+
+
+@app.post("/subscribe")
+def add_subscriber_return_done(body: Subscribe):
+    subscriber = {
+        "email": body.email,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+    subscriber_dynamodb.create_item(subscriber)
+
+    return {"status": "Done"}
 
 
 @app.post("/initiateUpload")

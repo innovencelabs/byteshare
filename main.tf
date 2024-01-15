@@ -18,3 +18,19 @@ resource "aws_dynamodb_table" "byteshare-upload-metadata" {
     type = "S"
   }
 }
+
+resource "aws_dynamodb_table" "byteshare-subscriber" {
+  name           = "byteshare-subscriber"
+  billing_mode   = "PAY_PER_REQUEST"
+  hash_key       = "email"
+  range_key      = "created_at"
+
+  attribute {
+    name = "email"
+    type = "S"
+  }
+  attribute {
+    name = "created_at"
+    type = "S"
+  }
+}
