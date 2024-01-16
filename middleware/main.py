@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
 from db import DynamoDBManager
@@ -84,18 +84,28 @@ def add_subscriber_return_done(body: Subscribe):
 
 
 @app.post("/initiateUpload")
-def initiate_upload_return_presigned_url(file_name: str):
+def initiate_upload_return_presigned_url(file_name: str, request: Request):
     """
     Initiate upload to S3.
-    Creates presigned URL for upload and add to DB.
+    checks for file size under limit for current user type, creates presigned URL for upload and add to DB.
     Stores the file as <UPLOAD_ID>/<FILE_NAME> in S3
 
     Parameters:
     - file_name: name of the file to be uploaded
+    - content-length: file size of the uploaded file
 
     Returns:
     - Presigned URL for upload
     """
+
+    content_length = request.headers.get("content-length")
+    if content_length is None:
+        raise HTTPException(status_code=400, detail="Content-Length header not found")
+
+    max_file_size = 2 * 1024 * 1024 * 1024  # 2GB
+
+    if int(content_length) > max_file_size:
+        raise HTTPException(status_code=400, detail="File size exceeds the limit")
 
     upload_id = uuid.uuid4().hex
     file_path = upload_id + "/" + file_name

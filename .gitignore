@@ -8,3 +8,4 @@ middleware/python-site-packages.zip
 terraform.tfstate
 terraform.tfstate.backup
 ui/.env
+todo.txt
