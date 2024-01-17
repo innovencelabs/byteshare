@@ -57,12 +57,17 @@ uvicorn main:app --reload
 
 #### By default, UI runs on port **3000** and Middleware runs on port **8000**
 
-## Tech stack
+## Architecture
+![architecture](https://github.com/ambujraj/ByteShare/assets/29935993/24672635-edc3-4cf1-beb8-76a4c3f70001)
+
+
+## Technologies
 - 🖥️ **UI**: ReactJS
 - ⚙️ **Middleware**: FastAPI
 - 💾 **DB**: AWS DynamoDB
 - 📦 **Storage**: AWS S3
 - 📒 **Logging**: AWS Cloudwatch
+- 🔐 **Auth**: Appwrite
 
 ## Deployment
 - **UI**: Vercel
