@@ -48,7 +48,7 @@ cd ..
 7. Run the application
 ```bash
 cd ui
-npm start
+npm run dev
 
 --new tab--
 cd middleware
@@ -62,7 +62,7 @@ uvicorn main:app --reload
 
 
 ## Technologies
-- 🖥️ **UI**: ReactJS
+- 🖥️ **UI**: NextJS
 - ⚙️ **Middleware**: FastAPI
 - 💾 **DB**: AWS DynamoDB
 - 📦 **Storage**: AWS S3
