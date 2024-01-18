@@ -5,7 +5,7 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'ByteShare',
+  title: 'ByteShare: Landing',
   description: 'File sharing app',
 }
 
