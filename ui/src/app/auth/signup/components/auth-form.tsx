@@ -1,32 +1,67 @@
 'use client'
 
-import * as React from 'react'
-
 import { cn } from '@/lib/utils'
 import { Icons } from '@/components/icons'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import appwriteService from '@/authentication/appwrite/config'
+import useAuth from '@/context/useAuth'
+import { useRouter } from 'next/navigation'
+import React, { FormEvent, HTMLAttributes, useState } from 'react'
 
-interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
+interface UserAuthFormProps extends HTMLAttributes<HTMLDivElement> {}
 
 export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
-  const [isLoading, setIsLoading] = React.useState<boolean>(false)
+  const router = useRouter()
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    name: '',
+  })
+  const [error, setError] = useState('')
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
-  async function onSubmit(event: React.SyntheticEvent) {
-    event.preventDefault()
+  const { setAuthorised } = useAuth()
+
+  const create = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
     setIsLoading(true)
 
-    setTimeout(() => {
-      setIsLoading(false)
-    }, 3000)
+    try {
+      const userData = await appwriteService.createUserAccount(formData)
+      if (userData) {
+        setAuthorised(true)
+        router.push('/')
+      }
+    } catch (err: any) {
+      setError(err.message)
+    }
+
+    setIsLoading(false)
   }
 
   return (
     <div className={cn('grid gap-6', className)} {...props}>
-      <form onSubmit={onSubmit}>
+      <form onSubmit={create}>
         <div className="grid gap-8">
           <div className="grid gap-2">
+            <Label className="sr-only" htmlFor="name">
+              Name
+            </Label>
+            <Input
+              id="name"
+              placeholder="Your Name"
+              type="text"
+              value={formData.name}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, name: e.target.value }))
+              }
+              autoCapitalize="true"
+              autoCorrect="off"
+              disabled={isLoading}
+              required={true}
+            />
             <Label className="sr-only" htmlFor="email">
               Email
             </Label>
@@ -34,10 +69,15 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               id="email"
               placeholder="Email Address"
               type="email"
+              value={formData.email}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, email: e.target.value }))
+              }
               autoCapitalize="none"
               autoComplete="email"
               autoCorrect="off"
               disabled={isLoading}
+              required={true}
             />
             <Label className="sr-only" htmlFor="email">
               Email
@@ -46,9 +86,14 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               id="password"
               placeholder="Password"
               type="password"
+              value={formData.password}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, password: e.target.value }))
+              }
               autoCapitalize="none"
               autoCorrect="off"
               disabled={isLoading}
+              required={true}
             />
           </div>
           <Button disabled={isLoading}>

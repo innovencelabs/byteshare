@@ -1,42 +1,46 @@
 'use client'
 
-import * as React from 'react'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
 import { Icons } from '@/components/icons'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import appwriteService from '@/authentication/appwrite/config'
+import useAuth from '@/context/useAuth'
+import { useRouter } from 'next/navigation'
+import React, { FormEvent, HTMLAttributes, useState } from 'react'
 
-interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
+interface UserAuthFormProps extends HTMLAttributes<HTMLDivElement> {}
 
 export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
-  const [isLoading, setIsLoading] = React.useState<boolean>(false)
+  const router = useRouter()
+  const { setAuthorised } = useAuth()
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+  })
+  const [error, setError] = useState('')
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
-  async function handleLogin(event: React.SyntheticEvent) {
-    event.preventDefault()
+  const login = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
     setIsLoading(true)
+    try {
+      const session = await appwriteService.login(formData)
+      if (session) {
+        setAuthorised(true)
+        router.push('/')
+      }
+    } catch (err: any) {
+      setError(err.message)
+    }
 
-    setTimeout(() => {
-      setIsLoading(false)
-    }, 3000)
-  }
-
-  function handleForgotPassword(event: React.SyntheticEvent) {
-    event.preventDefault()
+    setIsLoading(false)
   }
 
   return (
     <div className={cn('grid gap-6', className)} {...props}>
-      <form onSubmit={handleLogin}>
+      <form onSubmit={login}>
         <div className="grid gap-8">
           <div className="grid gap-2">
             <Label className="sr-only" htmlFor="email">
@@ -46,10 +50,15 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               id="email"
               placeholder="Email Address"
               type="email"
+              value={formData.email}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, email: e.target.value }))
+              }
               autoCapitalize="none"
               autoComplete="email"
               autoCorrect="off"
               disabled={isLoading}
+              required={true}
             />
             <Label className="sr-only" htmlFor="password">
               Password
@@ -58,46 +67,22 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               id="password"
               placeholder="Password"
               type="password"
+              value={formData.password}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, password: e.target.value }))
+              }
               autoCapitalize="none"
               autoCorrect="off"
               disabled={isLoading}
+              required={true}
             />
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button
-                  className="flex items-center justify-start text-left p-0"
-                  variant="link"
-                >
-                  Forgot Password?
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                  <DialogTitle>Forgot Password</DialogTitle>
-                  <DialogDescription>
-                    Change you password with the link you will recieve on the
-                    email.
-                  </DialogDescription>
-                </DialogHeader>
-                <form onSubmit={handleForgotPassword}>
-                  <div className="grid gap-4 py-4">
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="name" className="text-right">
-                        Email
-                      </Label>
-                      <Input
-                        id="email"
-                        placeholder="email@domain.com"
-                        className="col-span-3"
-                      />
-                    </div>
-                  </div>
-                  <DialogFooter>
-                    <Button type="submit">Get verification email</Button>
-                  </DialogFooter>
-                </form>
-              </DialogContent>
-            </Dialog>
+            <Button
+              className="flex items-center justify-start text-left p-0"
+              variant="link"
+              onClick={() => router.push('/auth/forgot')}
+            >
+              Forgot Password?
+            </Button>
           </div>
           <Button disabled={isLoading}>
             {isLoading && (

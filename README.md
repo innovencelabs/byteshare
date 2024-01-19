@@ -31,13 +31,17 @@ terraform init
 terraform plan
 terraform apply
 ```
-5. Install UI dependencies
+5. Setup your Appwrite account [HERE](https://appwrite.io/)
+6. Create your Organisation and Project in Appwrite [TUTORIAL](https://youtu.be/pk92hS_d_ns?t=11&si=emSqp8Mdra_iF-dc)
+7. Install UI dependencies and add .env file
 ```bash
 cd ui
 npm install
+cp sample.env .env
 cd ..
 ```
-6. Install Middleware(Backend) dependencies
+8. Fill the values in .env file for backend url and Appwrite creds
+9. Install Middleware(Backend) dependencies
 ```bash
 cd middleware
 python3 -m venv .venv
@@ -45,7 +49,7 @@ source .venv/bin/activate
 pip3 install -r requirements.txt
 cd ..
 ```
-7. Run the application
+10. Run the application
 ```bash
 cd ui
 npm run dev
