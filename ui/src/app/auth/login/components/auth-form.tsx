@@ -1,6 +1,6 @@
-"use client"
+'use client'
 
-import * as React from "react"
+import * as React from 'react'
 import {
   Dialog,
   DialogContent,
@@ -9,12 +9,12 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { cn } from "@/lib/utils"
-import { Icons } from "@/components/icons"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+} from '@/components/ui/dialog'
+import { cn } from '@/lib/utils'
+import { Icons } from '@/components/icons'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -31,14 +31,11 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   }
 
   function handleForgotPassword(event: React.SyntheticEvent) {
-      event.preventDefault()
-      
-
-      
+    event.preventDefault()
   }
 
   return (
-    <div className={cn("grid gap-6", className)} {...props}>
+    <div className={cn('grid gap-6', className)} {...props}>
       <form onSubmit={handleLogin}>
         <div className="grid gap-8">
           <div className="grid gap-2">
@@ -67,13 +64,19 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
             />
             <Dialog>
               <DialogTrigger asChild>
-                <Button className="flex items-center justify-start text-left p-0" variant="link">Forgot Password?</Button>
+                <Button
+                  className="flex items-center justify-start text-left p-0"
+                  variant="link"
+                >
+                  Forgot Password?
+                </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                   <DialogTitle>Forgot Password</DialogTitle>
                   <DialogDescription>
-                    Change you password with the link you will recieve on the email.
+                    Change you password with the link you will recieve on the
+                    email.
                   </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleForgotPassword}>
@@ -82,7 +85,11 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
                       <Label htmlFor="name" className="text-right">
                         Email
                       </Label>
-                      <Input id="email" placeholder="email@domain.com" className="col-span-3" />
+                      <Input
+                        id="email"
+                        placeholder="email@domain.com"
+                        className="col-span-3"
+                      />
                     </div>
                   </div>
                   <DialogFooter>
@@ -115,7 +122,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
           <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
         ) : (
           <Icons.google className="mr-2 h-4 w-4" />
-        )}{" "}
+        )}{' '}
         Sign in with Google
       </Button>
     </div>

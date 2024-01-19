@@ -1,14 +1,14 @@
-import { Metadata } from "next"
-import Image from "next/image"
-import Link from "next/link"
+import { Metadata } from 'next'
+import Image from 'next/image'
+import Link from 'next/link'
 
-import { cn } from "@/lib/utils"
-import { buttonVariants } from "@/components/ui/button"
-import { UserAuthForm } from "./components/auth-form"
+import { cn } from '@/lib/utils'
+import { buttonVariants } from '@/components/ui/button'
+import { UserAuthForm } from './components/auth-form'
 
 export const metadata: Metadata = {
-  title: "ByteShare: Login",
-  description: "Login page",
+  title: 'ByteShare: Login',
+  description: 'Login page',
 }
 
 export default function LoginPage() {
@@ -34,8 +34,8 @@ export default function LoginPage() {
         <Link
           href="/auth/signup"
           className={cn(
-            buttonVariants({ variant: "ghost" }),
-            "absolute right-4 top-4 md:right-8 md:top-8"
+            buttonVariants({ variant: 'ghost' }),
+            'absolute right-4 top-4 md:right-8 md:top-8',
           )}
         >
           Create Account
@@ -57,8 +57,7 @@ export default function LoginPage() {
             </svg> */}
             ByteShare
           </div>
-          <div className="relative z-20 mt-auto">
-          </div>
+          <div className="relative z-20 mt-auto"></div>
         </div>
         <div className="lg:p-8">
           <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">

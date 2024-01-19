@@ -1,14 +1,14 @@
-import { Metadata } from "next"
-import Image from "next/image"
-import Link from "next/link"
+import { Metadata } from 'next'
+import Image from 'next/image'
+import Link from 'next/link'
 
-import { cn } from "@/lib/utils"
-import { buttonVariants } from "@/components/ui/button"
-import { UserAuthForm } from "./components/auth-form"
+import { cn } from '@/lib/utils'
+import { buttonVariants } from '@/components/ui/button'
+import { UserAuthForm } from './components/auth-form'
 
 export const metadata: Metadata = {
-  title: "ByteShare: Signup",
-  description: "Signup page",
+  title: 'ByteShare: Signup',
+  description: 'Signup page',
 }
 
 export default function SignupPage() {
@@ -34,8 +34,8 @@ export default function SignupPage() {
         <Link
           href="/auth/login"
           className={cn(
-            buttonVariants({ variant: "ghost" }),
-            "absolute right-4 top-4 md:right-8 md:top-8"
+            buttonVariants({ variant: 'ghost' }),
+            'absolute right-4 top-4 md:right-8 md:top-8',
           )}
         >
           Login
@@ -80,14 +80,14 @@ export default function SignupPage() {
             </div>
             <UserAuthForm />
             <p className="px-8 text-center text-sm text-muted-foreground">
-              By clicking continue, you agree to our{" "}
+              By clicking continue, you agree to our{' '}
               <Link
                 href="/auth/terms"
                 className="underline underline-offset-4 hover:text-primary"
               >
                 Terms of Service
-              </Link>{" "}
-              and{" "}
+              </Link>{' '}
+              and{' '}
               <Link
                 href="/auth/privacy"
                 className="underline underline-offset-4 hover:text-primary"
