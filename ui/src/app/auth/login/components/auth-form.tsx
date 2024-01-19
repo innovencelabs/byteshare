@@ -28,10 +28,12 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     try {
       const session = await appwriteService.login(formData)
       if (session) {
+        console.log(session)
         setAuthorised(true)
         router.push('/')
       }
     } catch (err: any) {
+      console.log(err)
       setError(err.message)
     }
 
@@ -81,7 +83,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               variant="link"
               onClick={(e) => {
                 e.preventDefault()
-                router.push('/auth/forgot')
+                router.push('/auth/forgot-password')
               }}
             >
               Forgot Password?

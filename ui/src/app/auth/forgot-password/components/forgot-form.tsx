@@ -35,6 +35,7 @@ export function ForgotPasswordForm({
         })
       }
     } catch (err: any) {
+      console.log(err)
       setError(err.message)
     }
 

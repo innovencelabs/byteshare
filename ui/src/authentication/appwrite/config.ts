@@ -69,11 +69,10 @@ export class AppwriteService {
 
   async initiateForgotPassword({ email }: ForgotPassword) {
     try {
-      return await account.createRecovery(
-        email,
-        'https://byteshare-ui.vercel.app',
-      )
-    } catch (err: any) {}
+      return await account.createRecovery(email, 'http://localhost:3000')
+    } catch (err: any) {
+      console.log(err)
+    }
   }
 
   async logout() {

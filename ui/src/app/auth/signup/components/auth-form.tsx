@@ -31,6 +31,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     try {
       const userData = await appwriteService.createUserAccount(formData)
       if (userData) {
+        console.log(userData)
         setAuthorised(true)
         router.push('/')
       }
