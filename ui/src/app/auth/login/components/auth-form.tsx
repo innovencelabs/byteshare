@@ -79,7 +79,10 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
             <Button
               className="flex items-center justify-start text-left p-0"
               variant="link"
-              onClick={() => router.push('/auth/forgot')}
+              onClick={(e) => {
+                e.preventDefault()
+                router.push('/auth/forgot')
+              }}
             >
               Forgot Password?
             </Button>
