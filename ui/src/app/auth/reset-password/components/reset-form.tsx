@@ -27,7 +27,6 @@ export function ResetPasswordForm({
   })
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [passwordMatchError, setPasswordMatchError] = useState('')
 
   let userId = searchParams.get('userId')
   let secret = searchParams.get('secret')
@@ -45,24 +44,35 @@ export function ResetPasswordForm({
 
   const resetPassword = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-
-    if (!(formData.password === formData.confirmPassword)) {
-      setPasswordMatchError('Password and Confirm password are not matching')
+    if (formData.password.length < 8) {
+      toast({
+        description: 'Password should be atleast 8 character.',
+      })
       return
     }
-    if (formData.password.length < 8) {
-      setPasswordMatchError('Password should be atleast 8 character')
-    } else {
-      setPasswordMatchError('')
+    if (!(formData.password === formData.confirmPassword)) {
+      toast({
+        description: 'Password and Confirm password are not matching.',
+      })
+      return
     }
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+    const isValidPassword = passwordRegex.test(formData.password)
+    if (!isValidPassword) {
+      toast({
+        description:
+          'Password should contain atleast one upper case, digit and special character.',
+      })
+      return
+    }
+
     userId = searchParams.get('userId')
     secret = searchParams.get('secret')
 
     setIsLoading(true)
 
     try {
-      console.log(formData.password)
-
       const response = await appwriteService.completeForgotPassword(formData)
       if (response) {
         router.push('/auth/login')
@@ -91,11 +101,6 @@ export function ResetPasswordForm({
               onChange={(e) => {
                 setFormData((prev) => ({ ...prev, password: e.target.value }))
               }}
-              onBlur={(e) => {
-                if (formData.password == formData.confirmPassword) {
-                  setPasswordMatchError('')
-                }
-              }}
               autoCorrect="off"
               disabled={isLoading}
               required={true}
@@ -114,18 +119,10 @@ export function ResetPasswordForm({
                   confirmPassword: e.target.value,
                 }))
               }}
-              onBlur={(e) => {
-                if (formData.password === formData.confirmPassword) {
-                  setPasswordMatchError('')
-                }
-              }}
               autoCorrect="off"
               disabled={isLoading}
               required={true}
             />
-            {passwordMatchError && (
-              <p className="text-red-500">{passwordMatchError}</p>
-            )}
           </div>
           <Button disabled={isLoading}>
             {isLoading && (

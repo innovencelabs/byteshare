@@ -40,6 +40,7 @@ export function ForgotPasswordForm({
     try {
       const response = await appwriteService.initiateForgotPassword(formData)
       if (response) {
+        setFormData({ ...formData, email: '' })
         toast({
           description: 'Verification email has been sent.',
         })
