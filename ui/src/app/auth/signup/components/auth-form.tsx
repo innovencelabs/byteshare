@@ -9,7 +9,7 @@ import appwriteService from '@/authentication/appwrite/config'
 import useAuth from '@/context/useAuth'
 import { useRouter } from 'next/navigation'
 import React, { FormEvent, HTMLAttributes, useState } from 'react'
-import { useToast } from '@/components/ui/use-toast'
+import { toast } from 'sonner'
 
 interface UserAuthFormProps extends HTMLAttributes<HTMLDivElement> {}
 
@@ -24,24 +24,20 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const { setAuthorised } = useAuth()
-  const { toast } = useToast()
 
   const create = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (formData.password.length < 8) {
-      toast({
-        description: 'Password should be atleast 8 character.',
-      })
+      toast.error('Password should be atleast 8 character.')
       return
     }
     const passwordRegex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
     const isValidPassword = passwordRegex.test(formData.password)
     if (!isValidPassword) {
-      toast({
-        description:
-          'Password should contain atleast one upper case, digit and special character.',
-      })
+      toast.error(
+        'Password should contain atleast one Upper case, Number and Special character.',
+      )
       return
     }
 

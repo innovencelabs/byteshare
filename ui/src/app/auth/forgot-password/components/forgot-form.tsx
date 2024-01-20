@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label'
 import appwriteService from '@/authentication/appwrite/config'
 import { useRouter } from 'next/navigation'
 import React, { FormEvent, HTMLAttributes, useState, useEffect } from 'react'
-import { useToast } from '@/components/ui/use-toast'
+import { toast } from 'sonner'
 
 interface ForgotPasswordFormProps extends HTMLAttributes<HTMLDivElement> {}
 
@@ -16,7 +16,6 @@ export function ForgotPasswordForm({
   className,
   ...props
 }: ForgotPasswordFormProps) {
-  const { toast } = useToast()
   const router = useRouter()
   const [formData, setFormData] = useState({
     email: '',
@@ -41,9 +40,7 @@ export function ForgotPasswordForm({
       const response = await appwriteService.initiateForgotPassword(formData)
       if (response) {
         setFormData({ ...formData, email: '' })
-        toast({
-          description: 'Verification email has been sent.',
-        })
+        toast.info('Verification email has been sent.')
       }
     } catch (err: any) {
       console.log(err)
