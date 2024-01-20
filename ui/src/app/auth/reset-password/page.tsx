@@ -1,14 +1,13 @@
 import React from 'react'
 import { Metadata } from 'next'
-import Image from 'next/image'
-import ForgotPasswordForm from './components/forgot-form'
+import ResetPasswordForm from './components/reset-form'
 
 export const metadata: Metadata = {
-  title: 'ByteShare: Forgot Password',
-  description: 'Forgot password page',
+  title: 'ByteShare: Reset Password',
+  description: 'Reset password page',
 }
 
-function ForgotPasswordPage() {
+function ResetPasswordPage() {
   return (
     <>
       <div className="md:hidden py-8"></div>
@@ -36,13 +35,13 @@ function ForgotPasswordPage() {
           <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
             <div className="flex flex-col space-y-2 text-center">
               <h1 className="text-2xl font-semibold tracking-tight">
-                Recover your account
+                Reset your password
               </h1>
               <p className="text-sm text-muted-foreground">
-                You will recieve a verification link on your email.
+                Enter your new password
               </p>
             </div>
-            <ForgotPasswordForm />
+            <ResetPasswordForm />
           </div>
         </div>
       </div>
@@ -50,4 +49,4 @@ function ForgotPasswordPage() {
   )
 }
 
-export default ForgotPasswordPage
+export default ResetPasswordPage

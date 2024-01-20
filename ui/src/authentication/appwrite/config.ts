@@ -16,6 +16,12 @@ type ForgotPassword = {
   email: string
 }
 
+type CompleteForgotPassword = {
+  userId: string
+  secret: string
+  password: string
+}
+
 const appwriteClient = new Client()
 appwriteClient.setEndpoint(conf.appwriteUrl).setProject(conf.appwriteProjectID)
 
@@ -69,7 +75,22 @@ export class AppwriteService {
 
   async initiateForgotPassword({ email }: ForgotPassword) {
     try {
-      return await account.createRecovery(email, 'http://localhost:3000')
+      const resetPasswordURL: string =
+        process.env.NEXT_PUBLIC_APP_URL + '/auth/reset-password'
+      return await account.createRecovery(email, resetPasswordURL)
+    } catch (err: any) {
+      console.log(err)
+    }
+  }
+
+  // TODO: make it to self login
+  async completeForgotPassword({
+    userId,
+    secret,
+    password,
+  }: CompleteForgotPassword) {
+    try {
+      return await account.updateRecovery(userId, secret, password, password)
     } catch (err: any) {
       console.log(err)
     }

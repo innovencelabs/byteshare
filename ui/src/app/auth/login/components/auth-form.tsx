@@ -83,6 +83,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               variant="link"
               onClick={(e) => {
                 e.preventDefault()
+                sessionStorage.setItem('FORGOT_PASSWORD_EMAIL', formData.email)
                 router.push('/auth/forgot-password')
               }}
             >

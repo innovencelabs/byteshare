@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import appwriteService from '@/authentication/appwrite/config'
 import { useRouter } from 'next/navigation'
-import React, { FormEvent, HTMLAttributes, useState } from 'react'
+import React, { FormEvent, HTMLAttributes, useState, useEffect } from 'react'
 import { useToast } from '@/components/ui/use-toast'
 
 interface ForgotPasswordFormProps extends HTMLAttributes<HTMLDivElement> {}
@@ -23,10 +23,20 @@ export function ForgotPasswordForm({
   })
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const forgotPasswordEmail = sessionStorage.getItem('FORGOT_PASSWORD_EMAIL')
+
+  useEffect(() => {
+    if (forgotPasswordEmail) {
+      setFormData({
+        email: forgotPasswordEmail,
+      })
+    }
+  }, [])
 
   const forgotPassword = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsLoading(true)
+    sessionStorage.setItem('FORGOT_PASSWORD_EMAIL', '')
     try {
       const response = await appwriteService.initiateForgotPassword(formData)
       if (response) {
