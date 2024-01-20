@@ -1,5 +1,4 @@
 import { Metadata } from 'next'
-import Image from 'next/image'
 import Link from 'next/link'
 
 import { cn } from '@/lib/utils'
@@ -11,7 +10,7 @@ export const metadata: Metadata = {
   description: 'Signup page',
 }
 
-export default function SignupPage() {
+function SignupPage() {
   return (
     <>
       <div className="md:hidden py-8"></div>
@@ -87,3 +86,5 @@ export default function SignupPage() {
     </>
   )
 }
+
+export default SignupPage
