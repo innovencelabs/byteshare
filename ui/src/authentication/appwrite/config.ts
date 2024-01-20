@@ -67,7 +67,7 @@ export class AppwriteService {
     try {
       return account.get()
     } catch (err: any) {
-      console.log(err)
+      throw err
     }
 
     return null
@@ -79,7 +79,7 @@ export class AppwriteService {
         process.env.NEXT_PUBLIC_APP_URL + '/auth/reset-password'
       return await account.createRecovery(email, resetPasswordURL)
     } catch (err: any) {
-      console.log(err)
+      throw err
     }
   }
 
@@ -92,7 +92,7 @@ export class AppwriteService {
     try {
       return await account.updateRecovery(userId, secret, password, password)
     } catch (err: any) {
-      console.log(err)
+      throw err
     }
   }
 
@@ -100,7 +100,7 @@ export class AppwriteService {
     try {
       return await account.deleteSession('current')
     } catch (err: any) {
-      console.log(err)
+      throw err
     }
   }
 }

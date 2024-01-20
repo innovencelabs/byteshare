@@ -24,7 +24,7 @@ export function ResetPasswordForm({
     password: '',
     confirmPassword: '',
   })
-  const [error, setError] = useState('')
+
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
   let userId = searchParams.get('userId')
@@ -72,8 +72,7 @@ export function ResetPasswordForm({
         router.push('/auth/login')
       }
     } catch (err: any) {
-      console.log(err)
-      setError(err.message)
+      toast.error(err.message)
     }
 
     setIsLoading(false)

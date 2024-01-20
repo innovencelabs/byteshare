@@ -20,7 +20,6 @@ export function ForgotPasswordForm({
   const [formData, setFormData] = useState({
     email: '',
   })
-  const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const forgotPasswordEmail = sessionStorage.getItem('FORGOT_PASSWORD_EMAIL')
 
@@ -43,8 +42,7 @@ export function ForgotPasswordForm({
         toast.info('Verification email has been sent.')
       }
     } catch (err: any) {
-      console.log(err)
-      setError(err.message)
+      toast.error(err.message)
     }
 
     setIsLoading(false)

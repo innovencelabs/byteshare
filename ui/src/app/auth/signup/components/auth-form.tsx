@@ -20,7 +20,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     password: '',
     name: '',
   })
-  const [error, setError] = useState('')
+
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const { setAuthorised } = useAuth()
@@ -50,7 +50,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         router.push('/')
       }
     } catch (err: any) {
-      setError(err.message)
+      toast.error(err.message)
     }
 
     setIsLoading(false)

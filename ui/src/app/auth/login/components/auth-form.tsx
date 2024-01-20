@@ -9,6 +9,7 @@ import appwriteService from '@/authentication/appwrite/config'
 import useAuth from '@/context/useAuth'
 import { useRouter } from 'next/navigation'
 import React, { FormEvent, HTMLAttributes, useState } from 'react'
+import { toast } from 'sonner'
 
 interface UserAuthFormProps extends HTMLAttributes<HTMLDivElement> {}
 
@@ -19,7 +20,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     email: '',
     password: '',
   })
-  const [error, setError] = useState('')
+
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const login = async (e: FormEvent<HTMLFormElement>) => {
@@ -32,8 +33,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         router.push('/')
       }
     } catch (err: any) {
-      console.log(err)
-      setError(err.message)
+      toast.error(err.message)
     }
 
     setIsLoading(false)
