@@ -20,6 +20,12 @@ type CompleteForgotPassword = {
   userId: string
   secret: string
   password: string
+  confirmPassword: string
+}
+
+type CompleteVerification = {
+  userId: string
+  secret: string
 }
 
 const appwriteClient = new Client()
@@ -49,6 +55,24 @@ export class AppwriteService {
   async login({ email, password }: LoginUserAccount) {
     try {
       return await account.createEmailSession(email, password)
+    } catch (err: any) {
+      throw err
+    }
+  }
+
+  async initiateVerification() {
+    try {
+      const verifyEmailURL: string =
+        process.env.NEXT_PUBLIC_APP_URL + '/auth/verify-email'
+      return await account.createVerification(verifyEmailURL)
+    } catch (err: any) {
+      throw err
+    }
+  }
+
+  async completeVerification({ userId, secret }: CompleteVerification) {
+    try {
+      return await account.updateVerification(userId, secret)
     } catch (err: any) {
       throw err
     }
@@ -88,9 +112,15 @@ export class AppwriteService {
     userId,
     secret,
     password,
+    confirmPassword,
   }: CompleteForgotPassword) {
     try {
-      return await account.updateRecovery(userId, secret, password, password)
+      return await account.updateRecovery(
+        userId,
+        secret,
+        password,
+        confirmPassword,
+      )
     } catch (err: any) {
       throw err
     }

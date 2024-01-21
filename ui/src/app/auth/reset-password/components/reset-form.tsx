@@ -43,23 +43,6 @@ export function ResetPasswordForm({
 
   const resetPassword = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (formData.password.length < 8) {
-      toast.error('Password should be atleast 8 character.')
-      return
-    }
-    if (!(formData.password === formData.confirmPassword)) {
-      toast.error('Password and Confirm password are not matching.')
-      return
-    }
-    const passwordRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
-    const isValidPassword = passwordRegex.test(formData.password)
-    if (!isValidPassword) {
-      toast.error(
-        'Password should contain atleast one Upper case, Number and Special character.',
-      )
-      return
-    }
 
     userId = searchParams.get('userId')
     secret = searchParams.get('secret')

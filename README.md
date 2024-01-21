@@ -80,4 +80,4 @@ uvicorn main:app --reload
 - **CI/CD**: Github actions
 
 ## Deployed version
-### Frontend - https://byteshare-ui.vercel.app/
+### Frontend - https://byteshare-ui.vercel.app
