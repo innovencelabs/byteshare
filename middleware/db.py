@@ -22,6 +22,7 @@ class DynamoDBManager:
                 return item
             else:
                 print("Item not found.")
+                return None
         except Exception as e:
             print(f"Error in reading row for key: {key}\nError: {e}")
 
@@ -46,7 +47,9 @@ class DynamoDBManager:
             )
             print(f"Item updated successfully: {response}")
         except Exception as e:
-            print(f"Error in updating row for key: {key} and update_date: {update_data}\nError: {e}")
+            print(
+                f"Error in updating row for key: {key} and update_date: {update_data}\nError: {e}"
+            )
 
     def delete_item(self, key):
         try:

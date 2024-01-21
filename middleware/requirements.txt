@@ -5,3 +5,4 @@ botocore==1.34.7
 six==1.16.0
 mangum==0.17.0
 qrcode==7.4.2
+python-dotenv==1.0.0

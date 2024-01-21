@@ -29,6 +29,9 @@ Resources:
         - AmazonS3FullAccess
         - AmazonDynamoDBFullAccess
         - AWSXrayWriteOnlyAccess
+      Environment:
+        Variables:
+          WEB_BASE_URL: 'https://byteshare-ui.vercel.app'
       Events:
         ApiEventWithProxy:
           Type: Api

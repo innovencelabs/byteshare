@@ -41,12 +41,13 @@ cp sample.env .env
 cd ..
 ```
 8. Fill the values in .env file for backend url and Appwrite creds
-9. Install Middleware(Backend) dependencies
+9. Install Middleware(Backend) dependencies and add .env file
 ```bash
 cd middleware
 python3 -m venv .venv
 source .venv/bin/activate
 pip3 install -r requirements.txt
+cp sample.env .env
 cd ..
 ```
 10. Run the application

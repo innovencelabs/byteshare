@@ -11,3 +11,4 @@ ui/.env
 todo.txt
 ui-bkp
 ui/.next
+middleware/.env
