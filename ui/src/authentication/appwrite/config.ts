@@ -82,16 +82,16 @@ export class AppwriteService {
     try {
       const data = await this.getCurrentUser()
       return Boolean(data)
-    } catch (err: any) {
-      throw err
-    }
+    } catch (err: any) {}
+
+    return false
   }
 
   async getCurrentUser() {
     try {
       return account.get()
     } catch (err: any) {
-      throw err
+      console.log('GetCurrentUser Error: ' + err)
     }
 
     return null
@@ -130,7 +130,7 @@ export class AppwriteService {
     try {
       return await account.deleteSession('current')
     } catch (err: any) {
-      throw err
+      console.log('Logout Error: ' + err)
     }
   }
 }

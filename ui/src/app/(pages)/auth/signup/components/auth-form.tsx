@@ -7,14 +7,15 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import appwriteService from '@/authentication/appwrite/config'
 import useAuth from '@/context/useAuth'
-import { useRouter } from 'next/navigation'
-import React, { FormEvent, HTMLAttributes, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import React, { FormEvent, HTMLAttributes, useCallback, useState } from 'react'
 import { toast } from 'sonner'
 
 interface UserAuthFormProps extends HTMLAttributes<HTMLDivElement> {}
 
 export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -25,21 +26,18 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
 
   const { setAuthorised } = useAuth()
 
+  const createQueryString = useCallback(
+    (name: string, value: string) => {
+      const params = new URLSearchParams(searchParams.toString())
+      params.set(name, value)
+
+      return params.toString()
+    },
+    [searchParams],
+  )
+
   const create = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (formData.password.length < 8) {
-      toast.error('Password should be atleast 8 character.')
-      return
-    }
-    const passwordRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
-    const isValidPassword = passwordRegex.test(formData.password)
-    if (!isValidPassword) {
-      toast.error(
-        'Password should contain atleast one Upper case, Number and Special character.',
-      )
-      return
-    }
 
     setIsLoading(true)
 
@@ -47,7 +45,8 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       const userData = await appwriteService.createUserAccount(formData)
       if (userData) {
         setAuthorised(true)
-        router.push('/')
+        await appwriteService.initiateVerification()
+        router.push('/' + '?' + createQueryString('from', 'signup'))
       }
     } catch (err: any) {
       toast.error(err.message)
