@@ -275,19 +275,19 @@ def get_file_url_return_name_link(upload_id: str):
 
     file_name = upload_metadata["s3_file_name"]
     file_path = upload_id + "/" + file_name
-    upload_expiration_time = 86400  # 1 days
+    download_expiration_time = 21600  # 6 hours
 
     # Generate share presigned link
     file_url = s3_client.generate_presigned_url(
         "get_object",
         Params={"Bucket": S3_BUCKET_NAME, "Key": file_path},
-        ExpiresIn=upload_expiration_time,
+        ExpiresIn=download_expiration_time,
     )
 
     keys = {"upload_id": upload_id}
     update_data = {
         "download_count": download_count + 1,
-        "updated_at": time_now.isoformat()
+        "updated_at": time_now.isoformat(),
     }
     dynamodb.update_item(keys, update_data)
 
