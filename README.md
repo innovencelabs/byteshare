@@ -1,18 +1,24 @@
-#
 
-<div align="center">
-    <img src="https://github.com/ambujraj/ByteShare/assets/29935993/94a01fc5-a75f-4e46-a163-a0443f234da3" alt="logo">
-</div>
+<h1 align="center">ByteShare</h1>
 
-#
+<p align="center">
+    An open-source file sharing app.
+</p>
+<p align="center">
+    <img alt="GitHub License" src="https://img.shields.io/github/license/ambujraj/ByteShare">
+    <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/ambujraj/byteShare/deploy-backend.yaml">
+    <img alt="GitHub closed pull requests" src="https://img.shields.io/github/issues-pr-closed/ambujraj/ByteShare">
+    <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/t/ambujraj/ByteShare">
+    <img alt="Static Badge" src="https://img.shields.io/badge/Pricing-Free-green">
+    <img alt="Static Badge" src="https://img.shields.io/badge/Join_Us-Contribute-red">
+</p>
 
-##### File sharing app that can share large files to N number of people
 
-## Highlights
-- Large files can be shared seamlessly
-- User will get a QR and a sharing link which they can share
-- Active link expiry time
-- File security
+## Overview
+Meet ByteShare, your go-to platform for seamless and secure file sharing. Designed for simplicity, ByteShare offers easy generation of shareable links and QR codes, making file sharing a breeze. Whether it's a single document or a collection of files, ByteShare streamlines the process, ensuring a user-friendly experience for all.
+
+## Repo Beat
+![Alt](https://repobeats.axiom.co/api/embed/2e1732e935eda7db6a2af19f0ac29b6f6aa6fc88.svg "Repobeats analytics image")
   
 ## Local Setup
 1. Clone the repository
@@ -37,7 +43,7 @@ terraform apply
 ```bash
 cd ui
 npm install
-cp sample.env .env
+cp .env.example .env
 cd ..
 ```
 8. Fill the values in .env file for backend url and Appwrite creds
@@ -47,7 +53,7 @@ cd middleware
 python3 -m venv .venv
 source .venv/bin/activate
 pip3 install -r requirements.txt
-cp sample.env .env
+cp .env.example .env
 cd ..
 ```
 10. Run the application
@@ -66,18 +72,19 @@ uvicorn main:app --reload
 ![architecture](https://github.com/ambujraj/ByteShare/assets/29935993/24672635-edc3-4cf1-beb8-76a4c3f70001)
 
 
-## Technologies
-- 🖥️ **UI**: NextJS
-- ⚙️ **Middleware**: FastAPI
-- 💾 **DB**: AWS DynamoDB
-- 📦 **Storage**: AWS S3
-- 📒 **Logging**: AWS Cloudwatch
-- 🔐 **Auth**: Appwrite
+## Built with
+- NextJS
+- ShadCN (TailwindCSS)
+- FastAPI
+- AWS DynamoDB
+- AWS S3
+- AWS Cloudwatch
+- Appwrite
 
 ## Deployment
-- **UI**: Vercel
-- **Middleware**: AWS API Gateway and Lambda via SAM deployment
-- **CI/CD**: Github actions
+- Vercel
+- AWS API Gateway and Lambda via SAM deployment
+- Github actions
 
 ## Deployed version
 ### Frontend - https://byteshare-ui.vercel.app
