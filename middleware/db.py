@@ -1,3 +1,4 @@
+from fastapi import HTTPException
 import boto3
 
 
@@ -6,6 +7,18 @@ class DynamoDBManager:
         self.table_name = table_name
         self.dynamodb = boto3.resource("dynamodb")
         self.table = self.dynamodb.Table(table_name)
+
+    def health_check(self):
+        try:
+            response = self.table.scan()
+
+            if "Items" not in response:
+                raise HTTPException(
+                    status_code=503, detail="Database connection failed"
+                )
+        except Exception as e:
+            print(f"Database connection failed: {str(e)}")
+            raise HTTPException(status_code=503, detail="Database connection failed")
 
     def create_item(self, item):
         try:

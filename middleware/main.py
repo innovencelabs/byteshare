@@ -2,11 +2,11 @@ from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
 from db import DynamoDBManager
+from storage.s3_cloudfront import S3CloudfrontManager
 from enum import Enum as PythonEnum
 from datetime import datetime, timedelta, timezone
 from pydantic import BaseModel
 from dotenv import load_dotenv
-import boto3
 import uuid
 import qrcode
 import os
@@ -28,9 +28,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# S3 client
-s3_client = boto3.client("s3")
+# Storage
 S3_BUCKET_NAME = "byteshare-blob"
+storage = S3CloudfrontManager(S3_BUCKET_NAME)
 
 # DynamoDB
 table_name = "byteshare-upload-metadata"
@@ -67,18 +67,8 @@ def health_check():
     - Status of application and external services
     """
 
-    try:
-        dynamodb = boto3.client("dynamodb")
-        dynamodb.list_tables()
-    except Exception as e:
-        print(f"Database connection failed: {str(e)}")
-        raise HTTPException(status_code=503, detail="Database connection failed")
-
-    try:
-        response = s3_client.list_objects_v2(Bucket=S3_BUCKET_NAME)
-    except Exception as e:
-        print(f"S3 connection failed: {str(e)}")
-        raise HTTPException(status_code=503, detail="S3 connection failed")
+    dynamodb.health_check()
+    storage.health_check()
 
     return {"status": "ok", "details": "Service is running"}
 
@@ -105,11 +95,11 @@ def add_subscriber_return_done(body: Subscribe):
 
 
 @app.post("/initiateUpload")
-def initiate_upload_return_presigned_url(body: InitiateUpload, request: Request):
+def initiate_upload_return_upload_url(body: InitiateUpload, request: Request):
     """
-    Initiate upload to S3.
-    checks for file size under limit for current user type, creates presigned URL for upload and add to DB.
-    Stores the file as <UPLOAD_ID>/<FILE_NAME> in S3
+    Initiate upload to Storage.
+    checks for file size under limit for current user type, creates upload URL for upload and add to DB.
+    Stores the file as <UPLOAD_ID>/<FILE_NAME> in Storage
 
     Parameters:
     - file_name: name of the file to be uploaded
@@ -118,7 +108,7 @@ def initiate_upload_return_presigned_url(body: InitiateUpload, request: Request)
     - content-length: file size of the uploaded file
 
     Returns:
-    - Presigned URL for upload
+    - Upload URL for upload
     """
 
     content_length = request.headers.get("content-length")
@@ -134,12 +124,7 @@ def initiate_upload_return_presigned_url(body: InitiateUpload, request: Request)
     upload_id = uuid.uuid4().hex
     file_path = upload_id + "/" + file_name
     expiration_time = 10800
-    presigned_url = s3_client.generate_presigned_url(
-        "put_object",
-        Params={"Bucket": S3_BUCKET_NAME, "Key": file_path},
-        ExpiresIn=expiration_time,
-        HttpMethod="PUT",
-    )
+    upload_url = storage.generate_upload_url(file_path, expiration_time)
 
     time_now = datetime.now(timezone.utc)
 
@@ -150,22 +135,22 @@ def initiate_upload_return_presigned_url(body: InitiateUpload, request: Request)
         "creator_ip": body.creator_ip,
         "download_count": 0,
         "max_download": 5,
-        "s3_file_name": file_name,
-        "s3_qr_name": "",
+        "storage_file_name": file_name,
+        "storage_qr_name": "",
         "expires_at": "",
         "updated_at": "",
         "created_at": time_now.isoformat(),
     }
     dynamodb.create_item(upload_metadata)
 
-    return {"presigned_url": presigned_url, "upload_id": upload_id}
+    return {"upload_url": upload_url, "upload_id": upload_id}
 
 
 @app.post("/postUpload/{upload_id}")
 def post_upload_return_link_qr(upload_id: str):
     """
-    Post upload to S3.
-    Update status to DB, check for the file present in S3, generate sharable link and QR
+    Post upload to Storage.
+    Update status to DB, check for the file present in Storage, generate sharable link and QR
 
     Parameters:
     - upload_id: upload id of the upload process
@@ -177,22 +162,14 @@ def post_upload_return_link_qr(upload_id: str):
     upload_metadata = dynamodb.read_item({"upload_id": upload_id})
     if upload_metadata == None:
         raise HTTPException(status_code=400, detail="Upload ID not valid")
-    file_name = upload_metadata["s3_file_name"]
+    file_name = upload_metadata["storage_file_name"]
     file_path = upload_id + "/" + file_name
     upload_expiration_time = 604800  # 7 days
 
-    # Check for file present in S3
-    try:
-        response = s3_client.head_object(Bucket=S3_BUCKET_NAME, Key=file_path)
-    except s3_client.exceptions.ClientError as e:
-        if e.response["Error"]["Code"] == "404":
-            print(f"File '{file_path}' does not exist in bucket '{S3_BUCKET_NAME}'")
-            raise HTTPException(status_code=400, detail="Upload not found")
-        else:
-            print("Error in checking availability in S3: " + e)
-            raise HTTPException(
-                status_code=500, detail="Internal error connecting to S3"
-            )
+    # Check for file present in Storage
+    is_file_present = storage.is_file_present(file_path)
+    if not is_file_present:
+        raise HTTPException(status_code=400, detail="Upload not found")
 
     # Generate share link
     file_url = web_base_url + "/share/" + upload_id
@@ -216,47 +193,42 @@ def post_upload_return_link_qr(upload_id: str):
     img.save(temp_qr_path)
 
     qr_name = "QRCode.png"
-    qr_s3_file_name = upload_id + "/" + qr_name
+    qr_storage_file_name = upload_id + "/" + qr_name
 
-    # Upload the QR code to S3
-    try:
-        s3_client.upload_file(temp_qr_path, S3_BUCKET_NAME, qr_s3_file_name)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
+    # Upload the QR code to Storage
+    storage.upload_file(temp_qr_path, qr_storage_file_name)
 
     # Remove the local file
     os.remove(temp_qr_path)
 
-    # Generate presigned URL for the uploaded QR code
-    qr_presigned_url = s3_client.generate_presigned_url(
-        "get_object",
-        Params={"Bucket": S3_BUCKET_NAME, "Key": qr_s3_file_name},
-        ExpiresIn=upload_expiration_time,
+    # Generate Download URL for the uploaded QR code
+    qr_download_url = storage.generate_download_url(
+        qr_storage_file_name, upload_expiration_time
     )
 
     keys = {"upload_id": upload_id}
     update_data = {
         "status": StatusEnum.uploaded.name,
-        "s3_qr_name": qr_name,
+        "storage_qr_name": qr_name,
         "expires_at": expires_at.isoformat(),
         "updated_at": time_now.isoformat(),
     }
     dynamodb.update_item(keys, update_data)
 
-    return {"url": file_url, "QR": qr_presigned_url}
+    return {"url": file_url, "QR": qr_download_url}
 
 
-@app.get("/fileURL/{upload_id}")
+@app.get("/download/{upload_id}")
 def get_file_url_return_name_link(upload_id: str):
     """
-    Get presigned file url from S3.
+    Get download url from Storage.
     Checks for the expires at, download count < max download and updates the count in DB
 
     Parameters:
     - upload_id: upload id of the upload process
 
     Returns:
-    - File name and presigned url
+    - File name and download url
     """
 
     time_now = datetime.now(timezone.utc).isoformat()
@@ -273,16 +245,12 @@ def get_file_url_return_name_link(upload_id: str):
     if download_count >= max_count:
         raise HTTPException(status_code=400, detail="Download limit exceeded")
 
-    file_name = upload_metadata["s3_file_name"]
+    file_name = upload_metadata["storage_file_name"]
     file_path = upload_id + "/" + file_name
     download_expiration_time = 21600  # 6 hours
 
-    # Generate share presigned link
-    file_url = s3_client.generate_presigned_url(
-        "get_object",
-        Params={"Bucket": S3_BUCKET_NAME, "Key": file_path},
-        ExpiresIn=download_expiration_time,
-    )
+    # Generate share download link
+    file_url = storage.generate_download_url(file_path, download_expiration_time)
 
     keys = {"upload_id": upload_id}
     update_data = {
