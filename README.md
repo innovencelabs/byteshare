@@ -69,7 +69,7 @@ uvicorn main:app --reload
 #### By default, UI runs on port **3000** and Middleware runs on port **8000**
 
 ## Architecture
-![architecture](https://github.com/ambujraj/ByteShare/assets/29935993/24672635-edc3-4cf1-beb8-76a4c3f70001)
+![Architecture](https://github.com/ambujraj/ByteShare/assets/29935993/e1e1b007-e292-4031-848d-4af3791c5402)
 
 
 ## Built with
