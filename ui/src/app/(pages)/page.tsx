@@ -66,7 +66,7 @@ export default function Home() {
       setUploadSize(
         (totalSize / (1024 * 1024 * 1024)).toFixed(2) +
           ' GB' +
-          ', FILE SIZE EXCEEDED',
+          ') (FILE SIZE EXCEEDED',
       )
       setSubmitDisabled(true)
     } else if (totalSize >= 1024 * 1024 * 1024) {
