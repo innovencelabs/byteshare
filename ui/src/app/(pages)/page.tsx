@@ -26,7 +26,7 @@ export default function Home() {
   const searchParams = useSearchParams()
   const from = searchParams.get('from')
   const [uploadSize, setUploadSize] = useState('0')
-  const [submitDisabled, setSubmitDisabled] = useState(false)
+  const [submitDisabled, setSubmitDisabled] = useState(true)
 
   useEffect(() => {
     appwriteService.getCurrentUser().then((user) => {
@@ -81,6 +81,10 @@ export default function Home() {
     setSubmitDisabled(false)
   }
 
+  const handleUploadSubmit = () => {
+    console.log('Starts here')
+  }
+
   return (
     <div className="h-screen flex flex-col justify-between">
       <Header authorised={authorised} />
@@ -110,7 +114,7 @@ export default function Home() {
                 You can select multiple files to share upto 2GB.
               </DrawerDescription>
             </DrawerHeader>
-            <form onSubmit={() => console.log('Upload')}>
+            <form onSubmit={handleUploadSubmit}>
               {' '}
               <div className="p-4">
                 <Label htmlFor="files">Files (Size: {uploadSize})</Label>
@@ -121,13 +125,15 @@ export default function Home() {
                   onChange={handleUploadChange}
                 />
               </div>
+              <DrawerFooter>
+                <Button disabled={submitDisabled} type="submit">
+                  Submit
+                </Button>
+                <DrawerClose asChild>
+                  <Button variant="ghost">Close</Button>
+                </DrawerClose>
+              </DrawerFooter>
             </form>
-            <DrawerFooter>
-              <Button disabled={submitDisabled}>Submit</Button>
-              <DrawerClose asChild>
-                <Button variant="ghost">Close</Button>
-              </DrawerClose>
-            </DrawerFooter>
           </div>
         </DrawerContent>
       </Drawer>
