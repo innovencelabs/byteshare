@@ -27,6 +27,7 @@ export default function Home() {
   const from = searchParams.get('from')
   const [uploadSize, setUploadSize] = useState('0')
   const [submitDisabled, setSubmitDisabled] = useState(true)
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
   useEffect(() => {
     appwriteService.getCurrentUser().then((user) => {
@@ -60,6 +61,7 @@ export default function Home() {
     }
     if (totalSize == 0) {
       setSubmitDisabled(true)
+      setUploadSize('0')
     } else if (totalSize >= 2 * 1024 * 1024 * 1024) {
       setUploadSize(
         (totalSize / (1024 * 1024 * 1024)).toFixed(2) +
@@ -81,18 +83,20 @@ export default function Home() {
   const handleDrawerClose = () => {
     setUploadSize('0')
     setSubmitDisabled(true)
+    setIsDrawerOpen(false)
   }
 
-  const handleUploadSubmit = () => {
+  const handleUploadSubmit = (event) => {
+    event.preventDefault()
     console.log('Starts here')
   }
 
   return (
     <div className="h-screen flex flex-col justify-between">
       <Header authorised={authorised} />
-      <Drawer onClose={handleDrawerClose}>
+      <Drawer open={isDrawerOpen} onClose={handleDrawerClose}>
         <div className="flex-grow flex items-center justify-center z-10">
-          <DrawerTrigger asChild>
+          <DrawerTrigger asChild onClick={() => setIsDrawerOpen(!isDrawerOpen)}>
             <Button
               className="font-semibold text-3xl shadow-lg px-20 py-20 bg-blue-100 text-blue-800 hover:bg-slate-200 hover:text-blue-800 rounded-2xl"
               onClick={() => handleSend()}
@@ -131,7 +135,7 @@ export default function Home() {
                 <Button disabled={submitDisabled} type="submit">
                   Submit
                 </Button>
-                <DrawerClose asChild>
+                <DrawerClose asChild onClick={() => setIsDrawerOpen(false)}>
                   <Button variant="ghost">Close</Button>
                 </DrawerClose>
               </DrawerFooter>
