@@ -58,7 +58,9 @@ export default function Home() {
     for (const file of selectedFiles) {
       totalSize += file.size
     }
-    if (totalSize >= 2 * 1024 * 1024 * 1024) {
+    if (totalSize == 0) {
+      setSubmitDisabled(true)
+    } else if (totalSize >= 2 * 1024 * 1024 * 1024) {
       setUploadSize(
         (totalSize / (1024 * 1024 * 1024)).toFixed(2) +
           ' GB' +
@@ -78,7 +80,7 @@ export default function Home() {
 
   const handleDrawerClose = () => {
     setUploadSize('0')
-    setSubmitDisabled(false)
+    setSubmitDisabled(true)
   }
 
   const handleUploadSubmit = () => {
@@ -92,7 +94,7 @@ export default function Home() {
         <div className="flex-grow flex items-center justify-center z-10">
           <DrawerTrigger asChild>
             <Button
-              className="font-semibold text-3xl shadow-lg px-20 py-20 bg-slate-200 text-blue-800 hover:bg-blue-100 hover:text-blue-800 rounded-2xl"
+              className="font-semibold text-3xl shadow-lg px-20 py-20 bg-blue-100 text-blue-800 hover:bg-slate-200 hover:text-blue-800 rounded-2xl"
               onClick={() => handleSend()}
             >
               Send
