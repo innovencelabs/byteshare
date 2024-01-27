@@ -28,6 +28,7 @@ export default function Home() {
   const [uploadSize, setUploadSize] = useState('0')
   const [submitDisabled, setSubmitDisabled] = useState(true)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  const [selectedFiles, setSelectedFiles] = useState(null)
 
   useEffect(() => {
     appwriteService.getCurrentUser().then((user) => {
@@ -52,11 +53,11 @@ export default function Home() {
     }
   }
 
-  const handleUploadChange = (e) => {
+  const handleUploadChange = (event) => {
     setSubmitDisabled(false)
-    const selectedFiles = e.target.files
+    const files = event.target.files
     let totalSize = 0
-    for (const file of selectedFiles) {
+    for (const file of files) {
       totalSize += file.size
     }
     if (totalSize == 0) {
@@ -78,6 +79,8 @@ export default function Home() {
     } else {
       setUploadSize(totalSize + ' Bytes')
     }
+
+    setSelectedFiles(files)
   }
 
   const handleDrawerClose = () => {
@@ -86,9 +89,41 @@ export default function Home() {
     setIsDrawerOpen(false)
   }
 
-  const handleUploadSubmit = (event) => {
+  const handleUploadSubmit = async (event) => {
     event.preventDefault()
     console.log('Starts here')
+    let totalSize = 0
+    for (const file of selectedFiles) {
+      totalSize += file.size
+    }
+    if (totalSize >= 2 * 1024 * 1024 * 1024) {
+      toast.error('File size exceeded.')
+      return
+    }
+
+    const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+
+    if (selectedFiles) {
+      try {
+        const firstFileJSON = {
+          file_name: selectedFiles[0].name,
+          creator_email: 'ambujm143@gmail.com',
+          creator_ip: '127.0.0.1',
+        }
+        const response = await fetch(apiBaseURL + '/initiateUpload', {
+          method: 'POST',
+          body: JSON.stringify(firstFileJSON),
+          headers: {
+            'File-Length': selectedFiles[0].size,
+            'Content-Type': 'application/json',
+          },
+        })
+        const data = await response.json()
+        console.log(data.upload_id)
+      } catch (e) {
+        console.log(e)
+      }
+    }
   }
 
   return (
