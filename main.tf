@@ -7,6 +7,17 @@ resource "aws_s3_bucket" "byteshare-blob" {
   bucket = "byteshare-blob"
 }
 
+resource "aws_s3_bucket_cors_configuration" "allow_upload" {
+  bucket = "byteshare-blob"
+
+  cors_rule {
+    allowed_headers = ["*"]
+    allowed_methods = ["PUT"]
+    allowed_origins = ["*"]
+    expose_headers = ["ETag", "Content-Length", "Content-Type"]
+  }
+}
+
 # DynamoDB table
 resource "aws_dynamodb_table" "byteshare-upload-metadata" {
   name           = "byteshare-upload-metadata"

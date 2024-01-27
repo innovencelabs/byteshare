@@ -28,10 +28,15 @@ export default function Home() {
   const [uploadSize, setUploadSize] = useState('0')
   const [submitDisabled, setSubmitDisabled] = useState(true)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-  const [selectedFiles, setSelectedFiles] = useState(null)
+  const [selectedFiles, setSelectedFiles] = useState([])
+  const [userEmail, setUserEmail] = useState('')
+  const [progress, setProgress] = useState(0)
 
   useEffect(() => {
     appwriteService.getCurrentUser().then((user) => {
+      if (user) {
+        setUserEmail(user.email)
+      }
       if (user && from == 'signup' && authorised && !user?.emailVerification) {
         toast.info(
           'Please check your email for a verification link to complete your registration.',
@@ -80,50 +85,145 @@ export default function Home() {
       setUploadSize(totalSize + ' Bytes')
     }
 
-    setSelectedFiles(files)
+    setSelectedFiles(Array.from(files))
   }
 
   const handleDrawerClose = () => {
     setUploadSize('0')
     setSubmitDisabled(true)
     setIsDrawerOpen(false)
+    setSelectedFiles([])
   }
 
   const handleUploadSubmit = async (event) => {
     event.preventDefault()
     console.log('Starts here')
     let totalSize = 0
+    let fileNames = []
     for (const file of selectedFiles) {
       totalSize += file.size
+      fileNames.push(file.name)
     }
     if (totalSize >= 2 * 1024 * 1024 * 1024) {
       toast.error('File size exceeded.')
       return
     }
 
-    const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
-
-    if (selectedFiles) {
+    if (selectedFiles.length > 0) {
       try {
-        const firstFileJSON = {
-          file_name: selectedFiles[0].name,
-          creator_email: 'ambujm143@gmail.com',
-          creator_ip: '127.0.0.1',
+        let firstFileUploadResponse = await uploadFirstFile(selectedFiles[0])
+        const continueID = firstFileUploadResponse.continueID
+        const uploadID = firstFileUploadResponse.uploadID
+
+        const remainingFiles = selectedFiles.slice(1)
+
+        const chunkSize = 3
+        for (let i = 0; i < remainingFiles.length; i += chunkSize) {
+          const chunk = remainingFiles.slice(i, i + chunkSize)
+
+          await Promise.all(
+            chunk.map((file) => uploadFile(file, uploadID, continueID)),
+          )
+
+          setProgress(((i + chunkSize) / remainingFiles.length) * 100)
         }
-        const response = await fetch(apiBaseURL + '/initiateUpload', {
-          method: 'POST',
-          body: JSON.stringify(firstFileJSON),
-          headers: {
-            'File-Length': selectedFiles[0].size,
-            'Content-Type': 'application/json',
-          },
-        })
-        const data = await response.json()
-        console.log(data.upload_id)
+
+        const postUploadResponse = await postUpload(fileNames, uploadID)
+        const shareURL = postUploadResponse.shareURL
+        const shareQR = postUploadResponse.shareQR
+
+        // TODO: do more for the data
+        console.log(uploadID)
       } catch (e) {
-        console.log(e)
+        toast.error('Something went wrong.')
+        return
       }
     }
+  }
+
+  const uploadFile = async (file, uploadID, continueID) => {
+    const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+
+    const fileJSON = {
+      file_name: file.name,
+      continue_id: continueID,
+    }
+    const initiateUploadResponse = await fetch(
+      apiBaseURL + '/initiateUpload' + '/' + uploadID,
+      {
+        method: 'POST',
+        body: JSON.stringify(fileJSON),
+        headers: {
+          'File-Length': file.size,
+          'Content-Type': 'application/json',
+        },
+      },
+    )
+    const data = await initiateUploadResponse.json()
+    const uploadURL = data.upload_url
+
+    const uploadResponse = await fetch(uploadURL, {
+      method: 'PUT',
+      body: file,
+      headers: {
+        'Content-Type': file.type,
+      },
+    })
+  }
+
+  const uploadFirstFile = async (file) => {
+    const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+
+    const firstFileJSON = {
+      file_name: file.name,
+      creator_email: userEmail,
+      creator_ip: '127.0.0.1',
+    }
+    const initiateUploadResponse = await fetch(apiBaseURL + '/initiateUpload', {
+      method: 'POST',
+      body: JSON.stringify(firstFileJSON),
+      headers: {
+        'File-Length': file.size,
+        'Content-Type': 'application/json',
+      },
+    })
+    const data = await initiateUploadResponse.json()
+    const uploadURL = data.upload_url
+    const continueID = data.continue_id
+    const uploadID = data.upload_id
+
+    const uploadResponse = await fetch(uploadURL, {
+      method: 'PUT',
+      body: file,
+      headers: {
+        'Content-Type': file.type,
+      },
+    })
+
+    return { uploadID, continueID }
+  }
+
+  const postUpload = async (fileNames, uploadID) => {
+    const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+
+    const fileJSON = {
+      file_names: fileNames,
+    }
+    const postUploadResponse = await fetch(
+      apiBaseURL + '/postUpload' + '/' + uploadID,
+      {
+        method: 'POST',
+        body: JSON.stringify(fileJSON),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    )
+    const data = await postUploadResponse.json()
+    const shareURL = data.url
+    const shareQR = data.QR
+
+    return { shareURL, shareQR }
   }
 
   return (
