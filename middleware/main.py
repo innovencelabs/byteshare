@@ -57,8 +57,6 @@ class InitiateUpload(BaseModel):
 class ContinueUpload(BaseModel):
     file_name: str
     continue_id: str
-    creator_email: str
-    creator_ip: str
 
 
 class PostUpload(BaseModel):
@@ -121,15 +119,15 @@ def initiate_upload_return_upload_url(body: InitiateUpload, request: Request):
     Returns:
     - Upload URL for upload and Upload id
     """
-
+    client_ip = request.headers.get("x-forwarded-for") or request.client.host
     content_length = int(request.headers.get("File-Length"))
     if content_length is None:
-        raise HTTPException(status_code=400, detail="file-Length header not found")
+        raise HTTPException(status_code=400, detail="file-Length header not found.")
 
     max_file_size = 2 * 1024 * 1024 * 1024  # 2GB
 
     if int(content_length) > max_file_size:
-        raise HTTPException(status_code=400, detail="File size exceeds the limit")
+        raise HTTPException(status_code=400, detail="File size exceeds the limit.")
 
     file_name = body.file_name
     upload_id = uuid.uuid4().hex
@@ -144,7 +142,7 @@ def initiate_upload_return_upload_url(body: InitiateUpload, request: Request):
         "upload_id": upload_id,
         "status": StatusEnum.initiated.name,
         "creator_email": body.creator_email,
-        "creator_ip": body.creator_ip,
+        "creator_ip": client_ip,
         "download_count": 0,
         "max_download": 5,
         "continue_id": continue_id,
