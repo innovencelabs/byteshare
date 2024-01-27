@@ -93,11 +93,12 @@ export default function Home() {
     setSubmitDisabled(true)
     setIsDrawerOpen(false)
     setSelectedFiles([])
+    setProgress(0)
   }
 
   const handleUploadSubmit = async (event) => {
     event.preventDefault()
-    console.log('Starts here')
+    setProgress(0)
     let totalSize = 0
     let fileNames = []
     for (const file of selectedFiles) {
@@ -116,16 +117,22 @@ export default function Home() {
         const uploadID = firstFileUploadResponse.uploadID
 
         const remainingFiles = selectedFiles.slice(1)
+        setProgress((1 / remainingFiles.length) * 100)
 
-        const chunkSize = 3
-        for (let i = 0; i < remainingFiles.length; i += chunkSize) {
-          const chunk = remainingFiles.slice(i, i + chunkSize)
+        // const chunkSize = 3
+        // for (let i = 0; i < remainingFiles.length; i += chunkSize) {
+        //   const chunk = remainingFiles.slice(i, i + chunkSize)
 
-          await Promise.all(
-            chunk.map((file) => uploadFile(file, uploadID, continueID)),
-          )
+        //   await Promise.all(
+        //     chunk.map((file) => uploadFile(file, uploadID, continueID)),
+        //   )
 
-          setProgress(((i + chunkSize) / remainingFiles.length) * 100)
+        //   setProgress(((i + chunkSize) / remainingFiles.length) * 100)
+        // }
+
+        for (let i = 0; i < remainingFiles.length; i++) {
+          await uploadFile(remainingFiles[i], uploadID, continueID)
+          setProgress(((i + 1) / selectedFiles.length) * 100)
         }
 
         const postUploadResponse = await postUpload(fileNames, uploadID)
@@ -135,6 +142,7 @@ export default function Home() {
         // TODO: do more for the data
         console.log(uploadID)
       } catch (e) {
+        setIsDrawerOpen(false)
         toast.error('Something went wrong.')
         return
       }
@@ -148,6 +156,7 @@ export default function Home() {
       file_name: file.name,
       continue_id: continueID,
     }
+
     const initiateUploadResponse = await fetch(
       apiBaseURL + '/initiateUpload' + '/' + uploadID,
       {
@@ -179,6 +188,7 @@ export default function Home() {
       creator_email: userEmail,
       creator_ip: '127.0.0.1',
     }
+
     const initiateUploadResponse = await fetch(apiBaseURL + '/initiateUpload', {
       method: 'POST',
       body: JSON.stringify(firstFileJSON),
