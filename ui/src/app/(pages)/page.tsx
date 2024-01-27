@@ -19,6 +19,8 @@ import {
 } from '@/components/ui/drawer'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Progress } from '@/components/ui/progress'
+import { CheckIcon, CopyIcon } from '@radix-ui/react-icons'
 
 export default function Home() {
   const router = useRouter()
@@ -31,6 +33,11 @@ export default function Home() {
   const [selectedFiles, setSelectedFiles] = useState([])
   const [userEmail, setUserEmail] = useState('')
   const [progress, setProgress] = useState(0)
+  const [uploading, setUploading] = useState(false)
+  const [uploaded, setUploaded] = useState(false)
+  const [shareURL, setShareURL] = useState('')
+  const [shareQR, setShareQR] = useState('')
+  const [isCopied, setIsCopied] = useState(false)
 
   useEffect(() => {
     appwriteService.getCurrentUser().then((user) => {
@@ -94,11 +101,22 @@ export default function Home() {
     setIsDrawerOpen(false)
     setSelectedFiles([])
     setProgress(0)
+    setUploading(false)
+    setUploaded(false)
+    setShareQR('')
+    setShareURL('')
+    setIsCopied(false)
+  }
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(shareURL)
+    setIsCopied(true)
   }
 
   const handleUploadSubmit = async (event) => {
     event.preventDefault()
     setProgress(0)
+    setSubmitDisabled(true)
     let totalSize = 0
     let fileNames = []
     for (const file of selectedFiles) {
@@ -109,7 +127,11 @@ export default function Home() {
       toast.error('File size exceeded.')
       return
     }
-
+    setUploading(true)
+    setUploaded(false)
+    if (selectedFiles.length == 1) {
+      setProgress(42)
+    }
     if (selectedFiles.length > 0) {
       try {
         let firstFileUploadResponse = await uploadFirstFile(selectedFiles[0])
@@ -117,7 +139,7 @@ export default function Home() {
         const uploadID = firstFileUploadResponse.uploadID
 
         const remainingFiles = selectedFiles.slice(1)
-        setProgress((1 / remainingFiles.length) * 100)
+        setProgress((1 / selectedFiles.length) * 100)
 
         // const chunkSize = 3
         // for (let i = 0; i < remainingFiles.length; i += chunkSize) {
@@ -139,10 +161,23 @@ export default function Home() {
         const shareURL = postUploadResponse.shareURL
         const shareQR = postUploadResponse.shareQR
 
-        // TODO: do more for the data
-        console.log(uploadID)
+        setUploading(false)
+        setUploaded(true)
+        setShareQR(shareQR)
+        setShareURL(shareURL)
+        setSubmitDisabled(true)
+        setUploadSize('0')
+        setSelectedFiles([])
       } catch (e) {
         setIsDrawerOpen(false)
+        setUploading(false)
+        setUploaded(false)
+        setShareQR('')
+        setShareURL('')
+        setSubmitDisabled(true)
+        setUploadSize('0')
+        setSelectedFiles([])
+        setIsCopied(false)
         toast.error('Something went wrong.')
         return
       }
@@ -262,29 +297,79 @@ export default function Home() {
             <DrawerHeader>
               <DrawerTitle className="text-center">Send Files</DrawerTitle>
               <DrawerDescription className="text-center">
-                You can select multiple files to share upto 2GB.
+                {uploaded
+                  ? 'Congratulation! Your share link has been generated.'
+                  : 'You can select multiple files to share upto 2GB.'}
               </DrawerDescription>
-            </DrawerHeader>
-            <form onSubmit={handleUploadSubmit}>
-              {' '}
-              <div className="p-4">
-                <Label htmlFor="files">Files (Size: {uploadSize})</Label>
-                <Input
-                  id="files"
-                  type="file"
-                  multiple
-                  onChange={handleUploadChange}
-                />
+            </DrawerHeader>{' '}
+            {!uploading && !uploaded ? (
+              <form onSubmit={handleUploadSubmit}>
+                <div className="p-4">
+                  <Label htmlFor="files">Files (Size: {uploadSize})</Label>
+                  <Input
+                    id="files"
+                    type="file"
+                    multiple
+                    onChange={handleUploadChange}
+                  />
+                </div>
+                <DrawerFooter>
+                  <Button disabled={submitDisabled} type="submit">
+                    Submit
+                  </Button>
+                  <DrawerClose asChild onClick={() => setIsDrawerOpen(false)}>
+                    <Button variant="ghost">Close</Button>
+                  </DrawerClose>
+                </DrawerFooter>
+              </form>
+            ) : !uploaded ? (
+              <div className="pt-4">
+                <Label>{progress.toFixed(1)}%</Label>
+                <Progress value={progress} className="m-auto w-[100%]" />
+
+                <DrawerFooter>
+                  <DrawerClose asChild onClick={() => setIsDrawerOpen(false)}>
+                    <Button variant="ghost">Close</Button>
+                  </DrawerClose>
+                </DrawerFooter>
               </div>
-              <DrawerFooter>
-                <Button disabled={submitDisabled} type="submit">
-                  Submit
-                </Button>
-                <DrawerClose asChild onClick={() => setIsDrawerOpen(false)}>
-                  <Button variant="ghost">Close</Button>
-                </DrawerClose>
-              </DrawerFooter>
-            </form>
+            ) : (
+              <div className="pt-4">
+                <Image
+                  src={shareQR}
+                  alt="QR code of the share link"
+                  width={600}
+                  height={400}
+                  className="w-full h-full object-cover"
+                />
+                <div className="flex items-center space-x-2">
+                  <div className="grid flex-1 gap-2">
+                    <Label htmlFor="link" className="sr-only">
+                      Link
+                    </Label>
+                    <Input id="link" defaultValue={shareURL} readOnly />
+                  </div>
+                  <Button
+                    type="submit"
+                    size="sm"
+                    className="px-3"
+                    onClick={handleCopy}
+                  >
+                    <span className="sr-only">Copy</span>
+                    {!isCopied ? (
+                      <CopyIcon className="h-4 w-4" />
+                    ) : (
+                      <CheckIcon className="h-4 w-4 text-white" />
+                    )}
+                  </Button>
+                </div>
+                <DrawerFooter>
+                  <DrawerClose asChild onClick={() => setIsDrawerOpen(false)}>
+                    <Button variant="ghost">Close</Button>
+                  </DrawerClose>
+                </DrawerFooter>
+              </div>
+            )}
           </div>
         </DrawerContent>
       </Drawer>
