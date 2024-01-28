@@ -141,7 +141,7 @@ function SharePage({ params }: Params) {
       <div className=" flex items-center justify-center h-[60%] w-[80%] m-auto bg-white z-10">
         <div className="w-[90%]">
           <p className="font-bold text-lg text-left pb-5">
-            Files are here and waiting!
+            {data.length > 0 ? 'Files are here and waiting!' : ''}
           </p>
           <div className="rounded-md border">
             <Table>
