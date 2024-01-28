@@ -256,6 +256,7 @@ def post_upload_return_link_qr(body: PostUpload, upload_id: str):
     time_now = datetime.now(timezone.utc)
     upload_expiration_time = 604800  # 7 days
     expires_at = time_now + timedelta(seconds=upload_expiration_time)
+    formatted_expires_at = expires_at.strftime("%B %d, %Y UTC")
 
     # Generate QR code
     qr = qrcode.QRCode(
@@ -295,7 +296,7 @@ def post_upload_return_link_qr(body: PostUpload, upload_id: str):
     }
     dynamodb.update_item(keys, update_data)
 
-    return {"url": file_url, "QR": qr_download_url}
+    return {"url": file_url, "QR": qr_download_url, "expiration_date": formatted_expires_at}
 
 
 @app.get("/download/{upload_id}")

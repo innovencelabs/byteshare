@@ -38,6 +38,7 @@ export default function Home() {
   const [shareURL, setShareURL] = useState('')
   const [shareQR, setShareQR] = useState('')
   const [isCopied, setIsCopied] = useState(false)
+  const [expirationDate, setExpirationDate] = useState('')
 
   useEffect(() => {
     appwriteService.getCurrentUser().then((user) => {
@@ -106,6 +107,7 @@ export default function Home() {
     setShareQR('')
     setShareURL('')
     setIsCopied(false)
+    setExpirationDate('')
   }
 
   const handleCopy = async () => {
@@ -166,11 +168,13 @@ export default function Home() {
         const postUploadResponse = await postUpload(fileNames, uploadID)
         const shareURL = postUploadResponse.shareURL
         const shareQR = postUploadResponse.shareQR
+        const shareExpirationDate = postUploadResponse.expirationDate
 
         setUploading(false)
         setUploaded(true)
         setShareQR(shareQR)
         setShareURL(shareURL)
+        setExpirationDate(shareExpirationDate)
         setSubmitDisabled(true)
         setUploadSize('0')
         setSelectedFiles([])
@@ -184,6 +188,7 @@ export default function Home() {
         setUploadSize('0')
         setSelectedFiles([])
         setIsCopied(false)
+        setExpirationDate('')
         toast.error('Something went wrong.')
         return
       }
@@ -273,8 +278,9 @@ export default function Home() {
     const data = await postUploadResponse.json()
     const shareURL = data.url
     const shareQR = data.QR
+    const expirationDate = data.expiration_date
 
-    return { shareURL, shareQR }
+    return { shareURL, shareQR, expirationDate }
   }
 
   return (
@@ -308,7 +314,7 @@ export default function Home() {
                     Congratulation!
                   </DrawerTitle>
                   <DrawerDescription className="text-center">
-                    Your share link has been generated with 7 days validity.
+                    Your share link has been generated.
                   </DrawerDescription>
                 </>
               ) : (
@@ -380,6 +386,10 @@ export default function Home() {
                       <CheckIcon className="h-4 w-4 text-white" />
                     )}
                   </Button>
+                </div>
+                <div className="flex justify-center text-xs mt-1">
+                  <span className="font-normal mr-1">Expiration date: </span>
+                  <span className="font-normal">{expirationDate}</span>
                 </div>
                 <DrawerFooter>
                   <DrawerClose asChild onClick={() => setIsDrawerOpen(false)}>
