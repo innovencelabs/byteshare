@@ -1,7 +1,7 @@
 'use client'
 import Image from 'next/image'
 import { Header } from '@/components/header'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import useAuth from '@/context/useAuth'
 import { DownloadIcon } from '@radix-ui/react-icons'
 import {
@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import TwitterHandle from '@/components/handle'
+import { toast } from 'sonner'
 
 type Params = {
   params: {
@@ -29,118 +30,29 @@ type Params = {
   }
 }
 
-const data: File[] = [
-  {
-    format: 'png',
-    name: 'Abc.png',
-    size: '20MB',
-    downloadLink:
-      'https://byteshare-blob.s3.amazonaws.com/a6053861124c46edb69040ad1a3ee53b/_af70b2e2-1d77-11eb-99e1-1f704b24b706%20%281%29.webp?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVHKDBKXW2NTAI4SJ%2F20240128%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Date=20240128T133423Z&X-Amz-Expires=21600&X-Amz-SignedHeaders=host&X-Amz-Signature=dc01a51798160c8cc52639960c3b9da39802dfbd380bd342cb21be01fa6700ed',
-  },
-  {
-    format: 'png',
-    name: 'Abc.png',
-    size: '20MB',
-    downloadLink:
-      'https://byteshare-blob.s3.amazonaws.com/a6053861124c46edb69040ad1a3ee53b/_af70b2e2-1d77-11eb-99e1-1f704b24b706%20%281%29.webp?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVHKDBKXW2NTAI4SJ%2F20240128%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Date=20240128T133423Z&X-Amz-Expires=21600&X-Amz-SignedHeaders=host&X-Amz-Signature=dc01a51798160c8cc52639960c3b9da39802dfbd380bd342cb21be01fa6700ed',
-  },
-  {
-    format: 'png',
-    name: 'Abc.png',
-    size: '20MB',
-    downloadLink:
-      'https://byteshare-blob.s3.amazonaws.com/a6053861124c46edb69040ad1a3ee53b/_af70b2e2-1d77-11eb-99e1-1f704b24b706%20%281%29.webp?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVHKDBKXW2NTAI4SJ%2F20240128%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Date=20240128T133423Z&X-Amz-Expires=21600&X-Amz-SignedHeaders=host&X-Amz-Signature=dc01a51798160c8cc52639960c3b9da39802dfbd380bd342cb21be01fa6700ed',
-  },
-  {
-    format: 'png',
-    name: 'Abc.png',
-    size: '20MB',
-    downloadLink:
-      'https://byteshare-blob.s3.amazonaws.com/a6053861124c46edb69040ad1a3ee53b/_af70b2e2-1d77-11eb-99e1-1f704b24b706%20%281%29.webp?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVHKDBKXW2NTAI4SJ%2F20240128%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Date=20240128T133423Z&X-Amz-Expires=21600&X-Amz-SignedHeaders=host&X-Amz-Signature=dc01a51798160c8cc52639960c3b9da39802dfbd380bd342cb21be01fa6700ed',
-  },
-  {
-    format: 'png',
-    name: 'Abc.png',
-    size: '20MB',
-    downloadLink:
-      'https://byteshare-blob.s3.amazonaws.com/a6053861124c46edb69040ad1a3ee53b/_af70b2e2-1d77-11eb-99e1-1f704b24b706%20%281%29.webp?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVHKDBKXW2NTAI4SJ%2F20240128%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Date=20240128T133423Z&X-Amz-Expires=21600&X-Amz-SignedHeaders=host&X-Amz-Signature=dc01a51798160c8cc52639960c3b9da39802dfbd380bd342cb21be01fa6700ed',
-  },
-  {
-    format: 'png',
-    name: 'Abc.png',
-    size: '20MB',
-    downloadLink:
-      'https://byteshare-blob.s3.amazonaws.com/a6053861124c46edb69040ad1a3ee53b/_af70b2e2-1d77-11eb-99e1-1f704b24b706%20%281%29.webp?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVHKDBKXW2NTAI4SJ%2F20240128%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Date=20240128T133423Z&X-Amz-Expires=21600&X-Amz-SignedHeaders=host&X-Amz-Signature=dc01a51798160c8cc52639960c3b9da39802dfbd380bd342cb21be01fa6700ed',
-  },
-  {
-    format: 'png',
-    name: 'Abc.png',
-    size: '20MB',
-    downloadLink:
-      'https://byteshare-blob.s3.amazonaws.com/a6053861124c46edb69040ad1a3ee53b/_af70b2e2-1d77-11eb-99e1-1f704b24b706%20%281%29.webp?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVHKDBKXW2NTAI4SJ%2F20240128%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Date=20240128T133423Z&X-Amz-Expires=21600&X-Amz-SignedHeaders=host&X-Amz-Signature=dc01a51798160c8cc52639960c3b9da39802dfbd380bd342cb21be01fa6700ed',
-  },
-  {
-    format: 'png',
-    name: 'Abc.png',
-    size: '20MB',
-    downloadLink:
-      'https://byteshare-blob.s3.amazonaws.com/a6053861124c46edb69040ad1a3ee53b/_af70b2e2-1d77-11eb-99e1-1f704b24b706%20%281%29.webp?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVHKDBKXW2NTAI4SJ%2F20240128%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Date=20240128T133423Z&X-Amz-Expires=21600&X-Amz-SignedHeaders=host&X-Amz-Signature=dc01a51798160c8cc52639960c3b9da39802dfbd380bd342cb21be01fa6700ed',
-  },
-  {
-    format: 'png',
-    name: 'Abc.png',
-    size: '20MB',
-    downloadLink:
-      'https://byteshare-blob.s3.amazonaws.com/a6053861124c46edb69040ad1a3ee53b/_af70b2e2-1d77-11eb-99e1-1f704b24b706%20%281%29.webp?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVHKDBKXW2NTAI4SJ%2F20240128%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Date=20240128T133423Z&X-Amz-Expires=21600&X-Amz-SignedHeaders=host&X-Amz-Signature=dc01a51798160c8cc52639960c3b9da39802dfbd380bd342cb21be01fa6700ed',
-  },
-  {
-    format: 'png',
-    name: 'Abc.png',
-    size: '20MB',
-    downloadLink:
-      'https://byteshare-blob.s3.amazonaws.com/a6053861124c46edb69040ad1a3ee53b/_af70b2e2-1d77-11eb-99e1-1f704b24b706%20%281%29.webp?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVHKDBKXW2NTAI4SJ%2F20240128%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Date=20240128T133423Z&X-Amz-Expires=21600&X-Amz-SignedHeaders=host&X-Amz-Signature=dc01a51798160c8cc52639960c3b9da39802dfbd380bd342cb21be01fa6700ed',
-  },
-  {
-    format: 'png',
-    name: 'Abc.png',
-    size: '20MB',
-    downloadLink:
-      'https://byteshare-blob.s3.amazonaws.com/a6053861124c46edb69040ad1a3ee53b/_af70b2e2-1d77-11eb-99e1-1f704b24b706%20%281%29.webp?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVHKDBKXW2NTAI4SJ%2F20240128%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Date=20240128T133423Z&X-Amz-Expires=21600&X-Amz-SignedHeaders=host&X-Amz-Signature=dc01a51798160c8cc52639960c3b9da39802dfbd380bd342cb21be01fa6700ed',
-  },
-  {
-    format: 'png',
-    name: 'Abc.png',
-    size: '20MB',
-    downloadLink:
-      'https://byteshare-blob.s3.amazonaws.com/a6053861124c46edb69040ad1a3ee53b/_af70b2e2-1d77-11eb-99e1-1f704b24b706%20%281%29.webp?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVHKDBKXW2NTAI4SJ%2F20240128%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Date=20240128T133423Z&X-Amz-Expires=21600&X-Amz-SignedHeaders=host&X-Amz-Signature=dc01a51798160c8cc52639960c3b9da39802dfbd380bd342cb21be01fa6700ed',
-  },
-]
-
-export type File = {
+type File = {
   format: string
   name: string
   size: string
   downloadLink: string
 }
 
-export const columns: ColumnDef<File>[] = [
+const columns: ColumnDef<File>[] = [
   {
     accessorKey: 'name',
     header: () => <div className="text-left">File Name</div>,
-    cell: ({ row }) => <div>{row.getValue('name')}</div>,
+    cell: ({ row }) => <div>{row.original.name}</div>,
   },
   {
     accessorKey: 'format',
     header: 'Format',
-    cell: ({ row }) => (
-      <div className="uppercase">{row.getValue('format')}</div>
-    ),
+    cell: ({ row }) => <div className="uppercase">{row.original.format}</div>,
   },
   {
     accessorKey: 'size',
     header: () => <div className="text-right">Size</div>,
     cell: ({ row }) => {
-      const size = row.getValue('size')
+      const size = row.original.size
 
       return <div className="text-right font-medium">{size}</div>
     },
@@ -153,9 +65,9 @@ export const columns: ColumnDef<File>[] = [
         <Button
           variant="ghost"
           className="h-8 w-8 p-0"
-          onClick={() =>
-            handleDownload(row.getValue('downloadLink'), row.getValue('name'))
-          }
+          onClick={() => {
+            handleDownload(row.original.downloadLink, row.original.name)
+          }}
         >
           <span className="sr-only">Download</span>
           <DownloadIcon className="h-4 w-4" />
@@ -166,19 +78,47 @@ export const columns: ColumnDef<File>[] = [
 ]
 
 const handleDownload = (downloadLink: string, fileName: string) => {
-  const link = document.createElement('a')
-  link.href = downloadLink
-  link.download = fileName
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
+  // window.location.href = `${downloadLink}&response-content-disposition=attachment; filename="${fileName}"`
+  window.location.href = downloadLink
 }
 
 function SharePage({ params }: Params) {
   const { authorised } = useAuth()
+  const [isMounted, setIsMounted] = useState(false)
+  const [data, setData] = React.useState<File[]>([])
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+  useEffect(() => {
+    const fetchData = async () => {
+      const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
 
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({})
+      const downloadResponse = await fetch(
+        apiBaseURL + '/download' + '/' + params.uploadId,
+      )
+      if (!downloadResponse.ok) {
+        toast.error('Upload ID is not valid')
+        return
+      }
+      const responseData = await downloadResponse.json()
+      console.log(responseData)
+      const fileNames = Object.keys(responseData)
+
+      for (const fileName of fileNames) {
+        const file: File = {
+          format: responseData[fileName]['format'],
+          name: fileName,
+          size: responseData[fileName]['size'],
+          downloadLink: responseData[fileName]['download_url'],
+        }
+        setData((prevdata) => [...prevdata, file])
+      }
+    }
+    if (isMounted) {
+      fetchData()
+    } else {
+      setIsMounted(true)
+    }
+  }, [isMounted])
+
   const table = useReactTable({
     data,
     columns,
@@ -224,10 +164,7 @@ function SharePage({ params }: Params) {
               <TableBody>
                 {table.getRowModel().rows?.length ? (
                   table.getRowModel().rows.map((row) => (
-                    <TableRow
-                      key={row.id}
-                      data-state={row.getIsSelected() && 'selected'}
-                    >
+                    <TableRow key={row.id}>
                       {row.getVisibleCells().map((cell) => (
                         <TableCell key={cell.id}>
                           {flexRender(

@@ -21,3 +21,7 @@ class BaseStorage(ABC):
     @abstractmethod
     def is_file_present(self, file_path):
         pass
+
+    @abstractmethod
+    def get_file_info(self, file_path: str):
+        pass

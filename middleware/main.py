@@ -296,7 +296,11 @@ def post_upload_return_link_qr(body: PostUpload, upload_id: str):
     }
     dynamodb.update_item(keys, update_data)
 
-    return {"url": file_url, "QR": qr_download_url, "expiration_date": formatted_expires_at}
+    return {
+        "url": file_url,
+        "QR": qr_download_url,
+        "expiration_date": formatted_expires_at,
+    }
 
 
 @app.get("/download/{upload_id}")
@@ -309,10 +313,10 @@ def get_file_url_return_name_link(upload_id: str):
     - upload_id: upload id of the upload process
 
     Returns:
-    - File name and download url
+    - File details and download url
     """
 
-    file_urls = []
+    file_data = {}
     time_now = datetime.now(timezone.utc).isoformat()
     upload_metadata = dynamodb.read_item({"upload_id": upload_id})
     if upload_metadata == None:
@@ -332,11 +336,18 @@ def get_file_url_return_name_link(upload_id: str):
     file_names = set(upload_metadata["storage_file_names"])
     for file_name in file_names:
         file_path = upload_id + "/" + file_name
-        download_expiration_time = 21600  # 6 hours
 
+        file_format = _get_file_extension(file_name)
+        file_size = storage.get_file_info(file_path)
+
+        download_expiration_time = 21600  # 6 hours
         # Generate share download link
         file_url = storage.generate_download_url(file_path, download_expiration_time)
-        file_urls.append(file_url)
+
+        file_data[file_name] = {}
+        file_data[file_name]["format"] = file_format
+        file_data[file_name]["size"] = _format_size(file_size)
+        file_data[file_name]["download_url"] = file_url
 
     keys = {"upload_id": upload_id}
     update_data = {
@@ -345,11 +356,22 @@ def get_file_url_return_name_link(upload_id: str):
     }
     dynamodb.update_item(keys, update_data)
 
-    return {"file_names": list(file_names), "urls": file_urls}
+    return file_data
 
 
 def _get_file_extension(file_name):
     return file_name.split(".")[-1]
+
+
+def _format_size(byte_size):
+    if byte_size < 1024:
+        return f"{byte_size} B"
+    elif byte_size < 1024**2:
+        return f"{byte_size / 1024:.2f} KB"
+    elif byte_size < 1024**3:
+        return f"{byte_size / (1024 ** 2):.2f} MB"
+    else:
+        return f"{byte_size / (1024 ** 3):.2f} GB"
 
 
 # Create a Handler from FastAPI for lambda.

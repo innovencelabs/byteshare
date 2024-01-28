@@ -24,7 +24,8 @@ class S3CloudfrontManager(BaseStorage):
                 HttpMethod="PUT",
             )
         except Exception as e:
-            raise HTTPException(status_code=500, detail=e.message)
+            print("Generate upload url failed: " + str(e))
+            raise HTTPException(status_code=500, detail=str(e))
 
     def generate_download_url(self, file_path: str, expirations_seconds: int):
         try:
@@ -34,13 +35,15 @@ class S3CloudfrontManager(BaseStorage):
                 ExpiresIn=expirations_seconds,
             )
         except Exception as e:
-            raise HTTPException(status_code=500, detail=e.message)
+            print("Generate download url failed: " + str(e))
+            raise HTTPException(status_code=500, detail=str(e))
 
     def upload_file(self, localpath: str, file_path: str):
         try:
             self.s3.upload_file(localpath, self.bucket_name, file_path)
         except Exception as e:
-            raise HTTPException(status_code=500, detail=e.message)
+            print("Upload file failed: " + str(e))
+            raise HTTPException(status_code=500, detail=str(e))
 
     def is_file_present(self, file_path: str):
         try:
@@ -52,7 +55,21 @@ class S3CloudfrontManager(BaseStorage):
                 )
                 return False
             else:
-                print("Error in checking availability in S3: " + e)
-                raise HTTPException(status_code=500, detail=e.message)
+                print("Error in checking availability in S3: " + str(e))
+                raise HTTPException(status_code=500, detail=str(e))
 
         return True
+
+    def get_file_info(self, file_path: str):
+        try:
+            response = self.s3.head_object(Bucket=self.bucket_name, Key=file_path)
+
+            file_size = response["ContentLength"]
+
+            return file_size
+        except Exception as e:
+            print("Error in getting file info in S3: " + str(e))
+            raise HTTPException(status_code=500, detail=str(e))
+
+    def _get_exact_format(self, file_format):
+        return file_format.split("/")[-1]
