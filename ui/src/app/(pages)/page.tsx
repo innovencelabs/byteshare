@@ -302,12 +302,23 @@ export default function Home() {
         <DrawerContent>
           <div className="mx-auto w-full max-w-sm">
             <DrawerHeader>
-              <DrawerTitle className="text-center">Send Files</DrawerTitle>
-              <DrawerDescription className="text-center">
-                {uploaded
-                  ? 'Congratulation! Your share link has been generated with 7 days validity.'
-                  : 'You can select multiple files to share upto 2GB.'}
-              </DrawerDescription>
+              {uploaded ? (
+                <>
+                  <DrawerTitle className="text-center">
+                    Congratulation!
+                  </DrawerTitle>
+                  <DrawerDescription className="text-center">
+                    Your share link has been generated with 7 days validity.
+                  </DrawerDescription>
+                </>
+              ) : (
+                <>
+                  <DrawerTitle className="text-center">Send Files</DrawerTitle>
+                  <DrawerDescription className="text-center">
+                    You can select multiple files to share upto 2GB.
+                  </DrawerDescription>
+                </>
+              )}
             </DrawerHeader>{' '}
             {!uploading && !uploaded ? (
               <form onSubmit={handleUploadSubmit}>
