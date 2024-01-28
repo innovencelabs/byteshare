@@ -130,7 +130,13 @@ export default function Home() {
     setUploading(true)
     setUploaded(false)
     if (selectedFiles.length == 1) {
-      setProgress(42)
+      if (selectedFiles[0].size > 2 * 1024 * 1024) {
+        const randomNumber = Math.floor(Math.random() * (30 - 20 + 1)) + 20
+        setTimeout(() => setProgress(randomNumber), 500)
+      } else {
+        const randomNumber = Math.floor(Math.random() * (49 - 20 + 1)) + 20
+        setTimeout(() => setProgress(randomNumber), 100)
+      }
     }
     if (selectedFiles.length > 0) {
       try {
