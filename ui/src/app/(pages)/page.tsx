@@ -304,7 +304,7 @@ export default function Home() {
               <DrawerTitle className="text-center">Send Files</DrawerTitle>
               <DrawerDescription className="text-center">
                 {uploaded
-                  ? 'Congratulation! Your share link has been generated.'
+                  ? 'Congratulation! Your share link has been generated with 7 days validity.'
                   : 'You can select multiple files to share upto 2GB.'}
               </DrawerDescription>
             </DrawerHeader>{' '}
