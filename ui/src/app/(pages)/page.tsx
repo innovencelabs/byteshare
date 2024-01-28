@@ -20,7 +20,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Progress } from '@/components/ui/progress'
-import { CheckIcon, CopyIcon } from '@radix-ui/react-icons'
+import { CheckIcon, CopyIcon, TwitterLogoIcon } from '@radix-ui/react-icons'
 
 export default function Home() {
   const router = useRouter()
@@ -280,6 +280,7 @@ export default function Home() {
   return (
     <div className="h-screen flex flex-col justify-between">
       <Header authorised={authorised} />
+      {/* <p className="flex align-items-center z-10">hey</p> */}
       <Drawer open={isDrawerOpen} onClose={handleDrawerClose}>
         <div className="flex-grow flex items-center justify-center z-10">
           <DrawerTrigger asChild onClick={() => setIsDrawerOpen(!isDrawerOpen)}>
@@ -379,6 +380,14 @@ export default function Home() {
           </div>
         </DrawerContent>
       </Drawer>
+
+      <button
+        onClick={() => window.open(`https://twitter.com/_ambujraj`, '_blank')}
+        className="fixed bottom-4 right-0 md:right-0 lg:right-0 xl:right-0 my-0 bg-white text-black rounded-none py-2 px-2 text-xs flex items-center focus:outline-none hover:bg-white z-10"
+      >
+        <TwitterLogoIcon className="mr-1 w-4 h-4" />
+        <span>@_ambujraj</span>
+      </button>
       <div className="absolute inset-0">
         <Image
           src="/background.jpg"
