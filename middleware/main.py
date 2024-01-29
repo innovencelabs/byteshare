@@ -240,6 +240,8 @@ def post_upload_return_link_qr(body: PostUpload, upload_id: str):
     upload_metadata = dynamodb.read_item({"upload_id": upload_id})
     if upload_metadata == None:
         raise HTTPException(status_code=400, detail="Upload ID not valid")
+    if upload_metadata["status"] == StatusEnum.uploaded.name:
+        raise HTTPException(status_code=400, detail="Upload already completed")
 
     file_names = body.file_names
     for file_name in file_names:
