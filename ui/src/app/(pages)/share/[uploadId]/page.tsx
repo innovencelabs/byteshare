@@ -15,6 +15,15 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from '@/components/ui/drawer'
+import {
   Table,
   TableBody,
   TableCell,
@@ -26,6 +35,8 @@ import { Button } from '@/components/ui/button'
 import TwitterHandle from '@/components/handle'
 import { toast } from 'sonner'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Label } from '@/components/ui/label'
+import { Progress } from '@/components/ui/progress'
 
 type Params = {
   params: {
@@ -89,6 +100,9 @@ function SharePage({ params }: Params) {
   const { authorised } = useAuth()
   const [isMounted, setIsMounted] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  const [progress, setProgress] = useState(0)
+  const [downloadingAll, setDownloadingAll] = useState(false)
   const [data, setData] = React.useState<File[]>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   useEffect(() => {
@@ -125,29 +139,41 @@ function SharePage({ params }: Params) {
   }, [isMounted])
 
   const handleDownloadAll = async () => {
-    try {
-      const presignedUrls = []
-      for (const file of data) {
-        presignedUrls.push(file.downloadLink)
+    if (!downloadingAll) {
+      setDownloadingAll(true)
+      try {
+        const presignedUrls = []
+        for (const file of data) {
+          presignedUrls.push(file.downloadLink)
+        }
+
+        const zip = new JSZip()
+
+        for (let i = 0; i < presignedUrls.length; i++) {
+          const presignedUrl = presignedUrls[i]
+          const response = await fetch(presignedUrl)
+          const blob = await response.blob()
+
+          zip.file(data[i].name, blob)
+          setProgress(((i + 1) / presignedUrls.length) * 100)
+        }
+
+        const zipBlob = await zip.generateAsync({ type: 'blob' })
+        const zipFileName = 'ByteShare_' + params.uploadId + '.zip'
+        saveAs(zipBlob, zipFileName)
+      } catch (err) {
+        toast.error('Error downloading zip file.')
+      } finally {
+        setDownloadingAll(false)
+        setProgress(0)
+        setIsDrawerOpen(false)
       }
-
-      const zip = new JSZip()
-
-      for (let i = 0; i < presignedUrls.length; i++) {
-        const presignedUrl = presignedUrls[i]
-        const response = await fetch(presignedUrl)
-        const blob = await response.blob()
-
-        zip.file(data[i].name, blob)
-      }
-
-      const zipBlob = await zip.generateAsync({ type: 'blob' })
-      const zipFileName = 'ByteShare_' + params.uploadId + '.zip'
-      saveAs(zipBlob, zipFileName)
-    } catch (err) {
-      toast.error('Error downloading zip file.')
+    } else {
+      setIsDrawerOpen(true)
     }
   }
+
+  const handleDrawerClose = () => {}
 
   const table = useReactTable({
     data,
@@ -229,9 +255,43 @@ function SharePage({ params }: Params) {
           <div className="flex justify-between items-center py-4">
             <div>
               {data.length > 0 ? (
-                <Button variant="default" onClick={handleDownloadAll}>
-                  Download all
-                </Button>
+                <Drawer open={isDrawerOpen} onClose={handleDrawerClose}>
+                  <DrawerTrigger asChild onClick={() => setIsDrawerOpen(true)}>
+                    <Button variant="default" onClick={handleDownloadAll}>
+                      Download all
+                    </Button>
+                  </DrawerTrigger>
+
+                  <DrawerContent>
+                    <div className="mx-auto w-full max-w-sm">
+                      <DrawerHeader>
+                        <DrawerTitle className="text-center">
+                          Downloading as zip...
+                        </DrawerTitle>
+                      </DrawerHeader>{' '}
+                      {downloadingAll ? (
+                        <div className="pt-4">
+                          <Label>{progress.toFixed(1)}%</Label>
+                          <Progress
+                            value={progress}
+                            className="m-auto w-[100%]"
+                          />
+
+                          <DrawerFooter>
+                            <DrawerClose
+                              asChild
+                              onClick={() => setIsDrawerOpen(false)}
+                            >
+                              <Button variant="ghost">Close</Button>
+                            </DrawerClose>
+                          </DrawerFooter>
+                        </div>
+                      ) : (
+                        <></>
+                      )}
+                    </div>
+                  </DrawerContent>
+                </Drawer>
               ) : (
                 <></>
               )}
