@@ -23,6 +23,7 @@ import {
 import { Button } from '@/components/ui/button'
 import TwitterHandle from '@/components/handle'
 import { toast } from 'sonner'
+import { Skeleton } from '@/components/ui/skeleton'
 
 type Params = {
   params: {
@@ -85,6 +86,7 @@ const handleDownload = (downloadLink: string, fileName: string) => {
 function SharePage({ params }: Params) {
   const { authorised } = useAuth()
   const [isMounted, setIsMounted] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const [data, setData] = React.useState<File[]>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   useEffect(() => {
@@ -96,10 +98,10 @@ function SharePage({ params }: Params) {
       )
       if (!downloadResponse.ok) {
         toast.error('Upload ID is not valid')
+        setIsLoading(false)
         return
       }
       const responseData = await downloadResponse.json()
-      console.log(responseData)
       const fileNames = Object.keys(responseData)
 
       for (const fileName of fileNames) {
@@ -111,6 +113,7 @@ function SharePage({ params }: Params) {
         }
         setData((prevdata) => [...prevdata, file])
       }
+      setIsLoading(false)
     }
     if (isMounted) {
       fetchData()
@@ -138,7 +141,7 @@ function SharePage({ params }: Params) {
   return (
     <div className="h-screen flex flex-col justify-between">
       <Header authorised={authorised} />
-      <div className=" flex items-center justify-center h-[60%] w-[80%] m-auto bg-white z-10">
+      <div className=" flex items-center justify-center h-[60%] w-[80%] m-auto bg-white rounded-md z-10">
         <div className="w-[90%]">
           <p className="font-bold text-lg text-left pb-5">
             {data.length > 0 ? 'Files are here and waiting!' : ''}
@@ -181,15 +184,30 @@ function SharePage({ params }: Params) {
                       colSpan={columns.length}
                       className="h-24 text-center"
                     >
-                      No results.
+                      {isLoading ? (
+                        <>
+                          <Skeleton className="ml-[20%] mb-2 h-4 w-[60%]" />
+                          <Skeleton className="ml-[20%]  mb-2 h-4 w-[60%]" />
+                          <Skeleton className="ml-[20%]  mb-2 h-4 w-[60%]" />
+                        </>
+                      ) : (
+                        <div className="font-serif">No results.</div>
+                      )}
                     </TableCell>
                   </TableRow>
                 )}
               </TableBody>
             </Table>
           </div>
-          <div className="flex items-center justify-end space-x-2 py-4">
-            <div className="space-x-2">
+          <div className="flex justify-between items-center py-4">
+            <div>
+              {data.length > 0 ? (
+                <Button variant="default">Download all</Button>
+              ) : (
+                <></>
+              )}
+            </div>
+            <div className="flex space-x-2">
               <Button
                 variant="outline"
                 size="sm"
