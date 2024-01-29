@@ -1,6 +1,5 @@
 import React from 'react'
 import { Metadata } from 'next'
-import Image from 'next/image'
 import ForgotPasswordForm from './components/forgot-form'
 
 export const metadata: Metadata = {

@@ -59,7 +59,7 @@ export default function Home() {
         toast.success('Email has been successfully verified.')
       }
     })
-  }, [authorised])
+  }, [])
 
   const handleSend = () => {
     if (!authorised) {
@@ -172,27 +172,24 @@ export default function Home() {
         const shareQR = postUploadResponse.shareQR
         const shareExpirationDate = postUploadResponse.expirationDate
 
-        setUploading(false)
         setUploaded(true)
         setShareQR(shareQR)
         setShareURL(shareURL)
         setExpirationDate(shareExpirationDate)
-        setSubmitDisabled(true)
-        setUploadSize('0')
-        setSelectedFiles([])
       } catch (e) {
         setIsDrawerOpen(false)
-        setUploading(false)
         setUploaded(false)
         setShareQR('')
         setShareURL('')
-        setSubmitDisabled(true)
-        setUploadSize('0')
-        setSelectedFiles([])
         setIsCopied(false)
         setExpirationDate('')
         toast.error('Something went wrong.')
         return
+      } finally {
+        setUploading(false)
+        setSubmitDisabled(true)
+        setUploadSize('0')
+        setSelectedFiles([])
       }
     }
   }
