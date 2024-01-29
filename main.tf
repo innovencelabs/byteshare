@@ -5,6 +5,22 @@ provider "aws" {
 # S3 Bucket
 resource "aws_s3_bucket" "byteshare-blob" {
   bucket = "byteshare-blob"
+
+
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "move_to_glacier" {
+  bucket = "byteshare-blob"
+
+  rule {
+    id     = "glacier-transition-rule"
+    status = "Enabled"
+
+    transition {
+      days          = 8
+      storage_class = "GLACIER"
+    }
+  }
 }
 
 resource "aws_s3_bucket_cors_configuration" "allow_upload" {
@@ -14,15 +30,15 @@ resource "aws_s3_bucket_cors_configuration" "allow_upload" {
     allowed_headers = ["*"]
     allowed_methods = ["PUT", "GET", "HEAD"]
     allowed_origins = ["*"]
-    expose_headers = ["ETag", "Content-Length", "Content-Type"]
+    expose_headers  = ["ETag", "Content-Length", "Content-Type"]
   }
 }
 
 # DynamoDB table
 resource "aws_dynamodb_table" "byteshare-upload-metadata" {
-  name           = "byteshare-upload-metadata"
-  billing_mode   = "PAY_PER_REQUEST"
-  hash_key       = "upload_id"
+  name         = "byteshare-upload-metadata"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "upload_id"
 
   attribute {
     name = "upload_id"
@@ -31,10 +47,10 @@ resource "aws_dynamodb_table" "byteshare-upload-metadata" {
 }
 
 resource "aws_dynamodb_table" "byteshare-subscriber" {
-  name           = "byteshare-subscriber"
-  billing_mode   = "PAY_PER_REQUEST"
-  hash_key       = "email"
-  range_key      = "created_at"
+  name         = "byteshare-subscriber"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "email"
+  range_key    = "created_at"
 
   attribute {
     name = "email"
