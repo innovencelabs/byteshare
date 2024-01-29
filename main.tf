@@ -12,7 +12,7 @@ resource "aws_s3_bucket_cors_configuration" "allow_upload" {
 
   cors_rule {
     allowed_headers = ["*"]
-    allowed_methods = ["PUT"]
+    allowed_methods = ["PUT", "GET", "HEAD"]
     allowed_origins = ["*"]
     expose_headers = ["ETag", "Content-Length", "Content-Type"]
   }

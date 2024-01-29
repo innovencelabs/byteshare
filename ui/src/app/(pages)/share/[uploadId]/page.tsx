@@ -3,6 +3,8 @@ import Image from 'next/image'
 import { Header } from '@/components/header'
 import React, { useEffect, useState } from 'react'
 import useAuth from '@/context/useAuth'
+import JSZip from 'jszip'
+import { saveAs } from 'file-saver'
 import { DownloadIcon } from '@radix-ui/react-icons'
 import {
   ColumnDef,
@@ -122,6 +124,31 @@ function SharePage({ params }: Params) {
     }
   }, [isMounted])
 
+  const handleDownloadAll = async () => {
+    try {
+      const presignedUrls = []
+      for (const file of data) {
+        presignedUrls.push(file.downloadLink)
+      }
+
+      const zip = new JSZip()
+
+      for (let i = 0; i < presignedUrls.length; i++) {
+        const presignedUrl = presignedUrls[i]
+        const response = await fetch(presignedUrl)
+        const blob = await response.blob()
+
+        zip.file(data[i].name, blob)
+      }
+
+      const zipBlob = await zip.generateAsync({ type: 'blob' })
+      const zipFileName = 'ByteShare_' + params.uploadId + '.zip'
+      saveAs(zipBlob, zipFileName)
+    } catch (err) {
+      toast.error('Error downloading zip file.')
+    }
+  }
+
   const table = useReactTable({
     data,
     columns,
@@ -202,7 +229,9 @@ function SharePage({ params }: Params) {
           <div className="flex justify-between items-center py-4">
             <div>
               {data.length > 0 ? (
-                <Button variant="default">Download all</Button>
+                <Button variant="default" onClick={handleDownloadAll}>
+                  Download all
+                </Button>
               ) : (
                 <></>
               )}
