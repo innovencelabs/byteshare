@@ -51,51 +51,6 @@ type File = {
   downloadLink: string
 }
 
-const columns: ColumnDef<File>[] = [
-  {
-    accessorKey: 'name',
-    header: () => <div className="text-left">File Name</div>,
-    cell: ({ row }) => <div>{row.original.name}</div>,
-  },
-  {
-    accessorKey: 'format',
-    header: 'Format',
-    cell: ({ row }) => <div className="uppercase">{row.original.format}</div>,
-  },
-  {
-    accessorKey: 'size',
-    header: () => <div className="text-right">Size</div>,
-    cell: ({ row }) => {
-      const size = row.original.size
-
-      return <div className="text-right font-medium">{size}</div>
-    },
-  },
-  {
-    id: 'actions',
-    enableHiding: false,
-    cell: ({ row }) => {
-      return (
-        <Button
-          variant="ghost"
-          className="h-8 w-8 p-0"
-          onClick={() => {
-            handleDownload(row.original.downloadLink, row.original.name)
-          }}
-        >
-          <span className="sr-only">Download</span>
-          <DownloadIcon className="h-4 w-4" />
-        </Button>
-      )
-    },
-  },
-]
-
-const handleDownload = (downloadLink: string, fileName: string) => {
-  // window.location.href = `${downloadLink}&response-content-disposition=attachment; filename="${fileName}"`
-  window.location.href = downloadLink
-}
-
 function SharePage({ params }: Params) {
   const { authorised } = useAuth()
   const [isMounted, setIsMounted] = useState(false)
@@ -103,6 +58,7 @@ function SharePage({ params }: Params) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [progress, setProgress] = useState(0)
   const [downloadingAll, setDownloadingAll] = useState(false)
+  const [downloadingOne, setDownloadingOne] = useState(false)
   const [data, setData] = React.useState<File[]>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   useEffect(() => {
@@ -137,6 +93,66 @@ function SharePage({ params }: Params) {
       setIsMounted(true)
     }
   }, [isMounted])
+
+  const handleSingleDownload = async (
+    downloadLink: string,
+    fileName: string,
+  ) => {
+    try {
+      setDownloadingOne(true)
+      toast.info('Download in progress...', { duration: 9999999 })
+      const response = await fetch(downloadLink)
+      const blob = await response.blob()
+      saveAs(blob, fileName)
+      toast.dismiss()
+    } catch (err) {
+      toast.dismiss()
+      toast.error('Error in downloading file')
+    } finally {
+      setDownloadingOne(false)
+    }
+  }
+
+  const columns: ColumnDef<File>[] = [
+    {
+      accessorKey: 'name',
+      header: () => <div className="text-left">File Name</div>,
+      cell: ({ row }) => <div>{row.original.name}</div>,
+    },
+    {
+      accessorKey: 'format',
+      header: 'Format',
+      cell: ({ row }) => <div className="uppercase">{row.original.format}</div>,
+    },
+    {
+      accessorKey: 'size',
+      header: () => <div className="text-right">Size</div>,
+      cell: ({ row }) => {
+        const size = row.original.size
+
+        return <div className="text-right font-medium">{size}</div>
+      },
+    },
+    {
+      id: 'actions',
+      enableHiding: false,
+      cell: ({ row }) => {
+        return (
+          <Button
+            variant="ghost"
+            className="h-8 w-8 p-0"
+            disabled={downloadingOne}
+            onClick={() => {
+              handleSingleDownload(row.original.downloadLink, row.original.name)
+            }}
+          >
+            <span className="sr-only">Download</span>
+            <DownloadIcon className="h-4 w-4" />
+          </Button>
+        )
+      },
+    },
+  ]
 
   const handleDownloadAll = async () => {
     if (!downloadingAll) {

@@ -17,12 +17,13 @@ export default function NotFound() {
               404.
             </h2>
             <h3 className="text-xl font-light leading-normal lg:text-3xl md:text-3xl">
-              Sorry, we couldn't find this page.
+              Sorry, we couldn&apos;t find this page.
             </h3>
           </header>
 
           <p className="max-w-sm mb-5 leading-5 md:leading-7">
-            Don't worry, you can find plenty of other things on our homepage.
+            Don&apos;t worry, you can find plenty of other things on our
+            homepage.
           </p>
 
           <Link
