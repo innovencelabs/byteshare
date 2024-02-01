@@ -282,7 +282,7 @@ function SharePage({ params }: Params) {
                     <div className="mx-auto w-full max-w-sm">
                       <DrawerHeader>
                         <DrawerTitle className="text-center">
-                          Downloading as zip...
+                          Downloading zip...
                         </DrawerTitle>
                       </DrawerHeader>{' '}
                       {downloadingAll ? (

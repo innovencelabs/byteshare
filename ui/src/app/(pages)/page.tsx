@@ -40,6 +40,7 @@ export default function Home() {
   const [shareQR, setShareQR] = useState('')
   const [isCopied, setIsCopied] = useState(false)
   const [expirationDate, setExpirationDate] = useState('')
+  const [downloadsAllowed, setDownloadsAllowed] = useState('')
 
   useEffect(() => {
     appwriteService.getCurrentUser().then((user) => {
@@ -109,6 +110,7 @@ export default function Home() {
     setShareURL('')
     setIsCopied(false)
     setExpirationDate('')
+    setDownloadsAllowed('')
   }
 
   const handleCopy = async () => {
@@ -171,11 +173,13 @@ export default function Home() {
         const shareURL = postUploadResponse.shareURL
         const shareQR = postUploadResponse.shareQR
         const shareExpirationDate = postUploadResponse.expirationDate
+        const downloadsAllowed = postUploadResponse.downloadsAllowed
 
         setUploaded(true)
         setShareQR(shareQR)
         setShareURL(shareURL)
         setExpirationDate(shareExpirationDate)
+        setDownloadsAllowed(downloadsAllowed)
       } catch (e) {
         setIsDrawerOpen(false)
         setUploaded(false)
@@ -183,6 +187,7 @@ export default function Home() {
         setShareURL('')
         setIsCopied(false)
         setExpirationDate('')
+        setDownloadsAllowed('')
         toast.error('Something went wrong.')
         return
       } finally {
@@ -278,8 +283,9 @@ export default function Home() {
     const shareURL = data.url
     const shareQR = data.QR
     const expirationDate = data.expiration_date
+    const downloadsAllowed = data.downloads_allowed
 
-    return { shareURL, shareQR, expirationDate }
+    return { shareURL, shareQR, expirationDate, downloadsAllowed }
   }
 
   return (
@@ -387,9 +393,15 @@ export default function Home() {
                   </Button>
                 </div>
                 <div className="flex justify-center text-xs mt-1">
+                  <span className="font-normal">
+                    Enjoy up to {downloadsAllowed} downloads.
+                  </span>
+                </div>
+                <div className="flex justify-center text-xs mt-1">
                   <span className="font-normal mr-1">Expiration date: </span>
                   <span className="font-normal">{expirationDate}</span>
                 </div>
+
                 <DrawerFooter>
                   <DrawerClose asChild onClick={() => setIsDrawerOpen(false)}>
                     <Button variant="ghost">Close</Button>
