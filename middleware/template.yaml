@@ -26,12 +26,13 @@ Resources:
       Tracing: Active
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AmazonS3FullAccess
         - AmazonDynamoDBFullAccess
         - AWSXrayWriteOnlyAccess
       Environment:
         Variables:
-          WEB_BASE_URL: 'https://byteshare-ui.vercel.app'
+          R2_ACCOUNT_ID: !Ref R2_ACCOUNT_ID
+          R2_ACCESS_KEY: !Ref R2_ACCESS_KEY
+          R2_SECRET_KEY: !Ref R2_SECRET_KEY
       Events:
         ApiEventWithProxy:
           Type: Api
@@ -49,7 +50,9 @@ Resources:
       Cors:
         AllowMethods: "'OPTIONS,GET,POST,PUT,DELETE'"
         AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-        AllowOrigin: "'*'"
+        AllowOrigin: !Sub
+          - "'${CORS_ORIGIN}'"
+          - CORS_ORIGIN: !Ref CORS_ORIGIN
 
   SitePackagesLayer:
     Type: AWS::Serverless::LayerVersion
