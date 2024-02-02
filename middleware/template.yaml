@@ -42,6 +42,7 @@ Resources:
           R2_ACCOUNT_ID: !Ref R2AccountID
           R2_ACCESS_KEY: !Ref R2AccessKey
           R2_SECRET_KEY: !Ref R2SecretKey
+          WEB_BASE_URL: !Ref CorsOrigin
       Events:
         ApiEventWithProxy:
           Type: Api

@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Request, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
 from db import DynamoDBManager
 from storage.cloudflare_r2 import CloudflareR2Manager
@@ -15,6 +16,16 @@ app = FastAPI()
 
 # Load Environment variables
 load_dotenv()
+
+# CORS (Cross Origin Resource Sharing) (for local)
+web_base_url = str(os.getenv("WEB_BASE_URL"))
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Storage
 BUCKET_NAME = "byteshare-blob"

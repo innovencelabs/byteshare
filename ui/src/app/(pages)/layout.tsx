@@ -2,6 +2,7 @@
 import appwriteService from '@/authentication/appwrite/config'
 import { AuthProvider } from '@/context/authContext'
 import React, { useEffect, useState } from 'react'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 
 const InternalLayout = ({ children }: { children: React.ReactNode }) => {
   const [authorised, setAuthorised] = useState(false)
@@ -18,6 +19,7 @@ const InternalLayout = ({ children }: { children: React.ReactNode }) => {
     <AuthProvider
       value={{ authorised, setAuthorised, statusLoaded, setStatusLoaded }}
     >
+      <SpeedInsights />
       {children}
     </AuthProvider>
   )
