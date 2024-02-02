@@ -278,7 +278,7 @@ export default function Home() {
   }
 
   return (
-    <div className="h-screen flex flex-col justify-between">
+    <div className="min-h-screen flex flex-col justify-between">
       <Header authorised={authorised} statusLoaded={statusLoaded} />
       {/* <p className="flex align-items-center z-10">hey</p> */}
       <Drawer open={isDrawerOpen} onClose={handleDrawerClose}>

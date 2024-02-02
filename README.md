@@ -94,4 +94,4 @@ uvicorn main:app --reload
 - Github actions
 
 ## Deployed version
-### Frontend - https://byteshare-ui.vercel.app
+### Frontend - https://byteshare.io
