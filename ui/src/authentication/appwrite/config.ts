@@ -1,29 +1,11 @@
 import conf from '@/conf/config'
 import { Client, Account, ID } from 'appwrite'
 
-type CreateUserAccount = {
-  name: string
-  email: string
-  password: string
-}
-
-type LoginUserAccount = {
-  email: string
-  password: string
-}
-
-type ForgotPassword = {
+type InitiateMagicURLLogin = {
   email: string
 }
 
-type CompleteForgotPassword = {
-  userId: string
-  secret: string
-  password: string
-  confirmPassword: string
-}
-
-type CompleteVerification = {
+type CompleteMagicURLLogin = {
   userId: string
   secret: string
 }
@@ -34,45 +16,26 @@ appwriteClient.setEndpoint(conf.appwriteUrl).setProject(conf.appwriteProjectID)
 export const account = new Account(appwriteClient)
 
 export class AppwriteService {
-  async createUserAccount({ name, email, password }: CreateUserAccount) {
+  async initiateMagicURLAuthentication({ email }: InitiateMagicURLLogin) {
     try {
-      const userAccount = await account.create(
+      const initiateMagicURL: string =
+        process.env.NEXT_PUBLIC_APP_URL + '/auth/verify'
+      return await account.createMagicURLSession(
         ID.unique(),
         email,
-        password,
-        name,
+        initiateMagicURL,
       )
-      if (userAccount) {
-        return this.login({ email, password })
-      } else {
-        return userAccount
-      }
-    } catch (err: any) {
+    } catch (err) {
       throw err
     }
   }
 
-  async login({ email, password }: LoginUserAccount) {
+  async completeMagicURLAuthentication({
+    userId,
+    secret,
+  }: CompleteMagicURLLogin) {
     try {
-      return await account.createEmailSession(email, password)
-    } catch (err: any) {
-      throw err
-    }
-  }
-
-  async initiateVerification() {
-    try {
-      const verifyEmailURL: string =
-        process.env.NEXT_PUBLIC_APP_URL + '/auth/verify-email'
-      return await account.createVerification(verifyEmailURL)
-    } catch (err: any) {
-      throw err
-    }
-  }
-
-  async completeVerification({ userId, secret }: CompleteVerification) {
-    try {
-      return await account.updateVerification(userId, secret)
+      return await account.updateMagicURLSession(userId, secret)
     } catch (err: any) {
       throw err
     }
@@ -95,35 +58,6 @@ export class AppwriteService {
     }
 
     return null
-  }
-
-  async initiateForgotPassword({ email }: ForgotPassword) {
-    try {
-      const resetPasswordURL: string =
-        process.env.NEXT_PUBLIC_APP_URL + '/auth/reset-password'
-      return await account.createRecovery(email, resetPasswordURL)
-    } catch (err: any) {
-      throw err
-    }
-  }
-
-  // TODO: make it to self login
-  async completeForgotPassword({
-    userId,
-    secret,
-    password,
-    confirmPassword,
-  }: CompleteForgotPassword) {
-    try {
-      return await account.updateRecovery(
-        userId,
-        secret,
-        password,
-        confirmPassword,
-      )
-    } catch (err: any) {
-      throw err
-    }
   }
 
   async logout() {

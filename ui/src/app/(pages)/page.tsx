@@ -47,18 +47,6 @@ export default function Home() {
       if (user) {
         setUserEmail(user.email)
       }
-      if (user && from == 'signup' && authorised && !user?.emailVerification) {
-        toast.info(
-          'Please check your email for a verification link to complete your registration.',
-        )
-      } else if (
-        user &&
-        from == 'verify-email' &&
-        authorised &&
-        user?.emailVerification
-      ) {
-        toast.success('Email has been successfully verified.')
-      }
     })
   }, [])
 

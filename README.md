@@ -39,15 +39,16 @@ terraform apply
 ```
 5. Setup your Appwrite account [HERE](https://appwrite.io/)
 6. Create your Organisation and Project in Appwrite [TUTORIAL](https://youtu.be/pk92hS_d_ns?t=11&si=emSqp8Mdra_iF-dc)
-7. Install UI dependencies and add .env file
+7. Enable only Magic URL and JWT in Appwrite [SEE WHERE](https://github.com/ambujraj/ByteShare/assets/29935993/7a023290-01ca-43ff-b3a2-0962433ccb75)
+8. Install UI dependencies and add .env file
 ```bash
 cd ui
 npm install
 cp .env.example .env
 cd ..
 ```
-8. Fill the values in .env file for backend url and Appwrite creds
-9. Install Middleware(Backend) dependencies and add .env file
+9. Fill the values in .env file for backend url and Appwrite creds
+10. Install Middleware(Backend) dependencies and add .env file
 ```bash
 cd middleware
 python3 -m venv .venv
@@ -56,7 +57,7 @@ pip3 install -r requirements.txt
 cp .env.example .env
 cd ..
 ```
-10. Run the application
+11.  Run the application
 ```bash
 cd ui
 npm run dev
@@ -78,6 +79,7 @@ uvicorn main:app --reload
 - FastAPI
 - AWS DynamoDB
 - AWS S3
+- AWS Cloudfront
 - AWS Cloudwatch
 - Appwrite
 
