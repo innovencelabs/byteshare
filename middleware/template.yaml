@@ -30,9 +30,9 @@ Resources:
         - AWSXrayWriteOnlyAccess
       Environment:
         Variables:
-          R2_ACCOUNT_ID: !Ref R2_ACCOUNT_ID
-          R2_ACCESS_KEY: !Ref R2_ACCESS_KEY
-          R2_SECRET_KEY: !Ref R2_SECRET_KEY
+          R2_ACCOUNT_ID: !Ref R2AccountID
+          R2_ACCESS_KEY: !Ref R2AccessKey
+          R2_SECRET_KEY: !Ref R2SecretKey
       Events:
         ApiEventWithProxy:
           Type: Api
@@ -51,8 +51,8 @@ Resources:
         AllowMethods: "'OPTIONS,GET,POST,PUT,DELETE'"
         AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
         AllowOrigin: !Sub
-          - "'${CORS_ORIGIN}'"
-          - CORS_ORIGIN: !Ref CORS_ORIGIN
+          - "'${CorsOrigin}'"
+          - CorsOrigin: !Ref CorsOrigin
 
   SitePackagesLayer:
     Type: AWS::Serverless::LayerVersion
