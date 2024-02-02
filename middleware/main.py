@@ -271,7 +271,7 @@ def post_upload_return_link_qr(body: PostUpload, upload_id: str):
 
     img = qr.make_image(fill_color="black", back_color="white")
 
-    temp_qr_path = "{}.png".format(upload_id)
+    temp_qr_path = "/tmp/" + "{}.png".format(upload_id)
     img.save(temp_qr_path)
 
     qr_name = "QRCode_" + upload_id + ".png"
