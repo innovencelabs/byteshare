@@ -1,11 +1,13 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 
 function Share() {
   const router = useRouter()
-  router.push('/')
-  return <></>
+  useEffect(() => {
+    return router.push('/')
+  })
 }
 
 export default Share
