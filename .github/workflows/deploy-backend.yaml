@@ -38,7 +38,7 @@ jobs:
         zip -r python-site-packages.zip python
         rm -r python
         sam build
-        sam deploy --parameter-overrides CORS_ORIGIN="${{ secrets.CORS_ORIGIN }}" R2_ACCOUNT_ID="${{ secrets.R2_ACCOUNT_ID }}" R2_ACCESS_KEY="${{ secrets.R2_ACCESS_KEY }}" R2_SECRET_KEY="${{ secrets.R2_SECRET_KEY }}"
+        sam deploy --parameter-overrides "CORS_ORIGIN=${{ secrets.CORS_ORIGIN }}" "R2_ACCOUNT_ID=${{ secrets.R2_ACCOUNT_ID }}" "R2_ACCESS_KEY=${{ secrets.R2_ACCESS_KEY }}" "R2_SECRET_KEY=${{ secrets.R2_SECRET_KEY }}"
         rm python-site-packages.zip
 
       env:
