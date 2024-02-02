@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
 from db import DynamoDBManager
-from storage.s3_cloudfront import S3CloudfrontManager
+from storage.cloudflare_r2 import CloudflareR2Manager
 from enum import Enum as PythonEnum
 from datetime import datetime, timedelta, timezone
 from pydantic import BaseModel
@@ -29,8 +29,8 @@ app.add_middleware(
 )
 
 # Storage
-S3_BUCKET_NAME = "byteshare-blob"
-storage = S3CloudfrontManager(S3_BUCKET_NAME)
+BUCKET_NAME = "byteshare-blob"
+storage = CloudflareR2Manager(BUCKET_NAME)
 
 # DynamoDB
 table_name = "byteshare-upload-metadata"

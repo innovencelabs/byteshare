@@ -24,31 +24,37 @@ Meet ByteShare, your go-to platform for seamless and secure file sharing. Design
 1. Clone the repository
 ```bash
 git clone https://github.com/ambujraj/ByteShare.git
+cd ByteShare
 ```
 2. Install Terraform
 3. Configure your AWS account
 ```bash
 aws configure
 ```
-4. Create AWS resource using Terraform
+4. Setup Cloudflare R2
+5. Add variable file for terraform and enter your credentials.
+```bash
+cp terraform.tfvars.example terraform.tfvars
+```
+6. Create AWS resource using Terraform
 ```bash
 cd ByteShare
 terraform init
 terraform plan
 terraform apply
 ```
-5. Setup your Appwrite account [HERE](https://appwrite.io/)
-6. Create your Organisation and Project in Appwrite [TUTORIAL](https://youtu.be/pk92hS_d_ns?t=11&si=emSqp8Mdra_iF-dc)
-7. Enable only Magic URL and JWT in Appwrite [SEE WHERE](https://github.com/ambujraj/ByteShare/assets/29935993/7a023290-01ca-43ff-b3a2-0962433ccb75)
-8. Install UI dependencies and add .env file
+7. Setup your Appwrite account [HERE](https://appwrite.io/)
+8. Create your Organisation and Project in Appwrite [TUTORIAL](https://youtu.be/pk92hS_d_ns?t=11&si=emSqp8Mdra_iF-dc)
+9. Enable only Magic URL and JWT in Appwrite [SEE WHERE](https://github.com/ambujraj/ByteShare/assets/29935993/7a023290-01ca-43ff-b3a2-0962433ccb75)
+10. Install UI dependencies and add .env file
 ```bash
 cd ui
 npm install
 cp .env.example .env
 cd ..
 ```
-9. Fill the values in .env file for backend url and Appwrite creds
-10. Install Middleware(Backend) dependencies and add .env file
+11. Fill the values in .env file for backend url and Appwrite creds
+12.  Install Middleware(Backend) dependencies and add .env file
 ```bash
 cd middleware
 python3 -m venv .venv
@@ -57,7 +63,7 @@ pip3 install -r requirements.txt
 cp .env.example .env
 cd ..
 ```
-11.  Run the application
+13.   Run the application
 ```bash
 cd ui
 npm run dev
@@ -70,7 +76,7 @@ uvicorn main:app --reload
 #### By default, UI runs on port **3000** and Middleware runs on port **8000**
 
 ## Architecture
-![architecture](https://github.com/ambujraj/ByteShare/assets/29935993/c79ad42b-88e2-4695-9059-dd8384e44d4a)
+![architecture](https://github.com/ambujraj/ByteShare/assets/29935993/cc41b0e0-4ab4-4f56-b7be-013ae9f14018)
 
 
 ## Built with
@@ -78,8 +84,7 @@ uvicorn main:app --reload
 - ShadCN (TailwindCSS)
 - FastAPI
 - AWS DynamoDB
-- AWS S3
-- AWS Cloudfront
+- Cloudflare R2
 - AWS Cloudwatch
 - Appwrite
 

@@ -1,41 +1,76 @@
-provider "aws" {
-  region = "us-east-2"
-}
-
-# S3 Bucket
-resource "aws_s3_bucket" "byteshare-blob" {
-  bucket = "byteshare-blob"
-
-
-}
-
-resource "aws_s3_bucket_lifecycle_configuration" "move_to_glacier" {
-  bucket = "byteshare-blob"
-
-  rule {
-    id     = "glacier-transition-rule"
-    status = "Enabled"
-
-    transition {
-      days          = 8
-      storage_class = "GLACIER"
+terraform {
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+      version = "~> 5"
     }
   }
 }
 
-resource "aws_s3_bucket_cors_configuration" "allow_upload" {
+variable "aws_access_key" {}
+variable "aws_secret_key" {}
+variable "r2_access_key" {}
+variable "r2_secret_key" {}
+variable "r2_account_id" {}
+
+provider "aws" {
+  alias = "aws"
+  region = "us-east-2"
+  access_key = var.aws_access_key
+  secret_key = var.aws_secret_key
+}
+
+provider "aws" {
+  alias = "r2"
+  region = "us-east-2"
+
+  access_key = var.r2_access_key
+  secret_key = var.r2_secret_key
+
+  skip_credentials_validation = true
+  skip_region_validation      = true
+  skip_requesting_account_id  = true
+
+  endpoints {
+    s3 = "https://${var.r2_account_id}.r2.cloudflarestorage.com"
+  }
+}
+
+
+# Bucket
+resource "aws_s3_bucket" "byteshare-blob" {
+  provider = aws.r2
   bucket = "byteshare-blob"
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "expire-object" {
+  provider = aws.r2
+  bucket = aws_s3_bucket.byteshare-blob.id
+
+  rule {
+    id     = "expire_object"
+    status = "Enabled"
+    expiration {
+      days = 60
+    }
+  }
+}
+
+resource "aws_s3_bucket_cors_configuration" "allow-cors" {
+  provider = aws.r2
+  bucket = aws_s3_bucket.byteshare-blob.id
 
   cors_rule {
     allowed_headers = ["*"]
     allowed_methods = ["PUT", "GET", "HEAD"]
     allowed_origins = ["*"]
-    expose_headers  = ["ETag", "Content-Length", "Content-Type"]
+    expose_headers  = ["Content-Length", "Content-Type"]
   }
 }
 
 # DynamoDB table
 resource "aws_dynamodb_table" "byteshare-upload-metadata" {
+  provider = aws.aws
   name         = "byteshare-upload-metadata"
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "upload_id"
@@ -47,6 +82,7 @@ resource "aws_dynamodb_table" "byteshare-upload-metadata" {
 }
 
 resource "aws_dynamodb_table" "byteshare-subscriber" {
+  provider = aws.aws
   name         = "byteshare-subscriber"
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "email"
