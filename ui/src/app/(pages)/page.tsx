@@ -25,9 +25,7 @@ import TwitterHandle from '@/components/handle'
 
 export default function Home() {
   const router = useRouter()
-  const { authorised } = useAuth()
-  const searchParams = useSearchParams()
-  const from = searchParams.get('from')
+  const { authorised, statusLoaded } = useAuth()
   const [uploadSize, setUploadSize] = useState('0')
   const [submitDisabled, setSubmitDisabled] = useState(true)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
@@ -281,14 +279,15 @@ export default function Home() {
 
   return (
     <div className="h-screen flex flex-col justify-between">
-      <Header authorised={authorised} />
+      <Header authorised={authorised} statusLoaded={statusLoaded} />
       {/* <p className="flex align-items-center z-10">hey</p> */}
       <Drawer open={isDrawerOpen} onClose={handleDrawerClose}>
         <div className="flex-grow flex items-center justify-center z-10">
-          <DrawerTrigger asChild onClick={() => setIsDrawerOpen(!isDrawerOpen)}>
+          <DrawerTrigger asChild>
             <Button
               className="font-semibold text-3xl shadow-lg px-20 py-20 bg-blue-100 text-blue-800 hover:bg-slate-200 hover:text-blue-800 rounded-2xl"
               onClick={() => handleSend()}
+              disabled={!statusLoaded}
             >
               Send
             </Button>

@@ -52,7 +52,7 @@ type File = {
 }
 
 function SharePage({ params }: Params) {
-  const { authorised } = useAuth()
+  const { authorised, statusLoaded } = useAuth()
   const [isMounted, setIsMounted] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
@@ -209,7 +209,7 @@ function SharePage({ params }: Params) {
 
   return (
     <div className="h-screen flex flex-col justify-between">
-      <Header authorised={authorised} />
+      <Header authorised={authorised} statusLoaded={statusLoaded} />
       <div className=" flex items-center justify-center h-[60%] w-[80%] m-auto bg-white rounded-md z-10">
         <div className="w-[90%]">
           <p className="font-bold text-lg text-left pb-5">

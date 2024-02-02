@@ -5,13 +5,19 @@ import React, { useEffect, useState } from 'react'
 
 const InternalLayout = ({ children }: { children: React.ReactNode }) => {
   const [authorised, setAuthorised] = useState(false)
+  const [statusLoaded, setStatusLoaded] = useState(false)
 
   useEffect(() => {
-    appwriteService.isLoggedIn().then(setAuthorised)
+    appwriteService.isLoggedIn().then((isLoggedIn) => {
+      setAuthorised(isLoggedIn)
+      setStatusLoaded(true)
+    })
   }, [])
 
   return (
-    <AuthProvider value={{ authorised, setAuthorised }}>
+    <AuthProvider
+      value={{ authorised, setAuthorised, statusLoaded, setStatusLoaded }}
+    >
       {children}
     </AuthProvider>
   )
