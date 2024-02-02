@@ -28,7 +28,7 @@ app.add_middleware(
 )
 
 # Storage
-BUCKET_NAME = "byteshare-blob"
+BUCKET_NAME = "byteshare-blob" 
 storage = CloudflareR2Manager(BUCKET_NAME)
 
 # DynamoDB
