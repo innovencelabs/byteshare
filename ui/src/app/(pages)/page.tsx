@@ -51,8 +51,11 @@ export default function Home() {
   }, [])
 
   const handleSend = () => {
+    setIsDrawerOpen(false)
     if (!authorised) {
       router.push('/auth/login')
+    } else {
+      setIsDrawerOpen(true)
     }
   }
 
