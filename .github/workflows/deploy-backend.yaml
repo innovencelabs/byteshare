@@ -33,6 +33,7 @@ jobs:
 
     - name: Deploy Backend with SAM CLI
       env:
+        AWS_DEFAULT_REGION: us-east-2
         CORS_ORIGIN: ${{ secrets.CORS_ORIGIN }}
         R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
         R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}
@@ -47,5 +48,3 @@ jobs:
         sam deploy --parameter-overrides 'CORS_ORIGIN=$CORS_ORIGIN R2_ACCOUNT_ID=$R2_ACCOUNT_ID R2_ACCESS_KEY=$R2_ACCESS_KEY R2_SECRET_KEY=$R2_SECRET_KEY'
         rm python-site-packages.zip
 
-      env:
-        AWS_DEFAULT_REGION: us-east-2
