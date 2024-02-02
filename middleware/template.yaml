@@ -4,13 +4,20 @@ Parameters:
   LamdbaLayerName:
     Type: String
     Default: byteshare-dependencies
+  R2AccountID:
+    Type: String
+  R2AccessKey:
+    Type: String
+  R2SecretKey:
+    Type: String
+
 Globals:
   Function:
     Timeout: 900
   Api:
     Cors:
       AllowMethods: "'OPTIONS,GET,POST,PUT,DELETE'"
-      AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+      AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,File-Length'"
       AllowOrigin: "'*'"
 Resources:
   ByteShareFunction:
