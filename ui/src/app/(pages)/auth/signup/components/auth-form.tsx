@@ -7,30 +7,46 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import appwriteService from '@/authentication/appwrite/config'
 import useAuth from '@/context/useAuth'
-import { useRouter } from 'next/navigation'
-import React, { FormEvent, HTMLAttributes, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import React, { FormEvent, HTMLAttributes, useCallback, useState } from 'react'
 import { toast } from 'sonner'
 
 interface UserAuthFormProps extends HTMLAttributes<HTMLDivElement> {}
 
 export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const router = useRouter()
-  const { setAuthorised } = useAuth()
+  const searchParams = useSearchParams()
   const [formData, setFormData] = useState({
     email: '',
     password: '',
+    name: '',
   })
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
-  const login = async (e: FormEvent<HTMLFormElement>) => {
+  const { setAuthorised } = useAuth()
+
+  const createQueryString = useCallback(
+    (name: string, value: string) => {
+      const params = new URLSearchParams()
+      params.set(name, value)
+
+      return params.toString()
+    },
+    [searchParams],
+  )
+
+  const create = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+
     setIsLoading(true)
+
     try {
-      const session = await appwriteService.login(formData)
-      if (session) {
+      const userData = await appwriteService.createUserAccount(formData)
+      if (userData) {
         setAuthorised(true)
-        router.push('/')
+        await appwriteService.initiateVerification()
+        router.push('/' + '?' + createQueryString('from', 'signup'))
       }
     } catch (err: any) {
       toast.error(err.message)
@@ -41,15 +57,31 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
 
   return (
     <div className={cn('grid gap-6', className)} {...props}>
-      <form onSubmit={login}>
+      <form onSubmit={create}>
         <div className="grid gap-8">
           <div className="grid gap-2">
+            <Label className="sr-only" htmlFor="name">
+              Name
+            </Label>
+            <Input
+              id="name"
+              placeholder="Your Name"
+              type="text"
+              value={formData.name}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, name: e.target.value }))
+              }
+              autoCapitalize="true"
+              autoCorrect="off"
+              disabled={isLoading}
+              required={true}
+            />
             <Label className="sr-only" htmlFor="email">
               Email
             </Label>
             <Input
               id="email"
-              placeholder="Email address"
+              placeholder="Email Address"
               type="email"
               value={formData.email}
               onChange={(e) =>
@@ -61,8 +93,8 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               disabled={isLoading}
               required={true}
             />
-            <Label className="sr-only" htmlFor="password">
-              Password
+            <Label className="sr-only" htmlFor="email">
+              Email
             </Label>
             <Input
               id="password"
@@ -77,23 +109,12 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               disabled={isLoading}
               required={true}
             />
-            <Button
-              className="flex items-center justify-start text-left p-0"
-              variant="link"
-              onClick={(e) => {
-                e.preventDefault()
-                sessionStorage.setItem('FORGOT_PASSWORD_EMAIL', formData.email)
-                router.push('/auth/forgot-password')
-              }}
-            >
-              Forgot Password?
-            </Button>
           </div>
           <Button disabled={isLoading}>
             {isLoading && (
               <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
             )}
-            Sign In with Email
+            Sign Up with Email
           </Button>
         </div>
       </form>
@@ -113,7 +134,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         ) : (
           <Icons.google className="mr-2 h-4 w-4" />
         )}{' '}
-        Sign in with Google
+        Sign up with Google
       </Button>
     </div>
   )

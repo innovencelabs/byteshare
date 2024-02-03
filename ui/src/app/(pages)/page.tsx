@@ -4,7 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import useAuth from '@/context/useAuth'
 import appwriteService from '@/authentication/appwrite/config'
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Header } from '@/components/header'
 import { Button } from '@/components/ui/button'
 import {
@@ -20,12 +20,14 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Progress } from '@/components/ui/progress'
-import { CheckIcon, CopyIcon, TwitterLogoIcon } from '@radix-ui/react-icons'
+import { CheckIcon, CopyIcon } from '@radix-ui/react-icons'
 import TwitterHandle from '@/components/handle'
 
 export default function Home() {
   const router = useRouter()
   const { authorised, statusLoaded } = useAuth()
+  const searchParams = useSearchParams()
+  const from = searchParams.get('from')
   const [uploadSize, setUploadSize] = useState('0')
   const [submitDisabled, setSubmitDisabled] = useState(true)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
@@ -39,14 +41,41 @@ export default function Home() {
   const [isCopied, setIsCopied] = useState(false)
   const [expirationDate, setExpirationDate] = useState('')
   const [downloadsAllowed, setDownloadsAllowed] = useState('')
+  const audioRef = useRef(null)
+
+  const playSound = () => {
+    if (audioRef.current) {
+      audioRef.current.play()
+    }
+  }
 
   useEffect(() => {
-    appwriteService.getCurrentUser().then((user) => {
-      if (user) {
-        setUserEmail(user.email)
-      }
-    })
-  }, [])
+    if (statusLoaded) {
+      appwriteService.getCurrentUser().then((user) => {
+        if (user) {
+          setUserEmail(user.email)
+        }
+        if (
+          user &&
+          from == 'signup' &&
+          authorised &&
+          !user?.emailVerification
+        ) {
+          playSound()
+          toast.info(
+            'Please check your email for a verification link to complete your registration.',
+          )
+        } else if (
+          user &&
+          from == 'verify-email' &&
+          authorised &&
+          user?.emailVerification
+        ) {
+          toast.success('Email has been successfully verified.')
+        }
+      })
+    }
+  }, [statusLoaded])
 
   const handleSend = () => {
     setIsDrawerOpen(false)
@@ -402,7 +431,7 @@ export default function Home() {
           </div>
         </DrawerContent>
       </Drawer>
-
+      <audio ref={audioRef} src="/popsound.mp3" />
       <TwitterHandle />
       <div className="absolute inset-0">
         <Image
