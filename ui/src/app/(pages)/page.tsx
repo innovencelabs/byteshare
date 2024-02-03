@@ -153,15 +153,24 @@ export default function Home() {
     }
     setUploading(true)
     setUploaded(false)
+    let randomNumberToBegin = 0
     if (selectedFiles.length == 1) {
       if (selectedFiles[0].size > 2 * 1024 * 1024) {
-        const randomNumber = Math.floor(Math.random() * (30 - 20 + 1)) + 20
-        setTimeout(() => setProgress(randomNumber), 500)
+        setTimeout(
+          () => setProgress(Math.floor(Math.random() * (30 - 20 + 1)) + 20),
+          500,
+        )
       } else {
-        const randomNumber = Math.floor(Math.random() * (49 - 20 + 1)) + 20
-        setTimeout(() => setProgress(randomNumber), 100)
+        setTimeout(
+          () => setProgress(Math.floor(Math.random() * (49 - 20 + 1)) + 20),
+          100,
+        )
       }
+    } else if (selectedFiles.length > 1) {
+      randomNumberToBegin = Math.floor(Math.random() * (6 - 3 + 1)) + 3
+      setProgress(randomNumberToBegin)
     }
+
     if (selectedFiles.length > 0) {
       try {
         let firstFileUploadResponse = await uploadFirstFile(selectedFiles[0])
@@ -169,7 +178,10 @@ export default function Home() {
         const uploadID = firstFileUploadResponse.uploadID
 
         const remainingFiles = selectedFiles.slice(1)
-        setProgress((1 / selectedFiles.length) * 100)
+        setProgress(
+          randomNumberToBegin +
+            (1 / selectedFiles.length) * (100 - randomNumberToBegin),
+        )
 
         // const chunkSize = 3
         // for (let i = 0; i < remainingFiles.length; i += chunkSize) {
@@ -184,7 +196,10 @@ export default function Home() {
 
         for (let i = 0; i < remainingFiles.length; i++) {
           await uploadFile(remainingFiles[i], uploadID, continueID)
-          setProgress(((i + 1) / selectedFiles.length) * 100)
+          setProgress(
+            randomNumberToBegin +
+              ((i + 1) / selectedFiles.length) * (100 - randomNumberToBegin),
+          )
         }
 
         const postUploadResponse = await postUpload(fileNames, uploadID)
