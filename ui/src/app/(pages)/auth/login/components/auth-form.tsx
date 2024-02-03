@@ -39,6 +39,22 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     setIsLoading(false)
   }
 
+  const loginWithGoogle = (e) => {
+    e.preventDefault()
+    setIsLoading(true)
+
+    try {
+      const successRedirect = process.env.NEXT_PUBLIC_APP_URL
+      const failureRedirect = process.env.NEXT_PUBLIC_APP_URL + '/auth/login'
+
+      appwriteService.loginWithGoogle({ successRedirect, failureRedirect })
+    } catch (err) {
+      toast.error(err.message)
+    }
+
+    setIsLoading(false)
+  }
+
   return (
     <div className={cn('grid gap-6', className)} {...props}>
       <form onSubmit={login}>
@@ -113,7 +129,12 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
           </span>
         </div>
       </div>
-      <Button variant="outline" type="button" disabled={isLoading}>
+      <Button
+        variant="outline"
+        type="button"
+        onClick={loginWithGoogle}
+        disabled={isLoading}
+      >
         {isLoading ? (
           <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
         ) : (

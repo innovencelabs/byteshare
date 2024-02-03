@@ -28,6 +28,11 @@ type CompleteVerification = {
   secret: string
 }
 
+type SignInWithGoogle = {
+  successRedirect: string
+  failureRedirect: string
+}
+
 const appwriteClient = new Client()
 appwriteClient.setEndpoint(conf.appwriteUrl).setProject(conf.appwriteProjectID)
 
@@ -55,6 +60,17 @@ export class AppwriteService {
   async login({ email, password }: LoginUserAccount) {
     try {
       return await account.createEmailSession(email, password)
+    } catch (err: any) {
+      throw err
+    }
+  }
+
+  async loginWithGoogle({
+    successRedirect,
+    failureRedirect,
+  }: SignInWithGoogle) {
+    try {
+      account.createOAuth2Session('google', successRedirect, failureRedirect)
     } catch (err: any) {
       throw err
     }
