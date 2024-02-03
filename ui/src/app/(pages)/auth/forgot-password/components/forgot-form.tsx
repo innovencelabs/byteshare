@@ -27,7 +27,10 @@ export function ForgotPasswordForm({
     email: '',
   })
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const forgotPasswordEmail = sessionStorage.getItem('FORGOT_PASSWORD_EMAIL')
+  let forgotPasswordEmail = ''
+  if (typeof window !== 'undefined') {
+    forgotPasswordEmail = sessionStorage.getItem('FORGOT_PASSWORD_EMAIL')
+  }
   const audioRef = useRef(null)
 
   const playSound = () => {
@@ -47,7 +50,10 @@ export function ForgotPasswordForm({
   const forgotPassword = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsLoading(true)
-    sessionStorage.setItem('FORGOT_PASSWORD_EMAIL', '')
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('FORGOT_PASSWORD_EMAIL', '')
+    }
+
     try {
       const response = await appwriteService.initiateForgotPassword(formData)
       if (response) {
