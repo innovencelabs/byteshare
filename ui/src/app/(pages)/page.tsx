@@ -168,7 +168,7 @@ export default function Home() {
       }
     } else if (selectedFiles.length > 1) {
       randomNumberToBegin = Math.floor(Math.random() * (6 - 3 + 1)) + 3
-      setProgress(randomNumberToBegin)
+      setTimeout(() => setProgress(randomNumberToBegin), 100)
     }
 
     if (selectedFiles.length > 0) {
@@ -356,6 +356,18 @@ export default function Home() {
                     Your share link has been generated.
                   </DrawerDescription>
                 </>
+              ) : uploading ? (
+                <>
+                  <DrawerTitle className="">
+                    <Image
+                      className="mx-auto max-w-full max-h-full"
+                      src="/secure.png"
+                      alt="secure icon"
+                      height="20"
+                      width="20"
+                    />
+                  </DrawerTitle>
+                </>
               ) : (
                 <>
                   <DrawerTitle className="text-center">Send Files</DrawerTitle>
@@ -366,36 +378,40 @@ export default function Home() {
               )}
             </DrawerHeader>{' '}
             {!uploading && !uploaded ? (
-              <form onSubmit={handleUploadSubmit}>
-                <div className="p-4">
-                  <Label htmlFor="files">Files (Size: {uploadSize})</Label>
-                  <Input
-                    id="files"
-                    type="file"
-                    multiple
-                    onChange={handleUploadChange}
-                  />
-                </div>
-                <DrawerFooter>
-                  <Button disabled={submitDisabled} type="submit">
-                    Submit
-                  </Button>
-                  <DrawerClose asChild onClick={() => setIsDrawerOpen(false)}>
-                    <Button variant="ghost">Close</Button>
-                  </DrawerClose>
-                </DrawerFooter>
-              </form>
+              <>
+                <form onSubmit={handleUploadSubmit}>
+                  <div className="p-4">
+                    <Label htmlFor="files">Files (Size: {uploadSize})</Label>
+                    <Input
+                      id="files"
+                      type="file"
+                      multiple
+                      onChange={handleUploadChange}
+                    />
+                  </div>
+                  <DrawerFooter>
+                    <Button disabled={submitDisabled} type="submit">
+                      Submit
+                    </Button>
+                    <DrawerClose asChild onClick={() => setIsDrawerOpen(false)}>
+                      <Button variant="ghost">Close</Button>
+                    </DrawerClose>
+                  </DrawerFooter>
+                </form>
+              </>
             ) : !uploaded ? (
-              <div className="pt-4">
-                <Label>{progress.toFixed(1)}%</Label>
-                <Progress value={progress} className="m-auto w-[100%]" />
+              <>
+                <div className="pt-4">
+                  <Label>{progress.toFixed(1)}%</Label>
+                  <Progress value={progress} className="m-auto w-[100%]" />
 
-                <DrawerFooter>
-                  <DrawerClose asChild onClick={() => setIsDrawerOpen(false)}>
-                    <Button variant="ghost">Close</Button>
-                  </DrawerClose>
-                </DrawerFooter>
-              </div>
+                  <DrawerFooter>
+                    <DrawerClose asChild onClick={() => setIsDrawerOpen(false)}>
+                      <Button variant="ghost">Close</Button>
+                    </DrawerClose>
+                  </DrawerFooter>
+                </div>
+              </>
             ) : (
               <div className="pt-4">
                 <Image
