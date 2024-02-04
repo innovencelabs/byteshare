@@ -87,7 +87,7 @@ export default function Home() {
         }
       })
     }
-  }, [statusLoaded])
+  }, [statusLoaded, router])
 
   const handleSend = async () => {
     setIsDrawerOpen(false)
