@@ -12,6 +12,8 @@ Parameters:
     Type: String
   CorsOrigin:
     Type: String
+  ApiKeyValue:
+    Type: String
 
 Globals:
   Function:
@@ -63,6 +65,19 @@ Resources:
         AllowOrigin: !Sub
           - "'${CorsOrigin}'"
           - CorsOrigin: !Ref CorsOrigin
+      Auth:
+        ApiKeyRequired: true
+  ApiKey:
+    Type: AWS::ApiGateway::ApiKey
+    Properties: 
+      Name: !Join ["", [{"Ref": "AWS::StackName"}, "-apikey"]]
+      Description: "API Key for WebApp"
+      Enabled: true
+      GenerateDistinctId: false
+      Value: !Ref ApiKeyValue
+      StageKeys:
+        - RestApiId: !Ref ByteShareAPIGW
+          StageName: Prod
 
   SitePackagesLayer:
     Type: AWS::Serverless::LayerVersion

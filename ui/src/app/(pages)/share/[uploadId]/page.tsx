@@ -67,6 +67,12 @@ function SharePage({ params }: Params) {
 
       const downloadResponse = await fetch(
         apiBaseURL + '/download' + '/' + params.uploadId,
+        {
+          method: 'GET',
+          headers: {
+            'x-api-key': process.env.NEXT_PUBLIC_API_KEY,
+          },
+        },
       )
       if (!downloadResponse.ok) {
         toast.error('Upload ID is not valid')

@@ -263,6 +263,7 @@ export default function Home() {
         headers: {
           'File-Length': file.size,
           'Content-Type': 'application/json',
+          'x-api-key': process.env.NEXT_PUBLIC_API_KEY,
         },
       },
     )
@@ -293,6 +294,7 @@ export default function Home() {
       headers: {
         'File-Length': file.size,
         'Content-Type': 'application/json',
+        'x-api-key': process.env.NEXT_PUBLIC_API_KEY,
       },
     })
     const data = await initiateUploadResponse.json()
@@ -324,6 +326,7 @@ export default function Home() {
         body: JSON.stringify(fileJSON),
         headers: {
           'Content-Type': 'application/json',
+          'x-api-key': process.env.NEXT_PUBLIC_API_KEY,
         },
       },
     )
