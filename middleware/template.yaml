@@ -55,8 +55,6 @@ Resources:
             Method: any
   ByteShareAPIGW:
     Type: AWS::Serverless::Api
-    DependsOn:
-      - ApiKey
     Properties:
       StageName: prod
       OpenApiVersion: "3.0.0"
@@ -72,7 +70,7 @@ Resources:
   ApiKey:
     Type: AWS::ApiGateway::ApiKey
     Properties: 
-      Name: !Join ["", [{"Ref": "AWS::StackName"}, "-apikey"]]
+      Name: !Sub ${AWS::StackName}-apikey
       Description: "API Key for WebApp"
       Enabled: true
       GenerateDistinctId: false
