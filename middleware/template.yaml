@@ -55,6 +55,8 @@ Resources:
             Method: any
   ByteShareAPIGW:
     Type: AWS::Serverless::Api
+    DependsOn:
+      - ApiKey
     Properties:
       StageName: prod
       OpenApiVersion: "3.0.0"
