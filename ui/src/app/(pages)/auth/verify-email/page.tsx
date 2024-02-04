@@ -22,18 +22,22 @@ function VerifyEmailPage() {
   )
 
   useEffect(() => {
-    if (userId && secret) {
-      try {
-        appwriteService.completeVerification({ userId, secret })
-        return router.push(
-          '/' + '?' + createQueryString('from', 'verify-email'),
-        )
-      } catch (err) {
-        toast.error(err.message)
+    const completeVerification = async () => {
+      if (userId && secret) {
+        try {
+          await appwriteService.completeVerification({ userId, secret })
+          return router.push(
+            '/' + '?' + createQueryString('from', 'verify-email'),
+          )
+        } catch (err) {
+          toast.error(err.message)
+        }
+      } else {
+        return router.push('/')
       }
-    } else {
-      return router.push('/')
     }
+
+    completeVerification()
   }, [userId, secret])
 }
 
