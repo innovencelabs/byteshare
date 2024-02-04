@@ -4,7 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import useAuth from '@/context/useAuth'
 import appwriteService from '@/authentication/appwrite/config'
 import Image from 'next/image'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Header } from '@/components/header'
 import { Button } from '@/components/ui/button'
 import {
@@ -32,6 +32,7 @@ export default function Home() {
   const [submitDisabled, setSubmitDisabled] = useState(true)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [selectedFiles, setSelectedFiles] = useState([])
+  const [user, setUser] = useState(null)
   const [userEmail, setUserEmail] = useState('')
   const [progress, setProgress] = useState(0)
   const [uploading, setUploading] = useState(false)
@@ -49,27 +50,38 @@ export default function Home() {
     }
   }
 
+  const createQueryString = useCallback(
+    (name: string, value: string) => {
+      const params = new URLSearchParams()
+      params.set(name, value)
+
+      return params.toString()
+    },
+    [searchParams],
+  )
+
   useEffect(() => {
     if (statusLoaded) {
-      appwriteService.getCurrentUser().then((user) => {
-        if (user) {
-          setUserEmail(user.email)
+      appwriteService.getCurrentUser().then((userResponse) => {
+        if (userResponse) {
+          setUser(userResponse)
+          setUserEmail(userResponse.email)
         }
         if (
-          user &&
+          userResponse &&
           from == 'signup' &&
           authorised &&
-          !user?.emailVerification
+          !userResponse?.emailVerification
         ) {
           playSound()
           toast.info(
             'Please check your email for a verification link to complete your registration.',
           )
         } else if (
-          user &&
+          userResponse &&
           from == 'verify-email' &&
           authorised &&
-          user?.emailVerification
+          userResponse?.emailVerification
         ) {
           toast.success('Email has been successfully verified.')
         }
@@ -77,10 +89,13 @@ export default function Home() {
     }
   }, [statusLoaded])
 
-  const handleSend = () => {
+  const handleSend = async () => {
     setIsDrawerOpen(false)
     if (!authorised) {
-      router.push('/auth/login')
+      router.push('/auth/login' + '?' + createQueryString('from', 'home'))
+    } else if (!user?.emailVerification) {
+      toast.error('Email is not verified.')
+      await appwriteService.initiateVerification()
     } else {
       setIsDrawerOpen(true)
     }

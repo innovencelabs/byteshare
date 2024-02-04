@@ -7,8 +7,14 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import appwriteService from '@/authentication/appwrite/config'
 import useAuth from '@/context/useAuth'
-import { useRouter } from 'next/navigation'
-import React, { FormEvent, HTMLAttributes, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import React, {
+  FormEvent,
+  HTMLAttributes,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 import { toast } from 'sonner'
 
 interface UserAuthFormProps extends HTMLAttributes<HTMLDivElement> {}
@@ -20,8 +26,25 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     email: '',
     password: '',
   })
-
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const { authorised, statusLoaded } = useAuth()
+  const searchParams = useSearchParams()
+  const from = searchParams.get('from')
+  const audioRef = useRef(null)
+
+  const playSound = () => {
+    if (audioRef.current) {
+      audioRef.current.play()
+    }
+  }
+
+  useEffect(() => {
+    if (statusLoaded) {
+      if (!authorised && from == 'home') {
+        toast.info('Please log in to your account to continue.')
+      }
+    }
+  }, [statusLoaded])
 
   const login = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -165,6 +188,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         )}{' '}
         Continue with Google
       </Button>
+      <audio ref={audioRef} src="/popsound.mp3" />
     </div>
   )
 }
