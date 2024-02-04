@@ -77,7 +77,7 @@ Resources:
       Value: !Ref ApiKeyValue
       StageKeys:
         - RestApiId: !Ref ByteShareAPIGW
-          StageName: Prod
+          StageName: prod
 
   SitePackagesLayer:
     Type: AWS::Serverless::LayerVersion
