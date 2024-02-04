@@ -7,6 +7,7 @@ import Image from 'next/image'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Header } from '@/components/header'
 import { Button } from '@/components/ui/button'
+import axios from 'axios'
 import {
   Drawer,
   DrawerClose,
@@ -42,6 +43,8 @@ export default function Home() {
   const [isCopied, setIsCopied] = useState(false)
   const [expirationDate, setExpirationDate] = useState('')
   const [downloadsAllowed, setDownloadsAllowed] = useState('')
+  const [batchCount, setBatchCount] = useState(0)
+  const [totalBatch, setTotalBatch] = useState(0)
   const audioRef = useRef(null)
 
   const playSound = () => {
@@ -87,7 +90,7 @@ export default function Home() {
         }
       })
     }
-  }, [statusLoaded])
+  }, [statusLoaded, router])
 
   const handleSend = async () => {
     setIsDrawerOpen(false)
@@ -144,6 +147,8 @@ export default function Home() {
     setIsCopied(false)
     setExpirationDate('')
     setDownloadsAllowed('')
+    setBatchCount(0)
+    setTotalBatch(0)
   }
 
   const handleCopy = async () => {
@@ -168,53 +173,92 @@ export default function Home() {
     }
     setUploading(true)
     setUploaded(false)
-    let randomNumberToBegin = 0
-    if (selectedFiles.length == 1) {
-      if (selectedFiles[0].size > 2 * 1024 * 1024) {
-        setTimeout(
-          () => setProgress(Math.floor(Math.random() * (30 - 20 + 1)) + 20),
-          500,
-        )
-      } else {
-        setTimeout(
-          () => setProgress(Math.floor(Math.random() * (49 - 20 + 1)) + 20),
-          100,
-        )
-      }
-    } else if (selectedFiles.length > 1) {
-      randomNumberToBegin = Math.floor(Math.random() * (6 - 3 + 1)) + 3
-      setTimeout(() => setProgress(randomNumberToBegin), 100)
-    }
 
     if (selectedFiles.length > 0) {
       try {
-        let firstFileUploadResponse = await uploadFirstFile(selectedFiles[0])
-        const continueID = firstFileUploadResponse.continueID
-        const uploadID = firstFileUploadResponse.uploadID
+        let continueID = ''
+        let uploadID = ''
 
-        const remainingFiles = selectedFiles.slice(1)
-        setProgress(
-          randomNumberToBegin +
-            (1 / selectedFiles.length) * (100 - randomNumberToBegin),
-        )
+        const batchSize = 3
+        const totalFiles = selectedFiles.length
+        const totalBatches = Math.ceil(totalFiles / batchSize)
+        let filesUploaded = 0
 
-        // const chunkSize = 3
-        // for (let i = 0; i < remainingFiles.length; i += chunkSize) {
-        //   const chunk = remainingFiles.slice(i, i + chunkSize)
+        const uploadBatch = (files, batchUrls) => {
+          return new Promise<void>(async (resolve, reject) => {
+            const totalFilesInBatch = files.length
+            let uploadedFilesCount = 0
+            let totalBytesUploaded = 0
+            let totalBytesExpected = files.reduce(
+              (acc, file) => acc + file.size,
+              0,
+            )
 
-        //   await Promise.all(
-        //     chunk.map((file) => uploadFile(file, uploadID, continueID)),
-        //   )
+            const uploadPromises = files.map(async (file, index) => {
+              try {
+                const response = await axios.put(batchUrls[index], file, {
+                  onUploadProgress: (progressEvent) => {
+                    totalBytesUploaded = Math.min(
+                      totalBytesUploaded + progressEvent.loaded,
+                      totalBytesExpected,
+                    )
+                    const overallProgress =
+                      (totalBytesUploaded / totalBytesExpected) * 100
+                    setProgress(overallProgress)
+                  },
+                })
 
-        //   setProgress(((i + chunkSize) / remainingFiles.length) * 100)
-        // }
+                if (response.status !== 200) {
+                  throw new Error(
+                    `Unexpected response status: ${response.status}`,
+                  )
+                }
 
-        for (let i = 0; i < remainingFiles.length; i++) {
-          await uploadFile(remainingFiles[i], uploadID, continueID)
-          setProgress(
-            randomNumberToBegin +
-              ((i + 1) / selectedFiles.length) * (100 - randomNumberToBegin),
-          )
+                uploadedFilesCount++
+              } catch (error) {
+                reject(error)
+              }
+            })
+
+            try {
+              await Promise.all(uploadPromises)
+              resolve()
+            } catch (error) {
+              reject(error)
+            }
+          })
+        }
+        setBatchCount(1)
+        for (let batch = 0; batch < totalBatches; batch++) {
+          setTotalBatch(totalBatches)
+          const start = batch * batchSize
+          const end = Math.min((batch + 1) * batchSize, totalFiles)
+          const batchFiles = selectedFiles.slice(start, end)
+
+          let batchURL = []
+
+          for (let i = start; i < end; i++) {
+            if (i == 0) {
+              const firstFileResponse = await uploadFirstFile(selectedFiles[0])
+              uploadID = firstFileResponse.uploadID
+              let uploadURL = firstFileResponse.uploadURL
+              continueID = firstFileResponse.continueID
+              batchURL.push(uploadURL)
+
+              continue
+            }
+            const fileResponse = await uploadFile(
+              selectedFiles[i],
+              uploadID,
+              continueID,
+            )
+            let uploadURL = fileResponse.uploadURL
+            batchURL.push(uploadURL)
+          }
+          setProgress(0)
+          setBatchCount(batch + 1)
+          await uploadBatch(batchFiles, batchURL)
+          filesUploaded += batchFiles.length
         }
 
         const postUploadResponse = await postUpload(fileNames, uploadID)
@@ -243,6 +287,8 @@ export default function Home() {
         setSubmitDisabled(true)
         setUploadSize('0')
         setSelectedFiles([])
+        setBatchCount(0)
+        setTotalBatch(0)
       }
     }
   }
@@ -269,13 +315,7 @@ export default function Home() {
     const data = await initiateUploadResponse.json()
     const uploadURL = data.upload_url
 
-    const uploadResponse = await fetch(uploadURL, {
-      method: 'PUT',
-      body: file,
-      headers: {
-        'Content-Type': file.type,
-      },
-    })
+    return { uploadURL }
   }
 
   const uploadFirstFile = async (file) => {
@@ -300,15 +340,7 @@ export default function Home() {
     const continueID = data.continue_id
     const uploadID = data.upload_id
 
-    const uploadResponse = await fetch(uploadURL, {
-      method: 'PUT',
-      body: file,
-      headers: {
-        'Content-Type': file.type,
-      },
-    })
-
-    return { uploadID, continueID }
+    return { uploadID, uploadURL, continueID }
   }
 
   const postUpload = async (fileNames, uploadID) => {
@@ -417,7 +449,9 @@ export default function Home() {
             ) : !uploaded ? (
               <>
                 <div className="pt-4">
-                  <Label>{progress.toFixed(1)}%</Label>
+                  <Label>
+                    {progress.toFixed(1)}% ({batchCount}/{totalBatch})
+                  </Label>
                   <Progress value={progress} className="m-auto w-[100%]" />
 
                   <DrawerFooter>
