@@ -46,5 +46,5 @@ jobs:
         rm -r python
         sam build
         sam deploy --parameter-overrides CorsOrigin=$CORS_ORIGIN R2AccountID=$R2_ACCOUNT_ID R2AccessKey=$R2_ACCESS_KEY R2SecretKey=$R2_SECRET_KEY
-        rm python-site-packages.zip
+        rm python-site-packages.zip 
 
