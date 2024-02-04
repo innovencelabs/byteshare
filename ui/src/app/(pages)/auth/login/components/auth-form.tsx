@@ -119,6 +119,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
             <Button
               className="flex items-center justify-start text-left p-0"
               variant="link"
+              type="button"
               onClick={(e) => {
                 e.preventDefault()
                 if (typeof window !== 'undefined') {
@@ -134,7 +135,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               Forgot Password?
             </Button>
           </div>
-          <Button disabled={isLoading}>
+          <Button type="submit" disabled={isLoading}>
             {isLoading && (
               <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
             )}

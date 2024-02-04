@@ -91,6 +91,7 @@ uvicorn main:app --reload
 - Vercel
 - AWS API Gateway and Lambda via SAM deployment
 - Github actions
+- Cloudflare
 
 ## Deployed version
 ### Frontend - https://byteshare.io
