@@ -523,11 +523,11 @@ export default function Home() {
       <audio ref={audioRef} src="/popsound.mp3" />
       <TwitterHandle />
       <div className="text-left absolute bottom-3">
-        <p className="text-black text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-semibold">
-          Share
+        <p className="text-black text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-semibold">
+          Manage,
         </p>
-        <p className="text-slate-100 text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-semibold">
-          Anything to Anyone
+        <p className="text-slate-100 text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-semibold">
+          Share, Secure. Effortlessly.
         </p>
       </div>
       <div className="absolute inset-0 bg-black opacity-5 z-1"></div>
