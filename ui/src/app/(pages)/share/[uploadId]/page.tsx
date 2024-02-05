@@ -208,7 +208,7 @@ function SharePage({ params }: Params) {
   })
 
   return (
-    <div className="h-screen flex flex-col justify-between">
+    <div className="bg-main h-screen flex flex-col justify-between">
       <Header authorised={authorised} statusLoaded={statusLoaded} />
       <div className=" flex items-center justify-center h-[60%] w-[80%] m-auto bg-white rounded-md z-10">
         <div className="w-[90%]">
@@ -334,15 +334,7 @@ function SharePage({ params }: Params) {
         </div>
       </div>
       <TwitterHandle />
-      <div className="absolute inset-0">
-        <Image
-          src="/background.jpg"
-          alt="Background Image"
-          layout="fill"
-          objectFit="cover"
-          className="z-0 "
-        />
-      </div>
+
       <div className="absolute inset-0 bg-black opacity-5 z-1"></div>
     </div>
   )
