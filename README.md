@@ -93,5 +93,5 @@ uvicorn main:app --reload
 - Github actions
 - Cloudflare
 
-## Deployed version
-### Frontend - https://byteshare.io
+<!-- ## Deployed version
+### Frontend -  -->
