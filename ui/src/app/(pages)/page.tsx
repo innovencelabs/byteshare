@@ -378,7 +378,7 @@ export default function Home() {
       <Drawer open={isDrawerOpen} onClose={handleDrawerClose}>
         <div className="flex-grow flex items-center justify-center z-10">
           <DrawerTrigger asChild>
-            <div className="px-16 py-12 border-2 border-black rounded-2xl">
+            <div className="px-12 py-8 border-2 border-black rounded-2xl">
               <Button
                 className="font-semibold text-3xl border-2 border-blue-100 shadow-lg px-20 py-20 bg-white text-blue-800 hover:bg-slate-200 hover:text-blue-800 rounded-2xl"
                 onClick={() => handleSend()}
@@ -522,7 +522,7 @@ export default function Home() {
       </Drawer>
       <audio ref={audioRef} src="/popsound.mp3" />
       <TwitterHandle />
-      <div className=" text-left absolute bottom-1">
+      <div className="text-left absolute bottom-3">
         <p className="text-black text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-semibold">
           Share
         </p>
