@@ -372,21 +372,21 @@ export default function Home() {
   }
 
   return (
-    <div className="bg-main min-h-screen flex flex-col justify-between">
+    <div className="min-h-screen flex flex-col justify-between">
       <Header authorised={authorised} statusLoaded={statusLoaded} />
       {/* <p className="flex align-items-center z-10">hey</p> */}
       <Drawer open={isDrawerOpen} onClose={handleDrawerClose}>
         <div className="flex-grow flex items-center justify-center z-10">
           <DrawerTrigger asChild>
-            <div className="px-12 py-8 border-2 border-black rounded-2xl">
-              <Button
-                className="font-semibold text-3xl border-2 border-blue-100 shadow-lg px-20 py-20 bg-white text-blue-800 hover:bg-slate-200 hover:text-blue-800 rounded-2xl"
-                onClick={() => handleSend()}
-                disabled={!statusLoaded}
-              >
-                Send
-              </Button>
-            </div>
+            {/* <div className="px-12 py-8 border-2 border-black rounded-2xl"> */}
+            <Button
+              className="font-semibold text-3xl border-2 border-blue-100 shadow-lg px-20 py-20 bg-blue-100 text-blue-800 hover:bg-slate-200 hover:text-blue-800 rounded-2xl"
+              onClick={() => handleSend()}
+              disabled={!statusLoaded}
+            >
+              Send
+            </Button>
+            {/* </div> */}
           </DrawerTrigger>
           {/* <Button
             className="font-semibold text-3xl shadow-lg ml-10 px-20 py-20 bg-slate-200 text-blue-800 hover:bg-blue-100 hover:text-blue-800 rounded-2xl"
@@ -522,11 +522,20 @@ export default function Home() {
       </Drawer>
       <audio ref={audioRef} src="/popsound.mp3" />
       <TwitterHandle />
+      <div className="absolute inset-0">
+        <Image
+          src="/background.jpg"
+          alt="Background Image"
+          layout="fill"
+          objectFit="cover"
+          className="z-0"
+        />
+      </div>
       <div className="text-left absolute bottom-3">
-        <p className="text-black text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-semibold">
+        <p className="text-black text-xl sm:text-1xl md:text-2xl lg:text-3xl xl:text-4xl font-semibold">
           Manage,
         </p>
-        <p className="text-slate-100 text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-semibold">
+        <p className="text-blue-100 text-xl sm:text-1xl md:text-2xl lg:text-3xl xl:text-4xl font-semibold">
           Share, Secure. Effortlessly.
         </p>
       </div>
