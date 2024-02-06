@@ -340,9 +340,10 @@ function SharePage({ params }: Params) {
           alt="Background Image"
           layout="fill"
           objectFit="cover"
-          className="z-0 "
+          className="z-0"
         />
       </div>
+
       <div className="absolute inset-0 bg-black opacity-5 z-1"></div>
     </div>
   )

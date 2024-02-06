@@ -38,6 +38,7 @@ export default function Home() {
   const [progress, setProgress] = useState(0)
   const [uploading, setUploading] = useState(false)
   const [uploaded, setUploaded] = useState(false)
+  const [postProcessing, setPostProcessing] = useState(false)
   const [shareURL, setShareURL] = useState('')
   const [shareQR, setShareQR] = useState('')
   const [isCopied, setIsCopied] = useState(false)
@@ -142,6 +143,7 @@ export default function Home() {
     setProgress(0)
     setUploading(false)
     setUploaded(false)
+    setPostProcessing(false)
     setShareQR('')
     setShareURL('')
     setIsCopied(false)
@@ -260,7 +262,7 @@ export default function Home() {
           await uploadBatch(batchFiles, batchURL)
           filesUploaded += batchFiles.length
         }
-
+        setPostProcessing(true)
         const postUploadResponse = await postUpload(fileNames, uploadID)
         const shareURL = postUploadResponse.shareURL
         const shareQR = postUploadResponse.shareQR
@@ -284,6 +286,7 @@ export default function Home() {
         return
       } finally {
         setUploading(false)
+        setPostProcessing(false)
         setSubmitDisabled(true)
         setUploadSize('0')
         setSelectedFiles([])
@@ -375,13 +378,15 @@ export default function Home() {
       <Drawer open={isDrawerOpen} onClose={handleDrawerClose}>
         <div className="flex-grow flex items-center justify-center z-10">
           <DrawerTrigger asChild>
+            {/* <div className="px-12 py-8 border-2 border-black rounded-2xl"> */}
             <Button
-              className="font-semibold text-3xl shadow-lg px-20 py-20 bg-blue-100 text-blue-800 hover:bg-slate-200 hover:text-blue-800 rounded-2xl"
+              className="font-semibold text-3xl border-2 border-blue-100 shadow-lg px-20 py-20 bg-blue-100 text-blue-800 hover:bg-slate-200 hover:text-blue-800 rounded-2xl"
               onClick={() => handleSend()}
               disabled={!statusLoaded}
             >
               Send
             </Button>
+            {/* </div> */}
           </DrawerTrigger>
           {/* <Button
             className="font-semibold text-3xl shadow-lg ml-10 px-20 py-20 bg-slate-200 text-blue-800 hover:bg-blue-100 hover:text-blue-800 rounded-2xl"
@@ -449,9 +454,13 @@ export default function Home() {
             ) : !uploaded ? (
               <>
                 <div className="pt-4">
-                  <Label>
-                    {progress.toFixed(1)}% ({batchCount}/{totalBatch})
-                  </Label>
+                  {!postProcessing ? (
+                    <Label>
+                      {progress.toFixed(1)}% ({batchCount}/{totalBatch} batch)
+                    </Label>
+                  ) : (
+                    <Label>Processing...</Label>
+                  )}
                   <Progress value={progress} className="m-auto w-[100%]" />
 
                   <DrawerFooter>
@@ -519,8 +528,16 @@ export default function Home() {
           alt="Background Image"
           layout="fill"
           objectFit="cover"
-          className="z-0 "
+          className="z-0"
         />
+      </div>
+      <div className="text-left absolute bottom-3">
+        <p className="text-black text-xl sm:text-1xl md:text-2xl lg:text-3xl xl:text-4xl font-semibold">
+          Manage,
+        </p>
+        <p className="text-blue-100 text-xl sm:text-1xl md:text-2xl lg:text-3xl xl:text-4xl font-semibold">
+          Share, Secure. Effortlessly.
+        </p>
       </div>
       <div className="absolute inset-0 bg-black opacity-5 z-1"></div>
     </div>
