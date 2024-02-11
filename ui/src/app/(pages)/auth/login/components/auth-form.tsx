@@ -143,6 +143,13 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
           </Button>
         </div>
       </form>
+      <Button
+        variant="outline"
+        className="md:hidden"
+        onClick={() => router.push('/auth/signup')}
+      >
+        Switch to Create Account
+      </Button>
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
           <span className="w-full border-t" />
