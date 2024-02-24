@@ -6,6 +6,7 @@ import useAuth from '@/context/useAuth'
 import JSZip from 'jszip'
 import { saveAs } from 'file-saver'
 import { DownloadIcon } from '@radix-ui/react-icons'
+import { lookup } from 'mime-types'
 import {
   ColumnDef,
   VisibilityState,
@@ -122,7 +123,9 @@ function SharePage({ params }: Params) {
     {
       accessorKey: 'format',
       header: 'Format',
-      cell: ({ row }) => <div className="uppercase">{row.original.format}</div>,
+      cell: ({ row }) => (
+        <div className="lowercase">{lookup(row.original.name)}</div>
+      ),
     },
     {
       accessorKey: 'size',
