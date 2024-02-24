@@ -23,6 +23,12 @@ import { Label } from '@/components/ui/label'
 import { Progress } from '@/components/ui/progress'
 import { CheckIcon, CopyIcon } from '@radix-ui/react-icons'
 import TwitterHandle from '@/components/handle'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 
 export default function Home() {
   const router = useRouter()
@@ -379,13 +385,23 @@ export default function Home() {
         <div className="flex-grow flex items-center justify-center z-10">
           <DrawerTrigger asChild>
             {/* <div className="px-12 py-8 border-2 border-black rounded-2xl"> */}
-            <Button
-              className="font-semibold text-3xl border-2 border-blue-100 shadow-lg px-20 py-20 bg-blue-100 text-blue-800 hover:bg-slate-200 hover:text-blue-800 rounded-2xl"
-              onClick={() => handleSend()}
-              disabled={!statusLoaded}
-            >
-              Send
-            </Button>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    className="font-semibold text-3xl border-2 border-blue-100 shadow-lg px-20 py-20 bg-blue-100 text-blue-800 hover:bg-slate-200 hover:text-blue-800 rounded-2xl"
+                    onClick={() => handleSend()}
+                    disabled={!statusLoaded}
+                  >
+                    Send
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent className="bg-white text-black">
+                  <p>Send files</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
             {/* </div> */}
           </DrawerTrigger>
           {/* <Button
