@@ -29,7 +29,7 @@ export default function Home() {
   const { authorised, statusLoaded } = useAuth()
   const searchParams = useSearchParams()
   const from = searchParams.get('from')
-  const [uploadSize, setUploadSize] = useState('0')
+  const [uploadSize, setUploadSize] = useState('0 KB')
   const [submitDisabled, setSubmitDisabled] = useState(true)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [selectedFiles, setSelectedFiles] = useState([])
@@ -114,7 +114,7 @@ export default function Home() {
     }
     if (totalSize == 0) {
       setSubmitDisabled(true)
-      setUploadSize('0')
+      setUploadSize('0 KB')
     } else if (totalSize >= 2 * 1024 * 1024 * 1024) {
       setUploadSize(
         (totalSize / (1024 * 1024 * 1024)).toFixed(2) +
@@ -136,7 +136,7 @@ export default function Home() {
   }
 
   const handleDrawerClose = () => {
-    setUploadSize('0')
+    setUploadSize('0 KB')
     setSubmitDisabled(true)
     setIsDrawerOpen(false)
     setSelectedFiles([])
@@ -288,7 +288,7 @@ export default function Home() {
         setUploading(false)
         setPostProcessing(false)
         setSubmitDisabled(true)
-        setUploadSize('0')
+        setUploadSize('0 KB')
         setSelectedFiles([])
         setBatchCount(0)
         setTotalBatch(0)
