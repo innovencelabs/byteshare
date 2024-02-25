@@ -124,7 +124,11 @@ function SharePage({ params }: Params) {
       accessorKey: 'format',
       header: 'Format',
       cell: ({ row }) => (
-        <div className="lowercase">{lookup(row.original.name)}</div>
+        <div className="lowercase">
+          {lookup(row.original.name).includes('/')
+            ? lookup(row.original.name).split('/')[1]
+            : lookup(row.original.name)}
+        </div>
       ),
     },
     {
