@@ -29,6 +29,12 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
+import { Checkbox } from '@/components/ui/checkbox'
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from '@/components/ui/hover-card'
 
 export default function Home() {
   const router = useRouter()
@@ -45,6 +51,7 @@ export default function Home() {
   const [uploading, setUploading] = useState(false)
   const [uploaded, setUploaded] = useState(false)
   const [postProcessing, setPostProcessing] = useState(false)
+  const [willShareEmail, setWillShareEmail] = useState(false)
   const [shareURL, setShareURL] = useState('')
   const [shareQR, setShareQR] = useState('')
   const [isCopied, setIsCopied] = useState(false)
@@ -157,6 +164,7 @@ export default function Home() {
     setDownloadsAllowed('')
     setBatchCount(0)
     setTotalBatch(0)
+    setWillShareEmail(false)
   }
 
   const handleCopy = async () => {
@@ -298,6 +306,7 @@ export default function Home() {
         setSelectedFiles([])
         setBatchCount(0)
         setTotalBatch(0)
+        setWillShareEmail(false)
       }
     }
   }
@@ -334,6 +343,7 @@ export default function Home() {
       file_name: file.name,
       creator_email: userEmail,
       creator_ip: '127.0.0.1',
+      share_email_as_source: willShareEmail,
     }
 
     const initiateUploadResponse = await fetch(apiBaseURL + '/initiateUpload', {
@@ -457,6 +467,25 @@ export default function Home() {
                       multiple
                       onChange={handleUploadChange}
                     />
+                    <div className="mt-3 flex items-center space-x-2">
+                      <Checkbox
+                        id="share-email"
+                        checked={willShareEmail}
+                        onClick={() => setWillShareEmail(!willShareEmail)}
+                      />
+                      <Label htmlFor="share-email">
+                        Share your email as source (optional).{' '}
+                        <HoverCard>
+                          <HoverCardTrigger className="text-blue-400 cursor-help disabled">
+                            Why?
+                          </HoverCardTrigger>
+                          <HoverCardContent className="text-sm font-normal">
+                            Displaying your email as the upload source verifies
+                            ownership and increases transparency.
+                          </HoverCardContent>
+                        </HoverCard>
+                      </Label>
+                    </div>
                   </div>
                   <DrawerFooter>
                     <Button disabled={submitDisabled} type="submit">

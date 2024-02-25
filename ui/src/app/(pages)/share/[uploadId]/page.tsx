@@ -61,6 +61,7 @@ function SharePage({ params }: Params) {
   const [downloadingAll, setDownloadingAll] = useState(false)
   const [downloadingOne, setDownloadingOne] = useState(false)
   const [data, setData] = React.useState<File[]>([])
+  const [source, setSource] = useState(null)
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   useEffect(() => {
     const fetchData = async () => {
@@ -78,6 +79,10 @@ function SharePage({ params }: Params) {
       const fileNames = Object.keys(responseData)
 
       for (const fileName of fileNames) {
+        if (fileName == 'user_email') {
+          setSource(responseData[fileName])
+          continue
+        }
         const file: File = {
           format: responseData[fileName]['format'],
           name: fileName,
@@ -125,9 +130,9 @@ function SharePage({ params }: Params) {
       header: 'Format',
       cell: ({ row }) => (
         <div className="lowercase">
-          {lookup(row.original.name).includes('/')
-            ? lookup(row.original.name).split('/')[1]
-            : lookup(row.original.name)}
+          {String(lookup(row.original.name)).includes('/')
+            ? String(lookup(row.original.name)).split('/')[1]
+            : String(lookup(row.original.name))}
         </div>
       ),
     },
@@ -219,8 +224,11 @@ function SharePage({ params }: Params) {
       <Header authorised={authorised} statusLoaded={statusLoaded} />
       <div className=" flex items-center justify-center h-[60%] w-[80%] m-auto bg-white rounded-md z-10">
         <div className="w-[90%]">
-          <p className="font-bold text-lg text-left pb-5">
+          <p className="font-bold text-lg text-left pb-1">
             {data.length > 0 ? 'Files are here and waiting!' : ''}
+          </p>
+          <p className=" text-xs text-left pb-5">
+            {data.length > 0 && source ? 'Source: ' + source : ''}
           </p>
           <div className="rounded-md border">
             <Table>
