@@ -439,8 +439,9 @@ export default function Home() {
               ) : (
                 <>
                   <DrawerTitle className="text-center">Send Files</DrawerTitle>
-                  <DrawerDescription className="text-center">
-                    You can select multiple files to share upto 2GB.
+                  <DrawerDescription className="text-center text-xs font-semibold">
+                    {user ? user?.name?.split(' ')[0] + ', ' : ''}you can select
+                    multiple files to share upto 2GB.
                   </DrawerDescription>
                 </>
               )}
