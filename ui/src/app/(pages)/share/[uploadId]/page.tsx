@@ -211,7 +211,7 @@ function SharePage({ params }: Params) {
     onColumnVisibilityChange: setColumnVisibility,
     initialState: {
       pagination: {
-        pageSize: 5,
+        pageSize: 3,
       },
     },
     state: {
@@ -227,7 +227,7 @@ function SharePage({ params }: Params) {
           <p className="font-bold text-lg text-left pb-1">
             {data.length > 0 ? 'Files are here and waiting!' : ''}
           </p>
-          <p className=" text-xs text-left pb-5">
+          <p className=" text-xs text-left pb-3">
             {data.length > 0 && source ? 'Source: ' + source : ''}
           </p>
           <div className="rounded-md border">
