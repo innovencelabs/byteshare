@@ -474,7 +474,7 @@ export default function Home() {
                         onClick={() => setWillShareEmail(!willShareEmail)}
                       />
                       <Label htmlFor="share-email">
-                        Share your email as source (optional).{' '}
+                        Share your email as source.{' '}
                         <HoverCard>
                           <HoverCardTrigger className="text-blue-400 cursor-help disabled">
                             Why?
