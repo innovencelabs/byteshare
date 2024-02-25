@@ -51,6 +51,7 @@ class InitiateUpload(BaseModel):
     file_name: str
     creator_email: str
     creator_ip: str
+    share_email_as_source: bool
 
 
 class ContinueUpload(BaseModel):
@@ -129,6 +130,7 @@ def initiate_upload_return_upload_url(body: InitiateUpload, request: Request):
         raise HTTPException(status_code=400, detail="File size exceeds the limit.")
 
     file_name = body.file_name
+    share_email_as_source = body.share_email_as_source
     upload_id = uuid.uuid4().hex
     continue_id = uuid.uuid4().hex
     file_path = upload_id + "/" + file_name
@@ -142,6 +144,7 @@ def initiate_upload_return_upload_url(body: InitiateUpload, request: Request):
         "status": StatusEnum.initiated.name,
         "creator_email": body.creator_email,
         "creator_ip": client_ip,
+        "share_email_as_source": share_email_as_source,
         "download_count": 0,
         "max_download": 5,
         "continue_id": continue_id,
@@ -345,7 +348,10 @@ def get_file_url_return_name_link(upload_id: str):
         download_expiration_time = 21600  # 6 hours
         # Generate share download link
         file_url = storage.generate_download_url(file_path, download_expiration_time)
-
+        if(upload_metadata["share_email_as_source"]):
+            file_data["user_email"] = upload_metadata["creator_email"]
+        else:
+            file_data["user_email"] = None
         file_data[file_name] = {}
         file_data[file_name]["format"] = file_format
         file_data[file_name]["size"] = _format_size(file_size)
