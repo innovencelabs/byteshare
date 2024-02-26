@@ -332,11 +332,33 @@ def webhook_post_user_send_email(body: AddUser):
     Returns:
     - Sends a welcome email to the user.
     """
+
     params = {
-        "from": "ByteShare <onboarding@byteshare.io>",
+        "from": "ByteShare <hello@byteshare.io>",
         "to": [body.email],
-        "subject": "hello world",
-        "html": "<strong>it works!</strong>",
+        "subject": "Welcome to ByteShare",
+        "html": """
+        <body style="font-family: Arial, sans-serif; margin: 0; padding: 20px;">
+  <p>Hey {},</p>
+
+  <p style="font-size: 18px;"></p>
+
+  <p>I'm Ambuj, the founder of ByteShare.io, and I'd like to personally thank you for signing up to our service.</p>
+
+  <p>We established ByteShare to make file sharing easy, hassle-free and secure.</p>
+
+  <p>I’d love to hear what you think of our product. Is there anything we should work on or improve? <a href="https://byteshare.io/feedback" style="color: #007bff; text-decoration: none;">Let us know</a>.</p>
+  <p>You can also <a href="https://github.com/ambujraj/ByteShare" style="color: #007bff; text-decoration: none;">star us on Github</a></p>
+
+  <p>I'm always happy to help and read our customers' suggestions.</p>
+  
+  <p>Ambuj Raj<br>
+  ByteShare.io</p>
+
+</body>
+""".format(
+            body.name.split(" ")[0]
+        ),
     }
 
     email = resend.Emails.send(params)
