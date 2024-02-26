@@ -31,10 +31,10 @@ import {
 } from '@/components/ui/tooltip'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from '@/components/ui/hover-card'
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
 
 export default function Home() {
   const router = useRouter()
@@ -475,15 +475,20 @@ export default function Home() {
                       />
                       <Label htmlFor="share-email">
                         Share your email as source.{' '}
-                        <HoverCard>
-                          <HoverCardTrigger className="text-blue-400 cursor-help disabled">
-                            Why?
-                          </HoverCardTrigger>
-                          <HoverCardContent className="text-sm font-normal">
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="link"
+                              className="px-0 py-0 text-blue-500"
+                            >
+                              Why?
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-80 text-sm font-normal">
                             Displaying your email as the upload source verifies
                             ownership and increases transparency.
-                          </HoverCardContent>
-                        </HoverCard>
+                          </PopoverContent>
+                        </Popover>
                       </Label>
                     </div>
                   </div>
