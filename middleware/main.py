@@ -32,13 +32,15 @@ app.add_middleware(
 resend.api_key = str(os.getenv("RESEND_API_KEY"))
 
 # Storage
-BUCKET_NAME = "byteshare-blob" 
+BUCKET_NAME = "byteshare-blob"
 storage = CloudflareR2Manager(BUCKET_NAME)
 
 # DynamoDB
 table_name = "byteshare-upload-metadata"
+user_table_name = "byteshare-user"
 subscriber_table_name = "byteshare-subscriber"
 dynamodb = DynamoDBManager(table_name)
+user_dynamodb = DynamoDBManager(user_table_name)
 subscriber_dynamodb = DynamoDBManager(subscriber_table_name)
 
 
@@ -66,11 +68,11 @@ class ContinueUpload(BaseModel):
 class PostUpload(BaseModel):
     file_names: list
 
+
 class AddUser(BaseModel):
     name: str
     registration: str
     email: str
-    emailVerification: bool
 
 
 @app.get("/health")
@@ -317,6 +319,7 @@ def post_upload_return_link_qr(body: PostUpload, upload_id: str):
         "downloads_allowed": str(upload_metadata["max_download"]),
     }
 
+
 @app.post("/user")
 def webhook_post_user_send_email(body: AddUser):
     """
@@ -327,11 +330,17 @@ def webhook_post_user_send_email(body: AddUser):
     - name: name of the user
     - registration: registeration date
     - email: email address of user
-    - emailVerification: is email verified
 
     Returns:
     - Sends a welcome email to the user.
     """
+
+    user = {
+        "user_id": uuid.uuid4().hex,
+        "email": body.email,
+        "created_at": body.registration,
+    }
+    user_dynamodb.create_item(user)
 
     params = {
         "from": "ByteShare <hello@byteshare.io>",
@@ -352,6 +361,7 @@ def webhook_post_user_send_email(body: AddUser):
 
   <p>I'm always happy to help and read our customers' suggestions.</p>
   
+  <p>Thanks</p>
   <p>Ambuj Raj<br>
   ByteShare.io</p>
 
@@ -362,6 +372,7 @@ def webhook_post_user_send_email(body: AddUser):
     }
 
     email = resend.Emails.send(params)
+
 
 @app.get("/download/{upload_id}")
 def get_file_url_return_name_link(upload_id: str):
@@ -403,7 +414,7 @@ def get_file_url_return_name_link(upload_id: str):
         download_expiration_time = 21600  # 6 hours
         # Generate share download link
         file_url = storage.generate_download_url(file_path, download_expiration_time)
-        if(upload_metadata["share_email_as_source"]):
+        if upload_metadata["share_email_as_source"]:
             file_data["user_email"] = upload_metadata["creator_email"]
         else:
             file_data["user_email"] = None
