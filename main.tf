@@ -22,7 +22,7 @@ provider "aws" {
 
 provider "aws" {
   alias = "r2"
-  region = "us-east-2"
+  region = "auto"
 
   access_key = var.r2_access_key
   secret_key = var.r2_secret_key
@@ -77,6 +77,18 @@ resource "aws_dynamodb_table" "byteshare-upload-metadata" {
 
   attribute {
     name = "upload_id"
+    type = "S"
+  }
+}
+
+resource "aws_dynamodb_table" "byteshare-user" {
+  provider = aws.aws
+  name         = "byteshare-user"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "user_id"
+
+  attribute {
+    name = "user_id"
     type = "S"
   }
 }
