@@ -38,6 +38,7 @@ jobs:
         R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
         R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}
         R2_SECRET_KEY: ${{ secrets.R2_SECRET_KEY }}
+        RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
       run: |
         cd middleware
         pip install -r ./requirements.txt  --target ./python
@@ -45,6 +46,6 @@ jobs:
         zip -r python-site-packages.zip python
         rm -r python
         sam build
-        sam deploy --parameter-overrides CorsOrigin=$CORS_ORIGIN R2AccountID=$R2_ACCOUNT_ID R2AccessKey=$R2_ACCESS_KEY R2SecretKey=$R2_SECRET_KEY
+        sam deploy --parameter-overrides CorsOrigin=$CORS_ORIGIN ResendAPIKey=$RESEND_API_KEY R2AccountID=$R2_ACCOUNT_ID R2AccessKey=$R2_ACCESS_KEY R2SecretKey=$R2_SECRET_KEY
         rm python-site-packages.zip 
 

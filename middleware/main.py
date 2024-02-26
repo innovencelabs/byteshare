@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 import uuid
 import qrcode
 import os
+import resend
 
 
 app = FastAPI()
@@ -26,6 +27,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Resend
+resend.api_key = str(os.getenv("RESEND_API_KEY"))
 
 # Storage
 BUCKET_NAME = "byteshare-blob" 
@@ -61,6 +65,12 @@ class ContinueUpload(BaseModel):
 
 class PostUpload(BaseModel):
     file_names: list
+
+class AddUser(BaseModel):
+    name: str
+    registration: str
+    email: str
+    emailVerification: bool
 
 
 @app.get("/health")
@@ -307,6 +317,51 @@ def post_upload_return_link_qr(body: PostUpload, upload_id: str):
         "downloads_allowed": str(upload_metadata["max_download"]),
     }
 
+@app.post("/user")
+def webhook_post_user_send_email(body: AddUser):
+    """
+    Add new user to DB
+    sends a welcome email to the user
+
+    Parameters:
+    - name: name of the user
+    - registration: registeration date
+    - email: email address of user
+    - emailVerification: is email verified
+
+    Returns:
+    - Sends a welcome email to the user.
+    """
+
+    params = {
+        "from": "ByteShare <hello@byteshare.io>",
+        "to": [body.email],
+        "subject": "Welcome to ByteShare",
+        "html": """
+        <body style="font-family: Arial, sans-serif; margin: 0; padding: 20px;">
+  <p>Hey {},</p>
+
+  <p style="font-size: 18px;"></p>
+
+  <p>I'm Ambuj, the founder of ByteShare.io, and I'd like to personally thank you for signing up to our service.</p>
+
+  <p>We established ByteShare to make file sharing easy, hassle-free and secure.</p>
+
+  <p>I’d love to hear what you think of our product. Is there anything we should work on or improve? <a href="https://byteshare.io/feedback" style="color: #007bff; text-decoration: none;">Let us know</a>.</p>
+  <p>You can also <a href="https://github.com/ambujraj/ByteShare" style="color: #007bff; text-decoration: none;">star us on Github</a></p>
+
+  <p>I'm always happy to help and read our customers' suggestions.</p>
+  
+  <p>Ambuj Raj<br>
+  ByteShare.io</p>
+
+</body>
+""".format(
+            body.name.split(" ")[0]
+        ),
+    }
+
+    email = resend.Emails.send(params)
 
 @app.get("/download/{upload_id}")
 def get_file_url_return_name_link(upload_id: str):
