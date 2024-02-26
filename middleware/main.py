@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 import uuid
 import qrcode
 import os
+import resend
 
 
 app = FastAPI()
@@ -26,6 +27,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Resend
+resend.api_key = str(os.getenv("RESEND_API_KEY"))
 
 # Storage
 BUCKET_NAME = "byteshare-blob" 
@@ -61,6 +65,12 @@ class ContinueUpload(BaseModel):
 
 class PostUpload(BaseModel):
     file_names: list
+
+class AddUser(BaseModel):
+    name: str
+    registration: str
+    email: str
+    emailVerification: bool
 
 
 @app.get("/health")
@@ -307,6 +317,29 @@ def post_upload_return_link_qr(body: PostUpload, upload_id: str):
         "downloads_allowed": str(upload_metadata["max_download"]),
     }
 
+@app.post("/user")
+def webhook_post_user_send_email(body: AddUser):
+    """
+    Add new user to DB
+    sends a welcome email to the user
+
+    Parameters:
+    - name: name of the user
+    - registration: registeration date
+    - email: email address of user
+    - emailVerification: is email verified
+
+    Returns:
+    - Sends a welcome email to the user.
+    """
+    params = {
+        "from": "ByteShare <onboarding@byteshare.io>",
+        "to": [body.email],
+        "subject": "hello world",
+        "html": "<strong>it works!</strong>",
+    }
+
+    email = resend.Emails.send(params)
 
 @app.get("/download/{upload_id}")
 def get_file_url_return_name_link(upload_id: str):
