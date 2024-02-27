@@ -93,6 +93,18 @@ resource "aws_dynamodb_table" "byteshare-user" {
   }
 }
 
+resource "aws_dynamodb_table" "byteshare-feedback" {
+  provider = aws.aws
+  name         = "byteshare-feedback"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "feedback_id"
+
+  attribute {
+    name = "feedback_id"
+    type = "S"
+  }
+}
+
 resource "aws_dynamodb_table" "byteshare-subscriber" {
   provider = aws.aws
   name         = "byteshare-subscriber"
