@@ -1,9 +1,17 @@
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import React, { useEffect } from 'react'
+import { toast } from 'sonner'
+import React, { useEffect, useState } from 'react'
 import { Button } from './ui/button'
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
+import { Label } from './ui/label'
+import { Input } from './ui/input'
+import { Textarea } from './ui/textarea'
 
 export const Header = ({ authorised, statusLoaded }) => {
+  const [feedbackName, setFeedbackName] = useState('')
+  const [feedbackEmail, setFeedbackEmail] = useState('')
+  const [feedbackMessage, setFeedbackMessage] = useState('')
+  const [popoverOpen, setPopoverOpen] = useState(false)
   const router = useRouter()
   useEffect(() => {
     const script = document.createElement('script')
@@ -15,6 +23,29 @@ export const Header = ({ authorised, statusLoaded }) => {
       document.body.removeChild(script)
     }
   }, [])
+
+  const handleFeedbackSubmit = async (event) => {
+    event.preventDefault()
+    setPopoverOpen(false)
+
+    const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+    const feedbackJSON = {
+      name: feedbackName,
+      email: feedbackEmail,
+      message: feedbackMessage,
+    }
+
+    await fetch(apiBaseURL + '/feedback', {
+      method: 'POST',
+      body: JSON.stringify(feedbackJSON),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    toast.success('Your feedback has been received.😃')
+  }
+
   return (
     <nav className="bg-white border-gray-200 dark:bg-gray-900 z-10">
       <div className="flex flex-wrap items-center justify-between md:mx-10 p-4 sm:mx-auto">
@@ -81,13 +112,60 @@ export const Header = ({ authorised, statusLoaded }) => {
         >
           <ul className="flex flex-col font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
             <li>
-              <Button
-                variant="ghost"
-                onClick={() => router.push('/features')}
-                className="block py-2 px-3 md:p-0 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
-              >
-                Features
-              </Button>
+              <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="block py-2 px-3 md:p-0 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
+                  >
+                    Feedback
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80">
+                  <form onSubmit={handleFeedbackSubmit}>
+                    <div className="grid gap-4 py-4">
+                      <div className="grid grid-cols-4 items-center gap-2">
+                        <Label htmlFor="name" className="text-left">
+                          Name
+                        </Label>
+                        <Input
+                          id="name"
+                          value={feedbackName}
+                          onChange={(e) => setFeedbackName(e.target.value)}
+                          className="col-span-4"
+                        />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-2">
+                        <Label htmlFor="email" className="text-left">
+                          Email
+                        </Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          value={feedbackEmail}
+                          onChange={(e) => setFeedbackEmail(e.target.value)}
+                          className="col-span-4"
+                        />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-2">
+                        <Label htmlFor="message" className="text-left">
+                          Message<span className="text-red-500">*</span>
+                        </Label>
+                        <Textarea
+                          id="message"
+                          value={feedbackMessage}
+                          onChange={(e) => setFeedbackMessage(e.target.value)}
+                          className="col-span-4"
+                          required
+                        />
+                      </div>
+                    </div>
+                    <Button type="submit" className="flex justify-end">
+                      Submit
+                    </Button>
+                  </form>
+                </PopoverContent>
+              </Popover>
             </li>
             <li>
               <Button
@@ -100,11 +178,15 @@ export const Header = ({ authorised, statusLoaded }) => {
             </li>
             <li>
               <Button
-                variant="ghost"
-                onClick={() => router.push('/feedback')}
-                className="block py-2 px-3 md:p-0 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
+                variant="default"
+                onClick={() => router.push('/pricing')}
+                className="
+                block py-2 px-4
+                text-white rounded
+                hover:bg-blue-700
+              "
               >
-                Tell us
+                Upgrade
               </Button>
             </li>
           </ul>

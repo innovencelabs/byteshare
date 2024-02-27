@@ -39,9 +39,11 @@ storage = CloudflareR2Manager(BUCKET_NAME)
 table_name = "byteshare-upload-metadata"
 user_table_name = "byteshare-user"
 subscriber_table_name = "byteshare-subscriber"
+feedback_table_name = "byteshare-feedback"
 dynamodb = DynamoDBManager(table_name)
 user_dynamodb = DynamoDBManager(user_table_name)
 subscriber_dynamodb = DynamoDBManager(subscriber_table_name)
+feedback_dynamodb = DynamoDBManager(feedback_table_name)
 
 
 class StatusEnum(PythonEnum):
@@ -73,6 +75,11 @@ class AddUser(BaseModel):
     name: str
     registration: str
     email: str
+
+class Feedback(BaseModel):
+    name: str
+    email: str
+    message: str
 
 
 @app.get("/health")
@@ -319,6 +326,29 @@ def post_upload_return_link_qr(body: PostUpload, upload_id: str):
         "downloads_allowed": str(upload_metadata["max_download"]),
     }
 
+@app.post("/feedback")
+def post_feedback(body: Feedback):
+    """
+    Add feedback received from users to DB
+
+    Parameters:
+    - name: name of the user
+    - email: email address of user
+    - message: feedback
+
+
+    Returns:
+    - None
+    """
+    
+    feedback = {
+        "feedback_id": uuid.uuid4().hex,
+        "email": body.email,
+        "name": body.name,
+        "message": body.message
+    }
+    feedback_dynamodb.create_item(feedback)
+
 
 @app.post("/user")
 def webhook_post_user_send_email(body: AddUser):
@@ -356,7 +386,7 @@ def webhook_post_user_send_email(body: AddUser):
 
   <p>We established ByteShare to make file sharing easy, hassle-free and secure.</p>
 
-  <p>I’d love to hear what you think of our product. Is there anything we should work on or improve? <a href="https://byteshare.io/feedback" style="color: #007bff; text-decoration: none;">Let us know</a>.</p>
+  <p>I’d love to hear what you think of our product. Is there anything we should work on or improve? <a href="https://byteshare.io" style="color: #007bff; text-decoration: none;">Let us know</a>.</p>
   <p>You can also <a href="https://github.com/ambujraj/ByteShare" style="color: #007bff; text-decoration: none;">star us on Github</a></p>
 
   <p>I'm always happy to help and read our customers' suggestions.</p>
