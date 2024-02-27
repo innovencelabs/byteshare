@@ -179,7 +179,7 @@ export const Header = ({ authorised, statusLoaded }) => {
             <li>
               <Button
                 variant="default"
-                onClick={() => router.push('/pricing')}
+                onClick={() => router.push('/upgrade')}
                 className="
                 block py-2 px-4
                 text-white rounded
