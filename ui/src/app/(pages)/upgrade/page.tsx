@@ -29,7 +29,7 @@ function UpgradePage() {
   return (
     <>
       <form onSubmit={handleSubscribe}>
-        <div className="bg-black flex h-screen justify-center items-center z-10">
+        <div className="bg-[#303EA2] flex h-screen justify-center items-center z-10">
           <div className="bg-transparent p-8 rounded-md shadow-md max-w-sm">
             <h4 className="text-2xl font-semibold mb-4 text-white">
               Subscribe to Waitinglist and get{' '}
@@ -42,8 +42,11 @@ function UpgradePage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Email"
                 className="bg-white"
+                required
               />
-              <Button type="submit">Subscribe</Button>
+              <Button className="bg-black hover:bg-slate-800" type="submit">
+                Subscribe
+              </Button>
             </div>
           </div>
         </div>
