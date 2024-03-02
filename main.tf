@@ -79,6 +79,17 @@ resource "aws_dynamodb_table" "byteshare-upload-metadata" {
     name = "upload_id"
     type = "S"
   }
+
+  attribute {
+    name = "creator_id"
+    type = "S"
+  }
+
+  global_secondary_index {
+    name               = "userid-gsi"
+    hash_key           = "creator_id"
+    projection_type    = "ALL"
+  }
 }
 
 resource "aws_dynamodb_table" "byteshare-user" {
