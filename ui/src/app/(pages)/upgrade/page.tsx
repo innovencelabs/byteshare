@@ -22,7 +22,7 @@ function UpgradePage() {
         'Content-Type': 'application/json',
       },
     })
-
+    setEmail('')
     toast.success('You have been subscribed!')
   }
 
