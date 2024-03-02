@@ -5,7 +5,7 @@ from db import DynamoDBManager
 from storage.cloudflare_r2 import CloudflareR2Manager
 from enum import Enum as PythonEnum
 from datetime import datetime, timedelta, timezone
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from dotenv import load_dotenv
 import uuid
 import qrcode
@@ -72,9 +72,11 @@ class PostUpload(BaseModel):
 
 
 class AddUser(BaseModel):
+    id: str = Field(..., alias="$id")
     name: str
     registration: str
     email: str
+
 
 class Feedback(BaseModel):
     name: str
@@ -326,6 +328,7 @@ def post_upload_return_link_qr(body: PostUpload, upload_id: str):
         "downloads_allowed": str(upload_metadata["max_download"]),
     }
 
+
 @app.post("/feedback")
 def post_feedback(body: Feedback):
     """
@@ -340,12 +343,12 @@ def post_feedback(body: Feedback):
     Returns:
     - None
     """
-    
+
     feedback = {
         "feedback_id": uuid.uuid4().hex,
         "email": body.email,
         "name": body.name,
-        "message": body.message
+        "message": body.message,
     }
     feedback_dynamodb.create_item(feedback)
 
@@ -367,6 +370,7 @@ def webhook_post_user_send_email(body: AddUser):
 
     user = {
         "user_id": uuid.uuid4().hex,
+        "appwrite_id": body.id,
         "email": body.email,
         "created_at": body.registration,
     }
