@@ -57,6 +57,7 @@ class Subscribe(BaseModel):
 
 class InitiateUpload(BaseModel):
     file_name: str
+    creator_id: str
     creator_email: str
     creator_ip: str
     share_email_as_source: bool
@@ -163,6 +164,7 @@ def initiate_upload_return_upload_url(body: InitiateUpload, request: Request):
     upload_metadata = {
         "upload_id": upload_id,
         "status": StatusEnum.initiated.name,
+        "creator_id": body.creator_id,
         "creator_email": body.creator_email,
         "creator_ip": client_ip,
         "share_email_as_source": share_email_as_source,
@@ -369,8 +371,7 @@ def webhook_post_user_send_email(body: AddUser):
     """
 
     user = {
-        "user_id": uuid.uuid4().hex,
-        "appwrite_id": body.id,
+        "user_id": body.id,
         "email": body.email,
         "created_at": body.registration,
     }
@@ -406,6 +407,38 @@ def webhook_post_user_send_email(body: AddUser):
     }
 
     email = resend.Emails.send(params)
+
+@app.get("/history/{user_id}")
+def get_history_return_all_shares_list(user_id: str):
+    """
+    Get history for a given User.
+    Reads the DB to find all the shares made by the user.
+
+    Parameters:
+    - user_id: user id
+
+    Returns:
+    - List of json of the transfer details.
+    """
+    history = []
+
+    # user = user_dynamodb.read_item({"user_id": user_id})
+    # if(user==None):
+    #     raise HTTPException(status_code=400, detail="User does not exist")
+
+    upload_metadatas = dynamodb.read_items("creator_id", user_id)
+    for upload_metadata in upload_metadatas:
+        upload = {
+            "upload_id": upload_metadata["upload_id"],
+            "created_at": upload_metadata["created_at"],
+            "downloaded": upload_metadata["download_count"],
+            "max_download": upload_metadata["max_download"],
+            "total_size": upload_metadata["total_size"]
+        }
+
+        history.append(upload)
+    
+    return history
 
 
 @app.get("/download/{upload_id}")

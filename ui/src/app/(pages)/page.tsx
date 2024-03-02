@@ -341,6 +341,7 @@ export default function Home() {
 
     const firstFileJSON = {
       file_name: file.name,
+      creator_id: user['$id'],
       creator_email: userEmail,
       creator_ip: '127.0.0.1',
       share_email_as_source: willShareEmail,

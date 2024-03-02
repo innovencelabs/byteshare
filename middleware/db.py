@@ -39,6 +39,22 @@ class DynamoDBManager:
         except Exception as e:
             print(f"Error in reading row for key: {key}\nError: {e}")
 
+    def read_items(self, key_name, key_value):
+        try:
+            response = self.table.query(
+                IndexName="userid-gsi",
+                KeyConditionExpression=key_name + " = :key_value",
+                ExpressionAttributeValues={":key_value": key_value},
+            )
+            items = response.get("Items", [])
+            if items:
+                return items
+            else:
+                print("Items not found.")
+                return []
+        except Exception as e:
+            print(f"Error: {key_name}={key_value}\nError: {e}")
+
     def update_item(self, key, update_data):
         try:
             update_expression = "SET " + ", ".join(
