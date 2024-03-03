@@ -84,6 +84,9 @@ class Feedback(BaseModel):
     email: str
     message: str
 
+class DeleteUpload(BaseModel):
+    user_id: str
+
 
 @app.get("/health")
 def health_check():
@@ -164,6 +167,7 @@ def initiate_upload_return_upload_url(body: InitiateUpload, request: Request):
     upload_metadata = {
         "upload_id": upload_id,
         "status": StatusEnum.initiated.name,
+        "title": file_name,
         "creator_id": body.creator_id,
         "creator_email": body.creator_email,
         "creator_ip": client_ip,
@@ -332,7 +336,7 @@ def post_upload_return_link_qr(body: PostUpload, upload_id: str):
 
 
 @app.post("/feedback")
-def post_feedback(body: Feedback):
+def post_feedback_return_none(body: Feedback):
     """
     Add feedback received from users to DB
 
@@ -430,25 +434,49 @@ def get_history_return_all_shares_list(user_id: str):
     for upload_metadata in upload_metadatas:
         upload = {
             "upload_id": upload_metadata["upload_id"],
+            "title": upload_metadata["title"],
             "created_at": upload_metadata["created_at"],
             "downloaded": upload_metadata["download_count"],
             "max_download": upload_metadata["max_download"],
-            "total_size": upload_metadata["total_size"]
+            "total_size": _format_size(upload_metadata["total_size"])
         }
 
         history.append(upload)
     
     return history
 
+@app.delete("/upload/{upload_id}")
+def delete_upload_return_done(upload_id: str, body: DeleteUpload):
+    """
+    Delete the upload of the user
+    Reads the DB to find the upload and deletes.
+
+    Parameters:
+    - user_id: user id
+    - upload_id: upload id to be deleted
+
+    Returns:
+    - Done
+    """
+    upload_metadata = dynamodb.read_item({"upload_id": upload_id})
+    if(upload_metadata["creator_id"]!=body.user_id):
+        raise HTTPException(status_code=400, detail="User is not the owner of the upload")
+
+    keys = {"upload_id": upload_id}
+    dynamodb.delete_item(keys)
+
+    return {"status": "Done"}
+
 
 @app.get("/download/{upload_id}")
-def get_file_url_return_name_link(upload_id: str):
+def get_file_url_return_name_link(upload_id: str, user_id: str | None = None):
     """
     Get download url from Storage.
     Checks for the expires at, download count < max download and updates the count in DB
 
     Parameters:
     - upload_id: upload id of the upload process
+    - user_id: user id of the user(Optional)
 
     Returns:
     - File details and download url
@@ -468,8 +496,9 @@ def get_file_url_return_name_link(upload_id: str):
 
     download_count = upload_metadata["download_count"]
     max_count = upload_metadata["max_download"]
-    if download_count >= max_count:
-        raise HTTPException(status_code=400, detail="Download limit exceeded")
+    if(user_id==None or upload_metadata["creator_id"]!=user_id):
+        if download_count >= max_count:
+            raise HTTPException(status_code=400, detail="Download limit exceeded")
 
     file_names = set(upload_metadata["storage_file_names"])
     for file_name in file_names:
@@ -490,12 +519,13 @@ def get_file_url_return_name_link(upload_id: str):
         file_data[file_name]["size"] = _format_size(file_size)
         file_data[file_name]["download_url"] = file_url
 
-    keys = {"upload_id": upload_id}
-    update_data = {
-        "download_count": download_count + 1,
-        "updated_at": time_now,
-    }
-    dynamodb.update_item(keys, update_data)
+    if(user_id==None or upload_metadata["creator_id"]!=user_id):
+        keys = {"upload_id": upload_id}
+        update_data = {
+            "download_count": download_count + 1,
+            "updated_at": time_now,
+        }
+        dynamodb.update_item(keys, update_data)
 
     return file_data
 

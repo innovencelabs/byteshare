@@ -5,10 +5,12 @@ import React from 'react'
 
 const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter()
-  const { authorised } = useAuth()
+  const { authorised, statusLoaded } = useAuth()
 
-  if (!authorised) {
+  if (statusLoaded && !authorised) {
     router.push('/auth/login')
+  } else if (!statusLoaded) {
+    return <></>
   }
   return children
 }

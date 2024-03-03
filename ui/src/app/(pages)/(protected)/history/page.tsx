@@ -1,0 +1,439 @@
+'use client'
+import Image from 'next/image'
+import { toast } from 'sonner'
+import React, { useEffect, useState } from 'react'
+import useAuth from '@/context/useAuth'
+import appwriteService from '@/authentication/appwrite/config'
+import { Header } from '@/components/header'
+import JSZip from 'jszip'
+import { saveAs } from 'file-saver'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Button } from '@/components/ui/button'
+import TwitterHandle from '@/components/handle'
+import {
+  ColumnDef,
+  VisibilityState,
+  flexRender,
+  getCoreRowModel,
+  getPaginationRowModel,
+  useReactTable,
+} from '@tanstack/react-table'
+import { DotsHorizontalIcon, DownloadIcon } from '@radix-ui/react-icons'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+
+type History = {
+  id: string
+  title: string
+  created: string
+  downloaded: number
+  maxDownload: number
+  size: number
+}
+
+function HistoryPage() {
+  const [user, setUser] = useState(null)
+  const [userEmail, setUserEmail] = useState('')
+  const [userName, setUserName] = useState('')
+  const [data, setData] = React.useState<History[]>([])
+  const [downloading, setDownloading] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+  const { authorised, statusLoaded } = useAuth()
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+      const userID = user['$id']
+
+      const historyResponse = await fetch(
+        apiBaseURL + '/history' + '/' + userID,
+      )
+      if (!historyResponse.ok) {
+        toast.error('User ID is not valid')
+        setIsLoading(false)
+        return
+      }
+      const responseData = await historyResponse.json()
+
+      for (const fileName of responseData) {
+        const created = fileName['created_at']
+        const date = new Date(created)
+        const options = {
+          year: '2-digit',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+        }
+        const isoString = date.toUTCString()
+        const formattedDate = isoString.substring(0, 16)
+        const history: History = {
+          id: fileName['upload_id'],
+          title: fileName['title'],
+          created: formattedDate,
+          size: fileName['total_size'],
+          downloaded: fileName['downloaded'],
+          maxDownload: fileName['max_download'],
+        }
+        setData((prevdata) => [...prevdata, history])
+      }
+      setIsLoading(false)
+    }
+    if (isMounted) {
+      if (user) {
+        fetchData()
+      } else {
+        setIsMounted(false)
+      }
+    } else {
+      setIsMounted(true)
+    }
+  }, [isMounted])
+
+  useEffect(() => {
+    if (statusLoaded) {
+      appwriteService.getCurrentUser().then((userResponse) => {
+        if (userResponse) {
+          setUser(userResponse)
+          setUserEmail(userResponse.email)
+          setUserName(userResponse.name)
+        }
+      })
+    }
+  }, [statusLoaded])
+
+  const handleDownload = async (uploadId: string) => {
+    if (!downloading) {
+      setDownloading(true)
+      toast.info('Download in progress...', { duration: 9999999 })
+      const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+
+      const downloadResponse = await fetch(
+        apiBaseURL + '/download' + '/' + uploadId + '?user_id=' + user['$id'],
+      )
+      if (!downloadResponse.ok) {
+        toast.dismiss()
+        toast.error('Upload ID is not valid')
+        return
+      }
+      const responseData = await downloadResponse.json()
+      const fileNames = Object.keys(responseData)
+      let files = []
+
+      for (const fileName of fileNames) {
+        if (fileName == 'user_email') {
+          continue
+        }
+        const file = {
+          name: fileName,
+          downloadLink: responseData[fileName]['download_url'],
+        }
+        files.push(file)
+      }
+
+      try {
+        const zip = new JSZip()
+
+        for (const file of files) {
+          const presignedUrl = file.downloadLink
+          const response = await fetch(presignedUrl)
+          const blob = await response.blob()
+
+          zip.file(file.name, blob)
+        }
+
+        const zipBlob = await zip.generateAsync({ type: 'blob' })
+        const zipFileName = 'ByteShare_Preview_' + uploadId + '.zip'
+        saveAs(zipBlob, zipFileName)
+        toast.dismiss()
+      } catch (err) {
+        toast.dismiss()
+        toast.error('Error downloading zip file.')
+      } finally {
+        setDownloading(false)
+      }
+    }
+  }
+
+  const handleDelete = async (uploadId: string) => {
+    const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+
+    const deleteJSON = {
+      user_id: user['$id'],
+    }
+    const deleteResponse = await fetch(
+      apiBaseURL + '/upload' + '/' + uploadId,
+      {
+        method: 'DELETE',
+        body: JSON.stringify(deleteJSON),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    )
+    if (deleteResponse.ok) {
+      const index = data.findIndex((history) => history.id == uploadId)
+      if (index !== -1) {
+        const newData = [...data.slice(0, index), ...data.slice(index + 1)]
+        setData(newData)
+      }
+      toast.success('Successfully deleted.')
+    }
+  }
+
+  const columns: ColumnDef<History>[] = [
+    {
+      accessorKey: 'title',
+      header: () => <div className="text-left">Title</div>,
+      cell: ({ row }) => <div>{row.original.title}</div>,
+    },
+    {
+      accessorKey: 'created',
+      header: () => <div className="text-left">Created</div>,
+      cell: ({ row }) => <div>{row.original.created}</div>,
+    },
+    {
+      accessorKey: 'size',
+      header: 'Size',
+      cell: ({ row }) => <div>{row.original.size}</div>,
+    },
+    {
+      accessorKey: 'downloaded',
+      header: () => <div className="text-right">Downloads</div>,
+      cell: ({ row }) => {
+        return (
+          <div className="text-right font-medium">
+            {row.original.downloaded}
+          </div>
+        )
+      },
+    },
+    {
+      accessorKey: 'maxDownload',
+      header: () => <div className="text-right">Max Downloads</div>,
+      cell: ({ row }) => {
+        return (
+          <div className="text-right font-medium">
+            {row.original.maxDownload}
+          </div>
+        )
+      },
+    },
+    {
+      id: 'actions',
+      enableHiding: false,
+      cell: ({ row }) => {
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <DotsHorizontalIcon className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {/* <DropdownMenuItem
+                onClick={() =>
+                  window.open(
+                    process.env.NEXT_PUBLIC_APP_URL +
+                      '/share/' +
+                      row.original.id,
+                    '_blank',
+                  )
+                }
+              >
+                Preview
+              </DropdownMenuItem> */}
+              {/* <DropdownMenuItem>
+                <Dialog>
+                  <DialogTrigger><button>Edit title</button></DialogTrigger>
+                  <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                    <DialogTitle>abc</DialogTitle>
+                    <DialogDescription>
+                      Make changes to your profile here. Click save when you're
+                      done.
+                    </DialogDescription>
+                  </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        
+                        <Input
+                          id="name"
+                          value="Pedro Duarte"
+                          className="col-span-3"
+                        />
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button type="submit">Save changes</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </DropdownMenuItem> */}
+              {/* <DropdownMenuSeparator /> */}
+              <DropdownMenuItem
+                onClick={() => handleDownload(row.original.id)}
+                disabled={downloading}
+              >
+                Download
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                className="text-red-500"
+                onClick={() => handleDelete(row.original.id)}
+              >
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )
+      },
+    },
+  ]
+
+  const table = useReactTable({
+    data,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    initialState: {
+      pagination: {
+        pageSize: 3,
+      },
+    },
+    state: {
+      columnVisibility,
+    },
+  })
+
+  return (
+    <div className="h-screen flex flex-col justify-between">
+      <Header
+        authorised={authorised}
+        statusLoaded={statusLoaded}
+        name={userName}
+        email={userEmail}
+      />
+      <div className="flex items-center justify-center h-[60%] w-[80%] m-auto bg-white rounded-md z-10">
+        <div className="w-[90%]">
+          <p className="font-bold text-lg text-left pb-1">Transfer History</p>
+          <div className="rounded-md border ">
+            <Table>
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <TableHead key={header.id}>
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
+                      </TableHead>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows?.length ? (
+                  table.getRowModel().rows.map((row) => (
+                    <TableRow key={row.id}>
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={columns.length}
+                      className="h-24 text-center"
+                    >
+                      {isLoading ? (
+                        <>
+                          <Skeleton className="ml-[20%] mb-2 h-4 w-[60%]" />
+                          <Skeleton className="ml-[20%]  mb-2 h-4 w-[60%]" />
+                          <Skeleton className="ml-[20%]  mb-2 h-4 w-[60%]" />
+                        </>
+                      ) : (
+                        <div className="font-serif">No results.</div>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+          <div className="flex justify-end items-center py-4">
+            <div className="flex space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+              >
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+              >
+                Next
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <TwitterHandle />
+      <div className="absolute inset-0">
+        <Image
+          src="/background.jpg"
+          alt="Background Image"
+          layout="fill"
+          objectFit="cover"
+          className="z-0"
+        />
+      </div>
+
+      <div className="absolute inset-0 bg-black opacity-5 z-1"></div>
+    </div>
+  )
+}
+
+export default HistoryPage
