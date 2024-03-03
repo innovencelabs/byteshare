@@ -47,6 +47,7 @@ export default function Home() {
   const [selectedFiles, setSelectedFiles] = useState([])
   const [user, setUser] = useState(null)
   const [userEmail, setUserEmail] = useState('')
+  const [userName, setUserName] = useState('')
   const [progress, setProgress] = useState(0)
   const [uploading, setUploading] = useState(false)
   const [uploaded, setUploaded] = useState(false)
@@ -83,6 +84,7 @@ export default function Home() {
         if (userResponse) {
           setUser(userResponse)
           setUserEmail(userResponse.email)
+          setUserName(userResponse.name)
         }
         if (
           userResponse &&
@@ -390,7 +392,12 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col justify-between">
-      <Header authorised={authorised} statusLoaded={statusLoaded} />
+      <Header
+        authorised={authorised}
+        statusLoaded={statusLoaded}
+        name={userName}
+        email={userEmail}
+      />
       {/* <p className="flex align-items-center z-10">hey</p> */}
       <Drawer open={isDrawerOpen} onClose={handleDrawerClose}>
         <div className="flex-grow flex items-center justify-center z-10">
@@ -450,9 +457,8 @@ export default function Home() {
               ) : (
                 <>
                   <DrawerTitle className="text-center">Send Files</DrawerTitle>
-                  <DrawerDescription className="text-center text-xs font-semibold">
-                    {user ? user?.name?.split(' ')[0] + ', ' : ''}you can select
-                    multiple files to share upto 2GB.
+                  <DrawerDescription className="text-center">
+                    You can select multiple files to share upto 2GB.
                   </DrawerDescription>
                 </>
               )}

@@ -91,6 +91,7 @@ uvicorn main:app --reload
 - Cloudflare R2
 - AWS Cloudwatch
 - Appwrite
+- Resend
 
 ## Deployment
 - Vercel

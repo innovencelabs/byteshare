@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { Header } from '@/components/header'
 import React, { useEffect, useState } from 'react'
 import useAuth from '@/context/useAuth'
+import appwriteService from '@/authentication/appwrite/config'
 import JSZip from 'jszip'
 import { saveAs } from 'file-saver'
 import { DownloadIcon } from '@radix-ui/react-icons'
@@ -55,6 +56,8 @@ type File = {
 function SharePage({ params }: Params) {
   const { authorised, statusLoaded } = useAuth()
   const [isMounted, setIsMounted] = useState(false)
+  const [userName, setUserName] = useState('')
+  const [userEmail, setUserEmail] = useState('')
   const [isLoading, setIsLoading] = useState(true)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [progress, setProgress] = useState(0)
@@ -71,6 +74,7 @@ function SharePage({ params }: Params) {
         apiBaseURL + '/download' + '/' + params.uploadId,
       )
       if (!downloadResponse.ok) {
+        toast.dismiss()
         toast.error('Upload ID is not valid')
         setIsLoading(false)
         return
@@ -99,6 +103,17 @@ function SharePage({ params }: Params) {
       setIsMounted(true)
     }
   }, [isMounted])
+
+  useEffect(() => {
+    if (statusLoaded) {
+      appwriteService.getCurrentUser().then((userResponse) => {
+        if (userResponse) {
+          setUserEmail(userResponse.email)
+          setUserName(userResponse.name)
+        }
+      })
+    }
+  }, [statusLoaded])
 
   const handleSingleDownload = async (
     downloadLink: string,
@@ -221,7 +236,12 @@ function SharePage({ params }: Params) {
 
   return (
     <div className="h-screen flex flex-col justify-between">
-      <Header authorised={authorised} statusLoaded={statusLoaded} />
+      <Header
+        authorised={authorised}
+        statusLoaded={statusLoaded}
+        name={userName}
+        email={userEmail}
+      />
       <div className=" flex items-center justify-center h-[60%] w-[80%] m-auto bg-white rounded-md z-10">
         <div className="w-[90%]">
           <p className="font-bold text-lg text-left pb-1">
