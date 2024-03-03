@@ -95,7 +95,7 @@ export const Header = ({ authorised, statusLoaded, name, email }) => {
           {statusLoaded ? (
             <Button
               variant="ghost"
-              className="text-black hidden md:flex focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-4 py-2 mx-2 text-center"
+              className="text-black hidden lg:flex focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-4 py-2 mx-2 text-center"
               aria-label="Star this repository on GitHub"
               onClick={() =>
                 window.open(
