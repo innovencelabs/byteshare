@@ -7,7 +7,8 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'ByteShare',
-  description: 'File sharing app',
+  description:
+    'Generate shareable links & QR codes instantly. Seamless file sharing for documents, photos, & more. Secure & user-friendly. Sign up free!',
 }
 
 export default function RootLayout({
