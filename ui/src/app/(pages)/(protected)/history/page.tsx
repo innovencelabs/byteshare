@@ -20,9 +20,11 @@ import { Button } from '@/components/ui/button'
 import TwitterHandle from '@/components/handle'
 import {
   ColumnDef,
+  ColumnFiltersState,
   VisibilityState,
   flexRender,
   getCoreRowModel,
+  getFilteredRowModel,
   getPaginationRowModel,
   useReactTable,
 } from '@tanstack/react-table'
@@ -64,6 +66,9 @@ function HistoryPage() {
   const [isMounted, setIsMounted] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    [],
+  )
   const { authorised, statusLoaded } = useAuth()
 
   useEffect(() => {
@@ -323,6 +328,8 @@ function HistoryPage() {
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    onColumnFiltersChange: setColumnFilters,
+    getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     initialState: {
       pagination: {
@@ -331,6 +338,7 @@ function HistoryPage() {
     },
     state: {
       columnVisibility,
+      columnFilters,
     },
   })
 
@@ -344,7 +352,21 @@ function HistoryPage() {
       />
       <div className="flex items-center justify-center h-[60%] w-[80%] m-auto bg-white rounded-md z-10">
         <div className="w-[90%]">
-          <p className="font-bold text-lg text-left pb-1">Transfer History</p>
+          <div className="flex items-center mb-2">
+            <p className="font-bold text-lg text-left pb-1">Transfer History</p>
+            <div className="hidden md:flex md:flex-1 md:justify-end">
+              <Input
+                placeholder="Search by title"
+                value={
+                  (table.getColumn('title')?.getFilterValue() as string) ?? ''
+                }
+                onChange={(event) =>
+                  table.getColumn('title')?.setFilterValue(event.target.value)
+                }
+                className="max-w-xs w-auto"
+              />
+            </div>
+          </div>
           <div className="rounded-md border ">
             <Table>
               <TableHeader>
@@ -399,6 +421,9 @@ function HistoryPage() {
             </Table>
           </div>
           <div className="flex justify-end items-center py-4">
+            <div className="flex-1 text-sm text-muted-foreground">
+              Count: {table.getFilteredRowModel().rows.length}
+            </div>
             <div className="flex space-x-2">
               <Button
                 variant="outline"
