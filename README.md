@@ -43,10 +43,11 @@ cp terraform.tfvars.example terraform.tfvars
 ```
 6. Create AWS resource using Terraform
 ```bash
-cd ByteShare
+cd ByteShare/infrastructure/cloud
 terraform init
 terraform plan
 terraform apply
+cd ../../
 ```
 7. Setup your Appwrite account [HERE](https://appwrite.io/)
 8. Create your Organisation and Project in Appwrite [TUTORIAL](https://youtu.be/pk92hS_d_ns?t=11&si=emSqp8Mdra_iF-dc)
