@@ -1,0 +1,7 @@
+"❗️ terraform changes":
+  - main.tf
+  - terraform.tfvars.example
+
+"❗️ .env changes":
+  - ui/.env.example
+  - middleware/.env.example
