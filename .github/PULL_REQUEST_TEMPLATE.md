@@ -22,5 +22,6 @@ Fixes #(issue)
 
 ## Checklist
 
-- [ ] I have read through the [Contributing Guidelines](https://github.com/ambujraj/byteshare/blob/master/CONTRIBUTING.md)?
+- [ ] I have read through the [Contributing Guidelines](https://github.com/ambujraj/byteshare/blob/master/CONTRIBUTING.md)
+- [ ] I have also updated the dependent codes as well and README.md if applicable
 - [ ] My code adheres to consistent formatting standards and includes clear comments where necessary to enhance readability and understanding.
