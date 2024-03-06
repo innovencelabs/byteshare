@@ -242,7 +242,7 @@ function SharePage({ params }: Params) {
         name={userName}
         email={userEmail}
       />
-      <div className=" flex items-center justify-center h-[60%] w-[80%] m-auto bg-white rounded-md z-10">
+      <div className=" flex items-center justify-center h-[60%] w-[90%] m-auto bg-white rounded-md z-10">
         <div className="w-[90%]">
           <p className="font-bold text-lg text-left pb-1">
             {data.length > 0 ? 'Files are here and waiting!' : ''}
