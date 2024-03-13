@@ -88,11 +88,13 @@ uvicorn main:app --reload
 - NextJS
 - ShadCN (TailwindCSS)
 - FastAPI
+- RabbitMQ
 - AWS DynamoDB
 - Cloudflare R2
 - AWS Cloudwatch
 - Appwrite
 - Resend
+- ClamAV
 
 ## Deployment
 - Vercel

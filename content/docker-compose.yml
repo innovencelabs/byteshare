@@ -1,0 +1,50 @@
+version: '3.7'
+
+services:
+  freshclam:
+    restart: on-failure
+    image: byteshare-clamav:1.0.0
+    environment:
+      MODE: freshclam
+    volumes:
+      - conf:/etc/clamav
+      - data:/var/lib/clamav
+    networks:
+      - byteshare-content-network
+
+  clamav:
+    restart: on-failure
+    depends_on:
+      - freshclam
+    image: byteshare-clamav:1.0.0
+    ports:
+      - '3310:3310'
+    environment:
+      MODE: clamd
+      CLAMAV_TCP_ADDRESS: 0.0.0.0
+      CLAMAV_TCP_PORT: 3310
+    ulimits:
+      stack: 1048576
+    volumes:
+      - conf:/etc/clamav
+      - data:/var/lib/clamav
+    networks:
+      - byteshare-content-network
+  
+  moderation:
+    restart: always
+    depends_on:
+      - clamav
+    image: byteshare-moderation:1.0.0
+    ports:
+      - '50051:50051'
+    networks:
+      - byteshare-content-network
+
+networks:
+  byteshare-content-network:
+    driver: bridge
+
+volumes:
+  conf:
+  data:
