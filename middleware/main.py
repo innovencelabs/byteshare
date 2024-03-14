@@ -11,6 +11,7 @@ import uuid
 import qrcode
 import os
 import resend
+import pika
 
 
 app = FastAPI()
@@ -45,6 +46,11 @@ user_dynamodb = DynamoDBManager(user_table_name)
 subscriber_dynamodb = DynamoDBManager(subscriber_table_name)
 feedback_dynamodb = DynamoDBManager(feedback_table_name)
 
+# RabbitMQ
+params = pika.URLParameters(os.getenv("RABBITMQ_URL"))
+connection = pika.BlockingConnection(params)
+channel = connection.channel()
+channel.queue_declare(queue=os.getenv("RABBITMQ_QUEUE"))
 
 class StatusEnum(PythonEnum):
     initiated = "initiated"
@@ -86,6 +92,10 @@ class Feedback(BaseModel):
 
 class DeleteUpload(BaseModel):
     user_id: str
+
+
+class CompleteScan(BaseModel):
+    safe: bool
 
 
 @app.get("/health")
@@ -168,6 +178,7 @@ def initiate_upload_return_upload_url(body: InitiateUpload, request: Request):
         "upload_id": upload_id,
         "status": StatusEnum.initiated.name,
         "title": file_name,
+        "scanned": False, # row will be deleted if the file is not safe
         "creator_id": body.creator_id,
         "creator_email": body.creator_email,
         "creator_ip": client_ip,
@@ -327,6 +338,10 @@ def post_upload_return_link_qr(body: PostUpload, upload_id: str):
     }
     dynamodb.update_item(keys, update_data)
 
+    channel.basic_publish(
+        exchange="", routing_key=os.getenv("RABBITMQ_QUEUE"), body=upload_id
+    )
+
     return {
         "url": file_url,
         "QR": qr_download_url,
@@ -334,6 +349,66 @@ def post_upload_return_link_qr(body: PostUpload, upload_id: str):
         "downloads_allowed": str(upload_metadata["max_download"]),
     }
 
+@app.post("/completeScan/{upload_id}")
+def complete_scan(body: CompleteScan,upload_id):
+    """
+    Completes the scan after the scan is completed
+    Will delete the upload if the file is not safe or make the scanned column to True if file is safe.
+    Also sends the mail to the user stating that their upload is being deleted.
+
+    Parameters:
+    - upload_id: upload id of the upload process
+    - safe: whether the file is safe or not
+
+    Returns:
+    - None
+    """
+    safe = body.safe
+
+    upload_metadata = dynamodb.read_item({"upload_id": upload_id})
+    if upload_metadata == None:
+        raise HTTPException(status_code=400, detail="Upload ID not valid")
+
+    if safe:
+        time_now = datetime.now(timezone.utc)
+        keys = {"upload_id": upload_id}
+        update_data = {
+            "scanned": True,
+            "updated_at": time_now.isoformat(),
+        }
+        dynamodb.update_item(keys, update_data)
+    else:
+        keys = {"upload_id": upload_id}
+        dynamodb.delete_item(keys)
+
+        user_email = upload_metadata["creator_email"]
+        params = {
+            "from": "ByteShare <security@byteshare.io>",
+            "to": [user_email],
+            "subject": "Important: Security Alert Regarding Your Uploaded File",
+            "html": """
+            <body style="font-family: Arial, sans-serif; margin: 0; padding: 20px;">
+    <p>Hey,</p>
+
+    <p style="font-size: 18px;"></p>
+
+    <p>We hope this email finds you well.</p>
+
+    <p>We regret to inform you that upon scanning the file you recently uploaded, our system has detected several issues that require immediate attention. As a security measure, we have taken the necessary steps to remove the file from our servers to prevent any potential risks or threats to our system and users.</p>
+
+    <p>We kindly request your cooperation in resolving the identified issues. We understand that this might inconvenience you, and we apologize for any disruption this may cause.</p>
+    <p>To ensure the safety and integrity of our platform, we advise you to review the content of the file and address any issues or vulnerabilities it may contain. Once resolved, you are welcome to re-upload the file for further processing.</p>
+
+    <p>If you require any assistance or have any questions regarding this matter, please do not hesitate to contact our support team.</p>
+    
+    <p>Thank you for your prompt attention to this matter.</p>
+    <p>Best regards,<br>
+    ByteShare Team</p>
+
+    </body>
+    """}
+
+        email = resend.Emails.send(params)
 
 @app.post("/feedback")
 def post_feedback_return_none(body: Feedback):
@@ -450,6 +525,7 @@ def delete_upload_return_done(upload_id: str, body: DeleteUpload):
     """
     Delete the upload of the user
     Reads the DB to find the upload and deletes.
+    Will be called from history page and content moderation
 
     Parameters:
     - user_id: user id

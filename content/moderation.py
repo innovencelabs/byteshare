@@ -2,6 +2,7 @@ import pyclamd
 import pika
 import os
 import boto3
+import requests
 from dotenv import load_dotenv
 import logger
 load_dotenv()
@@ -26,6 +27,7 @@ def scan_file(file_stream):
 def scan_upload(ch, method, properties, body):
     try:
         upload_id = str(body.decode("utf-8"))
+        middleware_url = os.getenv("MIDDLEWARE_BASE_URL") + "/" + "completeScan/" + upload_id
 
         files_in_folder = [
             obj["Key"]
@@ -38,11 +40,20 @@ def scan_upload(ch, method, properties, body):
             file_stream = get_file_stream_from_r2(file_name)
             passed = scan_file(file_stream)
             if(not passed):
-                log.info("Failed")
+                payload = {
+                    'safe': False,
+                }
+                response = requests.post(middleware_url, json=payload)
+
+                log.info("Failed for Upload ID: " + upload_id)
                 ch.basic_ack(delivery_tag=method.delivery_tag)
                 return
 
-        log.info("Passed")
+        payload = {
+            'safe': True,
+        }
+        response = requests.post(middleware_url, json=payload)
+        log.info("Passed for Upload ID: " + upload_id)
 
     except Exception as e:
         log.error(str(e))

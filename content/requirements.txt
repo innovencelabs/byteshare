@@ -1,4 +1,5 @@
 pika==1.3.2
 pyClamd==0.4.0
-boto3==1.34.55
+boto3==1.34.7
+requests==2.31.0
 python-dotenv
