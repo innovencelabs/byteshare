@@ -1,4 +1,4 @@
-# Third Party Softwares
+# Third Party Repositories
 
 ## 1. Docker ClamAV
 
