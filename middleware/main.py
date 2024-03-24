@@ -167,7 +167,7 @@ def initiate_upload_return_upload_url(body: InitiateUpload, request: Request):
     upload_metadata = {
         "upload_id": upload_id,
         "status": StatusEnum.initiated.name,
-        "title": file_name,
+        "title": "Upload with " + file_name,
         "creator_id": body.creator_id,
         "creator_email": body.creator_email,
         "creator_ip": client_ip,
