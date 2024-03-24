@@ -202,27 +202,37 @@ export default function Home() {
         const totalBatches = Math.ceil(totalFiles / batchSize)
         let filesUploaded = 0
 
-        const uploadBatch = (files, batchUrls) => {
+        const uploadBatch = async (files, batchUrls) => {
           return new Promise<void>(async (resolve, reject) => {
             const totalFilesInBatch = files.length
-            let uploadedFilesCount = 0
             let totalBytesUploaded = 0
             let totalBytesExpected = files.reduce(
               (acc, file) => acc + file.size,
               0,
             )
+            let fileProgresses = Array(files.length).fill(0)
+
+            const calculateAggregateProgress = (fileProgresses) => {
+              if (fileProgresses.length === 0) return 0
+              const totalProgress = fileProgresses.reduce(
+                (acc, curr) => acc + curr,
+                0,
+              )
+              return totalProgress / fileProgresses.length // Calculate average progress
+            }
 
             const uploadPromises = files.map(async (file, index) => {
               try {
                 const response = await axios.put(batchUrls[index], file, {
                   onUploadProgress: (progressEvent) => {
-                    totalBytesUploaded = Math.min(
-                      totalBytesUploaded + progressEvent.loaded,
-                      totalBytesExpected,
-                    )
-                    const overallProgress =
-                      (totalBytesUploaded / totalBytesExpected) * 100
-                    setProgress(overallProgress)
+                    const loaded = progressEvent.loaded
+                    const total = progressEvent.total
+                    const fileProgress = (loaded / total) * 100
+                    fileProgresses[index] = fileProgress
+
+                    const aggregateProgress =
+                      calculateAggregateProgress(fileProgresses)
+                    setProgress(aggregateProgress)
                   },
                 })
 
@@ -231,8 +241,6 @@ export default function Home() {
                     `Unexpected response status: ${response.status}`,
                   )
                 }
-
-                uploadedFilesCount++
               } catch (error) {
                 reject(error)
               }
@@ -481,7 +489,7 @@ export default function Home() {
                         onClick={() => setWillShareEmail(!willShareEmail)}
                       />
                       <Label htmlFor="share-email">
-                        Share your email as source.{' '}
+                        Share my email address as source.{' '}
                         <Popover>
                           <PopoverTrigger asChild>
                             <Button
