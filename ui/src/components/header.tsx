@@ -132,7 +132,7 @@ export const Header = ({ authorised, statusLoaded, name, email }) => {
           ) : statusLoaded ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline">{getFormattedName(name)}</Button>
+                <Button variant="outline" className="text-xs md:text-sm">{getFormattedName(name)}</Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56">
                 <DropdownMenuLabel className="text-xs font-light">
