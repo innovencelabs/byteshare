@@ -58,19 +58,16 @@ export const Header = ({ authorised, statusLoaded, name, email }) => {
     toast.success('Your feedback has been received.😃')
   }
 
-  const getFormattedName = (name, maxLength = 13) => {
+  const getFormattedName = (name, maxLength = 8) => {
     const words = name.split(' ')
+    
     let firstWord = words[0]
 
     if (firstWord.length > maxLength) {
-      firstWord = firstWord.substring(0, maxLength - 3) + '...'
+      firstWord = firstWord.substring(0, maxLength - 2) + '..'
     }
 
-    if (firstWord.length + words.slice(1).join(' ').length > maxLength) {
       return firstWord
-    }
-
-    return name
   }
 
   return (
