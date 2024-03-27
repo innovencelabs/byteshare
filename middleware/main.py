@@ -70,6 +70,8 @@ class ContinueUpload(BaseModel):
 
 class PostUpload(BaseModel):
     file_names: list
+    receiver_email: str
+    user_id: str
 
 
 class AddUser(BaseModel):
@@ -171,6 +173,7 @@ def initiate_upload_return_upload_url(body: InitiateUpload, request: Request):
         "creator_id": body.creator_id,
         "creator_email": body.creator_email,
         "creator_ip": client_ip,
+        "receiver_email": "",
         "share_email_as_source": share_email_as_source,
         "download_count": 0,
         "max_download": 5,
@@ -256,11 +259,13 @@ def initiate_upload_with_upload_id_return_upload_url(
 def post_upload_return_link_qr(body: PostUpload, upload_id: str):
     """
     Post upload to Storage.
-    Update status to DB, check for the file present in Storage, generate sharable link and QR
+    Update status to DB, check for the file present in Storage, generate sharable link and QR, send the share link to email if given
 
     Parameters:
     - upload_id: upload id of the upload process
     - file_name: name of the file uploaded
+    - receiver_email: receiver email address
+    - user_id: user id of the sender
 
     Returns:
     - Sharable Link and QR code of frontend page
@@ -319,13 +324,61 @@ def post_upload_return_link_qr(body: PostUpload, upload_id: str):
     )
 
     keys = {"upload_id": upload_id}
-    update_data = {
-        "status": StatusEnum.uploaded.name,
-        "storage_qr_name": qr_name,
-        "expires_at": expires_at.isoformat(),
-        "updated_at": time_now.isoformat(),
-    }
+    if body.receiver_email:
+        update_data = {
+            "status": StatusEnum.uploaded.name,
+            "receiver_email": body.receiver_email,
+            "storage_qr_name": qr_name,
+            "expires_at": expires_at.isoformat(),
+            "updated_at": time_now.isoformat(),
+        }
+    else:
+        update_data = {
+            "status": StatusEnum.uploaded.name,
+            "storage_qr_name": qr_name,
+            "expires_at": expires_at.isoformat(),
+            "updated_at": time_now.isoformat(),
+        }
     dynamodb.update_item(keys, update_data)
+
+    # Send the share link to email, if given
+    if body.receiver_email:
+        user_id = body.user_id
+        user = user_dynamodb.read_item({"user_id": user_id})
+        if not user:
+            raise HTTPException(status_code=400, detail="User does not exist")
+        name = user["name"]
+        params = {
+            "from": "ByteShare <share@byteshare.io>",
+            "to": [body.receiver_email],
+            "subject": "You've Received a File from {}".format(name),
+            "html": """
+            <body style="font-family: Arial, sans-serif; margin: 0; padding: 20px;">
+            <p>Hey,</p>
+
+            <p style="font-size: 18px;"></p>
+
+            <p>You have received a file via ByteShare, a secure file sharing platform.</p> 
+            
+            <p>{} has sent you a file. You can download it using the link below:</p>
+
+            <p><b>{}</b></p>
+
+            <p>Please note that this link will expire after {}, so be sure to download the file promptly.</p>
+
+            <p>If you have any questions or concerns, feel free to contact us at contact@byteshare.io</p>
+            <p>Thank you for using ByteShare!</p>
+
+            <p>Best regards,</p>
+            <p>The ByteShare Team</p>
+
+            </body>
+            """.format(
+                name, file_url, expires_at.isoformat()
+            ),
+        }
+
+        email = resend.Emails.send(params)
 
     return {
         "url": file_url,
@@ -376,6 +429,7 @@ def webhook_post_user_send_email(body: AddUser):
 
     user = {
         "user_id": body.id,
+        "name": body.name,
         "email": body.email,
         "created_at": body.registration,
     }

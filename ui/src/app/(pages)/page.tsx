@@ -48,6 +48,7 @@ export default function Home() {
   const [user, setUser] = useState(null)
   const [userEmail, setUserEmail] = useState('')
   const [userName, setUserName] = useState('')
+  const [receiverEmail, setReceiverEmail] = useState('')
   const [progress, setProgress] = useState(0)
   const [uploading, setUploading] = useState(false)
   const [uploaded, setUploaded] = useState(false)
@@ -173,6 +174,10 @@ export default function Home() {
     await navigator.clipboard.writeText(shareURL)
     setIsCopied(true)
     setTimeout(() => setIsCopied(false), 2000)
+  }
+
+  const handleReceiverEmailChange = (e) => {
+    setReceiverEmail(e.target.value)
   }
 
   const handleUploadSubmit = async (event) => {
@@ -354,7 +359,7 @@ export default function Home() {
       creator_id: user['$id'],
       creator_email: userEmail,
       creator_ip: '127.0.0.1',
-      share_email_as_source: willShareEmail,
+      share_email_as_source: true,
     }
 
     const initiateUploadResponse = await fetch(apiBaseURL + '/initiateUpload', {
@@ -378,6 +383,8 @@ export default function Home() {
 
     const fileJSON = {
       file_names: fileNames,
+      receiver_email: receiverEmail,
+      user_id: user['$id'],
     }
     const postUploadResponse = await fetch(
       apiBaseURL + '/postUpload' + '/' + uploadID,
@@ -482,7 +489,20 @@ export default function Home() {
                       multiple
                       onChange={handleUploadChange}
                     />
-                    <div className="mt-3 flex items-center space-x-2">
+
+                    <Input
+                      className="mt-2"
+                      id="email"
+                      type="email"
+                      value={receiverEmail}
+                      onChange={handleReceiverEmailChange}
+                      placeholder="Email address of receiver (optional)"
+                      required={false}
+                    />
+                    {/* <div className="mt-2 border-l-4 border-slate-100 bg-gradient-linear bg-cover bg-no-repeat bg-left-bottom w-full h-0.5">
+                      <div className="bg-gradient-linear bg-cover bg-no-repeat bg-left-bottom w-full h-0.5 bg-slate-200"></div>
+                    </div>
+                    <div className="mt-1 flex items-center space-x-2">
                       <Checkbox
                         id="share-email"
                         checked={willShareEmail}
@@ -505,7 +525,7 @@ export default function Home() {
                           </PopoverContent>
                         </Popover>
                       </Label>
-                    </div>
+                    </div> */}
                   </div>
                   <DrawerFooter>
                     <Button disabled={submitDisabled} type="submit">
