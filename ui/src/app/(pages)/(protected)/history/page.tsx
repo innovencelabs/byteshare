@@ -143,6 +143,7 @@ function HistoryPage() {
         apiBaseURL + '/download' + '/' + uploadId + '?user_id=' + user['$id'],
       )
       if (!downloadResponse.ok) {
+        setDownloading(false)
         toast.dismiss()
         toast.error('Upload ID is not valid')
         return
@@ -184,6 +185,11 @@ function HistoryPage() {
         setDownloading(false)
       }
     }
+  }
+
+  const handleCopyShareLink = async(uploadId: string) => {
+    const shareURL = process.env.NEXT_PUBLIC_APP_URL + '/share/' + uploadId
+    await navigator.clipboard.writeText(shareURL)
   }
 
   const handleDelete = async (uploadId: string) => {
@@ -308,6 +314,11 @@ function HistoryPage() {
                 disabled={downloading}
               >
                 Download
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => handleCopyShareLink(row.original.id)}
+              >
+                Copy URL
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
