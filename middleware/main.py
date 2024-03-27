@@ -496,7 +496,10 @@ def get_history_return_all_shares_list(user_id: str):
         }
 
         history.append(upload)
-    
+
+        # Sort the history by date in place
+        history.sort(key=_sort_by_date_desc, reverse=True)
+
     return history
 
 @app.delete("/upload/{upload_id}")
@@ -582,6 +585,10 @@ def get_file_url_return_name_link(upload_id: str, user_id: str | None = None):
         dynamodb.update_item(keys, update_data)
 
     return file_data
+
+
+def _sort_by_date_desc(upload):
+    return upload["created_at"]
 
 
 def _get_file_extension(file_name):
