@@ -22,7 +22,6 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Progress } from '@/components/ui/progress'
 import { CheckIcon, CopyIcon } from '@radix-ui/react-icons'
-import TwitterHandle from '@/components/handle'
 import {
   Tooltip,
   TooltipContent,
@@ -607,7 +606,6 @@ export default function Home() {
         </DrawerContent>
       </Drawer>
       <audio ref={audioRef} src="/popsound.mp3" />
-      <TwitterHandle />
       <div className="absolute inset-0">
         <Image
           src="/background.jpg"

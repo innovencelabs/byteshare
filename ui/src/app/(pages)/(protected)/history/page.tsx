@@ -17,7 +17,6 @@ import {
 } from '@/components/ui/table'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Button } from '@/components/ui/button'
-import TwitterHandle from '@/components/handle'
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -456,7 +455,6 @@ function HistoryPage() {
           </div>
         </div>
       </div>
-      <TwitterHandle />
       <div className="absolute inset-0">
         <Image
           src="/background.jpg"
