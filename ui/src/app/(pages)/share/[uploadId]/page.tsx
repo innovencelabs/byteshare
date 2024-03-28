@@ -34,7 +34,6 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
-import TwitterHandle from '@/components/handle'
 import { toast } from 'sonner'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Label } from '@/components/ui/label'
@@ -368,7 +367,6 @@ function SharePage({ params }: Params) {
           </div>
         </div>
       </div>
-      <TwitterHandle />
       <div className="absolute inset-0">
         <Image
           src="/background.jpg"
