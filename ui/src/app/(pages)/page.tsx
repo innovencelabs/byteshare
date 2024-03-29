@@ -383,7 +383,7 @@ export default function Home() {
     const fileJSON = {
       file_names: fileNames,
       receiver_email: receiverEmail,
-      user_id: user['$id'],
+      sender_name: userName,
     }
     const postUploadResponse = await fetch(
       apiBaseURL + '/postUpload' + '/' + uploadID,
@@ -488,15 +488,16 @@ export default function Home() {
                       multiple
                       onChange={handleUploadChange}
                     />
-
+                    <Label htmlFor="receiver-email"></Label>
                     <Input
                       className="mt-2"
-                      id="email"
+                      id="receiver-email"
                       type="email"
                       value={receiverEmail}
                       onChange={handleReceiverEmailChange}
                       placeholder="Email address of receiver (optional)"
                       required={false}
+                      onPointerDown={(e) => e.stopPropagation()}
                     />
                     {/* <div className="mt-2 border-l-4 border-slate-100 bg-gradient-linear bg-cover bg-no-repeat bg-left-bottom w-full h-0.5">
                       <div className="bg-gradient-linear bg-cover bg-no-repeat bg-left-bottom w-full h-0.5 bg-slate-200"></div>
