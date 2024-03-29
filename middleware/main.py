@@ -71,7 +71,7 @@ class ContinueUpload(BaseModel):
 class PostUpload(BaseModel):
     file_names: list
     receiver_email: str
-    user_id: str
+    sender_name: str
 
 
 class AddUser(BaseModel):
@@ -343,11 +343,7 @@ def post_upload_return_link_qr(body: PostUpload, upload_id: str):
 
     # Send the share link to email, if given
     if body.receiver_email:
-        user_id = body.user_id
-        user = user_dynamodb.read_item({"user_id": user_id})
-        if not user:
-            raise HTTPException(status_code=400, detail="User does not exist")
-        name = user["name"]
+        name = body.sender_name
         params = {
             "from": "ByteShare <share@byteshare.io>",
             "to": [body.receiver_email],
@@ -360,7 +356,7 @@ def post_upload_return_link_qr(body: PostUpload, upload_id: str):
 
             <p>You have received a file via ByteShare, a secure file sharing platform.</p> 
             
-            <p>{} has sent you a file. You can download it using the link below:</p>
+            <p><b>{}</b> has sent you a file. You can download it using the link below:</p>
 
             <p><b>{}</b></p>
 
@@ -480,9 +476,10 @@ def get_history_return_all_shares_list(user_id: str):
     """
     history = []
 
-    user = user_dynamodb.read_item({"user_id": user_id})
-    if(user==None):
-        raise HTTPException(status_code=400, detail="User does not exist")
+    # Note: will be uncommented later
+    # user = user_dynamodb.read_item({"user_id": user_id})
+    # if(user==None):
+    #     raise HTTPException(status_code=400, detail="User does not exist")
 
     upload_metadatas = dynamodb.read_items("creator_id", user_id)
     for upload_metadata in upload_metadatas:
