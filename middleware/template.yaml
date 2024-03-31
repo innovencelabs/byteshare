@@ -87,6 +87,7 @@ Resources:
     Type: AWS::ApiGateway::ApiKey
     Properties:
       Name: ByteShareAPIKey
+      Enabled: true
   MyUsagePlanKey:
     Type: AWS::ApiGateway::UsagePlanKey
     Properties:
