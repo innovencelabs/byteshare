@@ -74,6 +74,7 @@ function HistoryPage() {
     const fetchData = async () => {
       const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
       const apiKey = process.env.NEXT_PUBLIC_API_KEY
+      const jwtToken = await appwriteService.getJWTToken()
       const userID = user['$id']
 
       const historyResponse = await fetch(
@@ -83,6 +84,7 @@ function HistoryPage() {
           headers: {
             'Content-Type': 'application/json',
             'x-api-key': apiKey,
+            Authorization: 'Bearer ' + jwtToken.jwt,
           },
         },
       )
@@ -210,6 +212,7 @@ function HistoryPage() {
   const handleDelete = async (uploadId: string) => {
     const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
     const apiKey = process.env.NEXT_PUBLIC_API_KEY
+    const jwtToken = await appwriteService.getJWTToken()
     
     const deleteJSON = {
       user_id: user['$id'],
@@ -222,6 +225,7 @@ function HistoryPage() {
         headers: {
           'Content-Type': 'application/json',
           'x-api-key': apiKey,
+          Authorization: 'Bearer ' + jwtToken.jwt,
         },
       },
     )

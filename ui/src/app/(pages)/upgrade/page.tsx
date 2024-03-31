@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import React, { useState } from 'react'
 import { toast } from 'sonner'
+import appwriteService from '@/authentication/appwrite/config'
 
 function UpgradePage() {
   const [email, setEmail] = useState('')
@@ -11,6 +12,7 @@ function UpgradePage() {
     e.preventDefault()
     const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
     const apiKey = process.env.NEXT_PUBLIC_API_KEY
+    const jwtToken = await appwriteService.getJWTToken()
 
     const subscribeJSON = {
       email: email,
@@ -22,6 +24,7 @@ function UpgradePage() {
       headers: {
         'Content-Type': 'application/json',
         'x-api-key': apiKey,
+        Authorization: 'Bearer ' + jwtToken.jwt,
       },
     })
     setEmail('')

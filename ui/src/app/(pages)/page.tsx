@@ -328,6 +328,7 @@ export default function Home() {
   const uploadFile = async (file, uploadID, continueID) => {
     const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
     const apiKey = process.env.NEXT_PUBLIC_API_KEY
+    const jwtToken = await appwriteService.getJWTToken()
 
     const fileJSON = {
       file_name: file.name,
@@ -343,6 +344,7 @@ export default function Home() {
           'File-Length': file.size,
           'Content-Type': 'application/json',
           'x-api-key': apiKey,
+          Authorization: 'Bearer ' + jwtToken.jwt,
         },
       },
     )
@@ -355,6 +357,7 @@ export default function Home() {
   const uploadFirstFile = async (file) => {
     const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
     const apiKey = process.env.NEXT_PUBLIC_API_KEY
+    const jwtToken = await appwriteService.getJWTToken()
 
     const firstFileJSON = {
       file_name: file.name,
@@ -371,6 +374,7 @@ export default function Home() {
         'File-Length': file.size,
         'Content-Type': 'application/json',
         'x-api-key': apiKey,
+        Authorization: 'Bearer ' + jwtToken.jwt,
       },
     })
     const data = await initiateUploadResponse.json()
@@ -384,6 +388,7 @@ export default function Home() {
   const postUpload = async (fileNames, uploadID) => {
     const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
     const apiKey = process.env.NEXT_PUBLIC_API_KEY
+    const jwtToken = await appwriteService.getJWTToken()
 
     const fileJSON = {
       file_names: fileNames,
@@ -398,6 +403,7 @@ export default function Home() {
         headers: {
           'Content-Type': 'application/json',
           'x-api-key': apiKey,
+          Authorization: 'Bearer ' + jwtToken.jwt,
         },
       },
     )

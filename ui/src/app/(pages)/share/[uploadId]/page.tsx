@@ -69,16 +69,18 @@ function SharePage({ params }: Params) {
     const fetchData = async () => {
       const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
       const apiKey = process.env.NEXT_PUBLIC_API_KEY
+      const jwtToken = await appwriteService.getJWTToken()
 
       const downloadResponse = await fetch(
-        apiBaseURL + '/download' + '/' + params.uploadId, 
-        { 
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-        }
-      }
+        apiBaseURL + '/download' + '/' + params.uploadId,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey,
+            Authorization: 'Bearer ' + jwtToken.jwt,
+          },
+        },
       )
       if (!downloadResponse.ok) {
         toast.dismiss()

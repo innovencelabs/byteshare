@@ -113,6 +113,16 @@ export class AppwriteService {
     return null
   }
 
+  async getJWTToken(){
+    try{
+      const jwt = await account.createJWT()
+      return jwt
+    } catch (err: any) {
+      console.log('GetJWTToken Error: ' + err)
+      return null
+    }
+  }
+
   async initiateForgotPassword({ email }: ForgotPassword) {
     try {
       const resetPasswordURL: string =
