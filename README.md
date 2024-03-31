@@ -37,29 +37,27 @@ cd ByteShare
 aws configure
 ```
 4. Setup Cloudflare R2
-5. Add variable file for terraform and enter your credentials.
-```bash
-cp terraform.tfvars.example terraform.tfvars
-```
-6. Create AWS resource using Terraform
+5. Create AWS resource using Terraform (only in infrastructure/cloud folder)
 ```bash
 cd ByteShare/infrastructure/cloud
+cp terraform.tfvars.example terraform.tfvars
+# Add you credentials in terraform.tfvars
 terraform init
 terraform plan
 terraform apply
 cd ../../
 ```
-7. Setup your Appwrite account [HERE](https://appwrite.io/)
-8. Create your Organisation and Project in Appwrite [TUTORIAL](https://youtu.be/pk92hS_d_ns?t=11&si=emSqp8Mdra_iF-dc)
-9.  Install UI dependencies and add .env file
+6. Setup your Appwrite account [HERE](https://appwrite.io/)
+7. Create your Organisation and Project in Appwrite [TUTORIAL](https://youtu.be/pk92hS_d_ns?t=11&si=emSqp8Mdra_iF-dc)
+8.  Install UI dependencies and add .env file
 ```bash
 cd ui
 npm install
 cp .env.example .env
 cd ..
 ```
-10.  Fill the values in .env file for backend url and Appwrite creds
-11.   Install Middleware(Backend) dependencies and add .env file
+9.   Fill the values in .env file for backend url and Appwrite creds
+10.    Install Middleware(Backend) dependencies and add .env file
 ```bash
 cd middleware
 python3 -m venv .venv
@@ -68,7 +66,7 @@ pip3 install -r requirements.txt
 cp .env.example .env
 cd ..
 ```
-12.    Run the application
+11.     Run the application
 ```bash
 cd ui
 npm run dev
