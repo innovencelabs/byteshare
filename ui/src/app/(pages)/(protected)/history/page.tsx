@@ -73,10 +73,18 @@ function HistoryPage() {
   useEffect(() => {
     const fetchData = async () => {
       const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+      const apiKey = process.env.NEXT_PUBLIC_API_KEY
       const userID = user['$id']
 
       const historyResponse = await fetch(
         apiBaseURL + '/history' + '/' + userID,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey,
+          },
+        },
       )
       if (!historyResponse.ok) {
         toast.error('User ID is not valid')
@@ -137,9 +145,17 @@ function HistoryPage() {
       setDownloading(true)
       toast.info('Download in progress...', { duration: 9999999 })
       const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+      const apiKey = process.env.NEXT_PUBLIC_API_KEY
 
       const downloadResponse = await fetch(
         apiBaseURL + '/download' + '/' + uploadId + '?user_id=' + user['$id'],
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey,
+          },
+        },
       )
       if (!downloadResponse.ok) {
         setDownloading(false)
@@ -193,7 +209,8 @@ function HistoryPage() {
 
   const handleDelete = async (uploadId: string) => {
     const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
-
+    const apiKey = process.env.NEXT_PUBLIC_API_KEY
+    
     const deleteJSON = {
       user_id: user['$id'],
     }
@@ -204,6 +221,7 @@ function HistoryPage() {
         body: JSON.stringify(deleteJSON),
         headers: {
           'Content-Type': 'application/json',
+          'x-api-key': apiKey,
         },
       },
     )

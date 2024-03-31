@@ -327,6 +327,7 @@ export default function Home() {
 
   const uploadFile = async (file, uploadID, continueID) => {
     const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+    const apiKey = process.env.NEXT_PUBLIC_API_KEY
 
     const fileJSON = {
       file_name: file.name,
@@ -341,6 +342,7 @@ export default function Home() {
         headers: {
           'File-Length': file.size,
           'Content-Type': 'application/json',
+          'x-api-key': apiKey,
         },
       },
     )
@@ -352,6 +354,7 @@ export default function Home() {
 
   const uploadFirstFile = async (file) => {
     const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+    const apiKey = process.env.NEXT_PUBLIC_API_KEY
 
     const firstFileJSON = {
       file_name: file.name,
@@ -367,6 +370,7 @@ export default function Home() {
       headers: {
         'File-Length': file.size,
         'Content-Type': 'application/json',
+        'x-api-key': apiKey,
       },
     })
     const data = await initiateUploadResponse.json()
@@ -379,6 +383,7 @@ export default function Home() {
 
   const postUpload = async (fileNames, uploadID) => {
     const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+    const apiKey = process.env.NEXT_PUBLIC_API_KEY
 
     const fileJSON = {
       file_names: fileNames,
@@ -392,6 +397,7 @@ export default function Home() {
         body: JSON.stringify(fileJSON),
         headers: {
           'Content-Type': 'application/json',
+          'x-api-key': apiKey,
         },
       },
     )

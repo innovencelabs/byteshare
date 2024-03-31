@@ -66,7 +66,6 @@ Resources:
         AllowOrigin: !Sub
           - "'${CorsOrigin}'"
           - CorsOrigin: !Ref CorsOrigin
-
   SitePackagesLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:
@@ -78,6 +77,22 @@ Resources:
         - python3.10
       LicenseInfo: "MIT"
       RetentionPolicy: Retain
+  ByteShareUsagePlan:
+    Type: AWS::ApiGateway::UsagePlan
+    Properties:
+      ApiStages:
+        - ApiId: !Ref ByteShareAPIGW
+          Stage: prod
+  ByteShareApiKey:
+    Type: AWS::ApiGateway::ApiKey
+    Properties:
+      Name: ByteShareAPIKey
+  MyUsagePlanKey:
+    Type: AWS::ApiGateway::UsagePlanKey
+    Properties:
+      KeyId: !Ref ByteShareApiKey
+      KeyType: API_KEY
+      UsagePlanId: !Ref ByteShareUsagePlan
 Outputs:
   ByteShareAPIRes:
     Description: "API Gateway endpoint URL for prod stage of byteshare function"
