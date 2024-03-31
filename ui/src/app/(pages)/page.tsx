@@ -344,7 +344,7 @@ export default function Home() {
           'File-Length': file.size,
           'Content-Type': 'application/json',
           'x-api-key': apiKey,
-          Authorization: jwtToken.jwt,
+          Authorization: 'Bearer ' + jwtToken.jwt,
         },
       },
     )
@@ -374,7 +374,7 @@ export default function Home() {
         'File-Length': file.size,
         'Content-Type': 'application/json',
         'x-api-key': apiKey,
-        Authorization: jwtToken.jwt,
+        Authorization: 'Bearer ' + jwtToken.jwt,
       },
     })
     const data = await initiateUploadResponse.json()
@@ -403,7 +403,7 @@ export default function Home() {
         headers: {
           'Content-Type': 'application/json',
           'x-api-key': apiKey,
-          Authorization: jwtToken.jwt,
+          Authorization: 'Bearer ' + jwtToken.jwt,
         },
       },
     )
