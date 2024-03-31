@@ -62,7 +62,7 @@ Resources:
       TracingEnabled: true
       Cors:
         AllowMethods: "'OPTIONS,GET,POST,PUT,DELETE'"
-        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,File-Length'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,x-api-key,X-Amz-Security-Token,File-Length'"
         AllowOrigin: !Sub
           - "'${CorsOrigin}'"
           - CorsOrigin: !Ref CorsOrigin
