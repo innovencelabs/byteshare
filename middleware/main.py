@@ -1,5 +1,7 @@
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, Depends, Header
 from fastapi.middleware.cors import CORSMiddleware
+from appwrite.client import Client
+from appwrite.services.account import Account
 from mangum import Mangum
 from db import DynamoDBManager
 from storage.cloudflare_r2 import CloudflareR2Manager
@@ -7,6 +9,7 @@ from enum import Enum as PythonEnum
 from datetime import datetime, timedelta, timezone
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
+from typing import Optional
 import uuid
 import qrcode
 import os
@@ -90,6 +93,43 @@ class DeleteUpload(BaseModel):
     user_id: str
 
 
+async def _authenticate(authorization: Optional[str] = Header(None)):
+    if authorization is None:
+        raise HTTPException(
+            status_code=401,
+            detail="Authorization header is missing",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    token_type, token = authorization.split()
+    if token_type.lower() != "bearer":
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid token type",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    try:
+        client = Client()
+        (
+            client.set_endpoint(os.getenv("APPWRITE_URL"))
+            .set_project(os.getenv("APPWRITE_PROJECT_ID"))
+            .set_jwt(token)
+        )
+
+        account = Account(client)
+
+        result = account.get()
+
+        print(result)
+    except Exception as e:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+
 @app.get("/health")
 def health_check():
     """
@@ -131,7 +171,9 @@ def add_subscriber_return_done(body: Subscribe):
 
 
 @app.post("/initiateUpload")
-def initiate_upload_return_upload_url(body: InitiateUpload, request: Request):
+def initiate_upload_return_upload_url(
+    body: InitiateUpload, request: Request, token_data: None = Depends(_authenticate)
+):
     """
     Initiate upload to Storage.
     checks for file size under limit for current user type, creates upload URL for upload and add to DB.
@@ -196,7 +238,10 @@ def initiate_upload_return_upload_url(body: InitiateUpload, request: Request):
 
 @app.post("/initiateUpload/{upload_id}")
 def initiate_upload_with_upload_id_return_upload_url(
-    body: ContinueUpload, upload_id: str, request: Request
+    body: ContinueUpload,
+    upload_id: str,
+    request: Request,
+    token_data: None = Depends(_authenticate),
 ):
     """
     Initiate upload to Storage for existing upload_id.
@@ -256,7 +301,9 @@ def initiate_upload_with_upload_id_return_upload_url(
 
 
 @app.post("/postUpload/{upload_id}")
-def post_upload_return_link_qr(body: PostUpload, upload_id: str):
+def post_upload_return_link_qr(
+    body: PostUpload, upload_id: str, token_data: None = Depends(_authenticate)
+):
     """
     Post upload to Storage.
     Update status to DB, check for the file present in Storage, generate sharable link and QR, send the share link to email if given
@@ -463,7 +510,9 @@ def webhook_post_user_send_email(body: AddUser):
     email = resend.Emails.send(params)
 
 @app.get("/history/{user_id}")
-def get_history_return_all_shares_list(user_id: str):
+def get_history_return_all_shares_list(
+    user_id: str, token_data: None = Depends(_authenticate)
+):
     """
     Get history for a given User.
     Reads the DB to find all the shares made by the user.
@@ -500,7 +549,9 @@ def get_history_return_all_shares_list(user_id: str):
     return history
 
 @app.delete("/upload/{upload_id}")
-def delete_upload_return_done(upload_id: str, body: DeleteUpload):
+def delete_upload_return_done(
+    upload_id: str, body: DeleteUpload, token_data: None = Depends(_authenticate)
+):
     """
     Delete the upload of the user
     Reads the DB to find the upload and deletes.

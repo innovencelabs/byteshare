@@ -14,6 +14,10 @@ Parameters:
     Type: String
   ResendAPIKey:
     Type: String
+  AppwriteURL:
+    Type: String
+  AppwriteProjectID:
+    Type: String
 
 Globals:
   Function:
@@ -46,6 +50,8 @@ Resources:
           R2_SECRET_KEY: !Ref R2SecretKey
           WEB_BASE_URL: !Ref CorsOrigin
           RESEND_API_KEY: !Ref ResendAPIKey
+          APPWRITE_URL: !Ref AppwriteURL
+          APPWRITE_PROJECT_ID: !Ref AppwriteProjectID
       Events:
         ApiEventWithProxy:
           Type: Api
