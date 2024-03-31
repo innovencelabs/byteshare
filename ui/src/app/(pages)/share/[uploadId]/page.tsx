@@ -68,9 +68,17 @@ function SharePage({ params }: Params) {
   useEffect(() => {
     const fetchData = async () => {
       const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+      const apiKey = process.env.NEXT_PUBLIC_API_KEY
 
       const downloadResponse = await fetch(
-        apiBaseURL + '/download' + '/' + params.uploadId,
+        apiBaseURL + '/download' + '/' + params.uploadId, 
+        { 
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+        }
+      }
       )
       if (!downloadResponse.ok) {
         toast.dismiss()

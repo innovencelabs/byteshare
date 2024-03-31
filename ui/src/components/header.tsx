@@ -41,6 +41,7 @@ export const Header = ({ authorised, statusLoaded, name, email }) => {
     setPopoverOpen(false)
 
     const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+    const apiKey = process.env.NEXT_PUBLIC_API_KEY
     const feedbackJSON = {
       name: feedbackName,
       email: feedbackEmail,
@@ -52,6 +53,7 @@ export const Header = ({ authorised, statusLoaded, name, email }) => {
       body: JSON.stringify(feedbackJSON),
       headers: {
         'Content-Type': 'application/json',
+        'x-api-key': apiKey,
       },
     })
 

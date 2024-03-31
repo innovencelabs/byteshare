@@ -10,6 +10,7 @@ function UpgradePage() {
   const handleSubscribe = async (e) => {
     e.preventDefault()
     const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+    const apiKey = process.env.NEXT_PUBLIC_API_KEY
 
     const subscribeJSON = {
       email: email,
@@ -20,6 +21,7 @@ function UpgradePage() {
       body: JSON.stringify(subscribeJSON),
       headers: {
         'Content-Type': 'application/json',
+        'x-api-key': apiKey,
       },
     })
     setEmail('')
