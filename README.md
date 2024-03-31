@@ -41,7 +41,7 @@ aws configure
 ```bash
 cd ByteShare/infrastructure/cloud
 cp terraform.tfvars.example terraform.tfvars
-# Add you credentials in terraform.tfvars
+# Add your credentials in terraform.tfvars
 terraform init
 terraform plan
 terraform apply
