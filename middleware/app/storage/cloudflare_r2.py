@@ -1,8 +1,9 @@
-from storage.storage import BaseStorage
-from fastapi import HTTPException
-from dotenv import load_dotenv
-import boto3
 import os
+
+import boto3
+from dotenv import load_dotenv
+from fastapi import HTTPException
+from storage.storage import BaseStorage
 
 load_dotenv()
 
@@ -16,7 +17,7 @@ class CloudflareR2Manager(BaseStorage):
             endpoint_url=endpoint_url,
             aws_access_key_id=os.getenv("R2_ACCESS_KEY"),
             aws_secret_access_key=os.getenv("R2_SECRET_KEY"),
-            region_name="auto"
+            region_name="auto",
         )
 
     def health_check(self):

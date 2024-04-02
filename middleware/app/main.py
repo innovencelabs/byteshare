@@ -1,20 +1,20 @@
-from fastapi import FastAPI, Request, HTTPException, Depends, Header
-from fastapi.middleware.cors import CORSMiddleware
+import os
+import uuid
+from datetime import datetime, timedelta, timezone
+from enum import Enum as PythonEnum
+from typing import Optional
+
+import qrcode
+import resend
 from appwrite.client import Client
 from appwrite.services.account import Account
-from mangum import Mangum
 from db import DynamoDBManager
-from storage.cloudflare_r2 import CloudflareR2Manager
-from enum import Enum as PythonEnum
-from datetime import datetime, timedelta, timezone
-from pydantic import BaseModel, Field
 from dotenv import load_dotenv
-from typing import Optional
-import uuid
-import qrcode
-import os
-import resend
-
+from fastapi import Depends, FastAPI, Header, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
+from mangum import Mangum
+from pydantic import BaseModel, Field
+from storage.cloudflare_r2 import CloudflareR2Manager
 
 app = FastAPI()
 
@@ -89,6 +89,7 @@ class Feedback(BaseModel):
     email: str
     message: str
 
+
 class DeleteUpload(BaseModel):
     user_id: str
 
@@ -122,7 +123,7 @@ async def _authenticate(authorization: Optional[str] = Header(None)):
         result = account.get()
 
         print(result)
-    except Exception as e:
+    except Exception:
         raise HTTPException(
             status_code=401,
             detail="Invalid token",
@@ -421,7 +422,7 @@ def post_upload_return_link_qr(
             ),
         }
 
-        email = resend.Emails.send(params)
+        resend.Emails.send(params)
 
     return {
         "url": file_url,
@@ -507,7 +508,8 @@ def webhook_post_user_send_email(body: AddUser):
         ),
     }
 
-    email = resend.Emails.send(params)
+    resend.Emails.send(params)
+
 
 @app.get("/history/{user_id}")
 def get_history_return_all_shares_list(
@@ -538,7 +540,7 @@ def get_history_return_all_shares_list(
             "created_at": upload_metadata["created_at"],
             "downloaded": upload_metadata["download_count"],
             "max_download": upload_metadata["max_download"],
-            "total_size": _format_size(upload_metadata["total_size"])
+            "total_size": _format_size(upload_metadata["total_size"]),
         }
 
         history.append(upload)
@@ -547,6 +549,7 @@ def get_history_return_all_shares_list(
         history.sort(key=_sort_by_date_desc, reverse=True)
 
     return history
+
 
 @app.delete("/upload/{upload_id}")
 def delete_upload_return_done(
@@ -564,8 +567,10 @@ def delete_upload_return_done(
     - Done
     """
     upload_metadata = dynamodb.read_item({"upload_id": upload_id})
-    if(upload_metadata["creator_id"]!=body.user_id):
-        raise HTTPException(status_code=400, detail="User is not the owner of the upload")
+    if upload_metadata["creator_id"] != body.user_id:
+        raise HTTPException(
+            status_code=400, detail="User is not the owner of the upload"
+        )
 
     keys = {"upload_id": upload_id}
     dynamodb.delete_item(keys)
@@ -601,7 +606,7 @@ def get_file_url_return_name_link(upload_id: str, user_id: str | None = None):
 
     download_count = upload_metadata["download_count"]
     max_count = upload_metadata["max_download"]
-    if(user_id==None or upload_metadata["creator_id"]!=user_id):
+    if user_id == None or upload_metadata["creator_id"] != user_id:
         if download_count >= max_count:
             raise HTTPException(status_code=400, detail="Download limit exceeded")
 
@@ -624,7 +629,7 @@ def get_file_url_return_name_link(upload_id: str, user_id: str | None = None):
         file_data[file_name]["size"] = _format_size(file_size)
         file_data[file_name]["download_url"] = file_url
 
-    if(user_id==None or upload_metadata["creator_id"]!=user_id):
+    if user_id == None or upload_metadata["creator_id"] != user_id:
         keys = {"upload_id": upload_id}
         update_data = {
             "download_count": download_count + 1,

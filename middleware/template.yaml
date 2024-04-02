@@ -35,7 +35,7 @@ Resources:
       MemorySize: 2048
       Handler: main.handler
       Runtime: python3.10
-      CodeUri: .
+      CodeUri: ./app
       Layers:
         - Ref: SitePackagesLayer
       Tracing: Active
