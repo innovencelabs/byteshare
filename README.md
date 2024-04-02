@@ -65,9 +65,10 @@ cd middleware
 python3 -m venv .venv
 source .venv/bin/activate
 pip3 install -r requirements.txt
+cd app
 cp .env.example .env
 # Add your credentials in .env
-cd ..
+cd ../..
 ```
 12.     Run the application
 ```bash
@@ -75,7 +76,7 @@ cd ui
 npm run dev
 
 --new tab--
-cd middleware
+cd middleware/app
 uvicorn main:app --reload
 ```
 

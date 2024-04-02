@@ -7,10 +7,9 @@ middleware/python-site-packages.zip
 .terraform.lock.hcl
 terraform.tfstate
 terraform.tfstate.backup
-ui/.env
+**/.env
 todo.txt
 ui-bkp
 ui/.next
-middleware/.env
 issue.txt
 terraform.tfvars

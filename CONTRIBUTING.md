@@ -60,9 +60,10 @@ Your contributions are invaluable to our open-source community. Whether you're a
   python3 -m venv .venv
   source .venv/bin/activate
   pip3 install -r requirements.txt
+  cd app
   cp .env.example .env
   # Add your credentials in .env
-  cd ..
+  cd ../..
   ```
   8. Run the application
   ```bash
@@ -70,7 +71,7 @@ Your contributions are invaluable to our open-source community. Whether you're a
   npm run dev
 
   --new tab--
-  cd middleware
+  cd middleware/app
   uvicorn main:app --reload
   ```
 

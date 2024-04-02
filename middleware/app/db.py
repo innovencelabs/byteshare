@@ -1,5 +1,5 @@
-from fastapi import HTTPException
 import boto3
+from fastapi import HTTPException
 
 
 class DynamoDBManager:
