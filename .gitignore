@@ -13,3 +13,5 @@ ui-bkp
 ui/.next
 issue.txt
 terraform.tfvars
+**/.coverage
+**/.pytest_cache

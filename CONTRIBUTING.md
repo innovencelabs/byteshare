@@ -112,6 +112,9 @@ git pull
 |       ├── context
 │       └── lib
 ├── middeware               # Backend application
+|       ├── app             # Source code
+|       ├── scripts         # Automation scripts
+│       └── tests           # Test scripts
 └── infrastructure          # Terraform scripts for cloud and local(docker version)
     ├── cloud               # For clouds
     └── local               # For docker containers
