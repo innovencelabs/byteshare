@@ -1,12 +1,8 @@
 name: Deploy SAM Backend
 
 on:
-  push:
-    branches:
-      - master
-    paths:
-      - 'middleware/**'
-      - '.github/workflows/deploy-backend.yaml'
+  release:
+    types: [created]
 
 jobs:
   deploy:
