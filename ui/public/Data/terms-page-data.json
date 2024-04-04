@@ -1,0 +1,66 @@
+{
+  "termsOfUse": {
+    "welcomeMessage": "Welcome to ByteShare! These Terms of Use ('Terms') govern your access and use of our large file sharing platform ('Service'). By accessing or using the Service, you agree to be bound by these Terms. Please read them carefully before using the Service.",
+    "sections": [
+      {
+        "title": "Acceptable Use",
+        "content": [
+          "You agree to use the Service only for lawful purposes and in accordance with these Terms. You agree not to:",
+          "- Upload, store, share, or transmit any content that is illegal, harmful, threatening, abusive, harassing, discriminatory, or offensive.",
+          "- Infringe on intellectual property rights, privacy rights, or other rights of others.",
+          "- Use the Service in a way that could damage, disable, overburden, or impair the Service or any other related servers, networks, or systems.",
+          "- Attempt to gain unauthorized access to the Service or any related systems or networks.",
+          "- Impersonate any person or entity, or falsely state or misrepresent your affiliation with a person or entity.",
+          "- Use the Service for any commercial purpose without our express written consent."
+        ]
+      },
+      {
+        "title": "File Storage and Deletion",
+        "content": [
+          "Files uploaded to the Service are stored for 60 days from the date of upload. After 60 days, your files will be automatically deleted.",
+          "We reserve the right to delete any files that we deem to violate these Terms or applicable laws.",
+          "We are not responsible for any loss or damage caused by the deletion of your files."
+        ]
+      },
+      {
+        "title": "Disclaimer and Warranties",
+        "content": [
+          "THE SERVICE IS PROVIDED 'AS IS' AND WITHOUT ANY WARRANTIES, EXPRESS OR IMPLIED. WE DISCLAIM ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.",
+          "WE DO NOT WARRANT THAT THE SERVICE WILL BE UNINTERRUPTED, ERROR-FREE, OR VIRUS-FREE. WE DO NOT WARRANT THAT THE RESULTS THAT MAY BE OBTAINED FROM THE USE OF THE SERVICE WILL BE ACCURATE OR RELIABLE."
+        ]
+      },
+      {
+        "title": "Limitation of Liability",
+        "content": [
+          "WE WILL NOT BE LIABLE FOR ANY DAMAGES OF ANY KIND ARISING OUT OF OR RELATED TO YOUR USE OF THE SERVICE, INCLUDING, BUT NOT LIMITED TO, DIRECT, INDIRECT, INCIDENTAL, CONSEQUENTIAL, AND PUNITIVE DAMAGES."
+        ]
+      },
+      {
+        "title": "Termination",
+        "content": [
+          "We may terminate your access to the Service at any time, for any reason, without notice.",
+          "You may terminate your use of the Service at any time."
+        ]
+      },
+      {
+        "title": "Governing Law and Dispute Resolution",
+        "content": [
+          "These Terms shall be governed by and construed in accordance with the laws of India, without regard to its conflict of laws provisions.",
+          "Any dispute arising out of or relating to these Terms shall be subject to the exclusive jurisdiction of the courts of India."
+        ]
+      },
+      {
+        "title": "Entire Agreement",
+        "content": [
+          "These Terms constitute the entire agreement between you and us with respect to the Service and supersede all prior or contemporaneous communications, representations, or agreements, whether oral or written."
+        ]
+      },
+      {
+        "title": "Changes to Terms",
+        "content": [
+          "We may change these Terms at any time by posting the revised Terms on the Service. Your continued use of the Service after the posting of the revised Terms constitutes your acceptance of the revised Terms."
+        ]
+      }
+    ]
+  }
+}
