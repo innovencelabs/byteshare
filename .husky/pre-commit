@@ -2,3 +2,8 @@
 . "$(dirname -- "$0")/_/husky.sh"
 
 npx -C ui lint-staged
+cd ..
+cd middleware
+chmod +x scripts/format-scripts.sh
+chmod +x scripts/format.sh
+./scripts/format-scripts.sh
