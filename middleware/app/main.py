@@ -184,7 +184,7 @@ def initiate_upload_return_upload_url(
     - file_name: name of the file to be uploaded
     - creator_email: email of the creator
     - creator_ip: ip address of the creator
-    - Fontent-Length: file size of the uploaded file
+    - Content-Length: file size of the uploaded file
 
     Returns:
     - Upload URL for upload and Upload id
@@ -299,6 +299,41 @@ def initiate_upload_with_upload_id_return_upload_url(
     dynamodb.update_item(keys, update_data)
 
     return {"upload_url": upload_url}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 @app.post("/postUpload/{upload_id}")

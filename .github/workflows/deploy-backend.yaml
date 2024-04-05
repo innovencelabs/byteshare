@@ -5,6 +5,27 @@ on:
     types: [created]
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.10'
+
+    - name: Run Tests
+      run: |
+        cd middleware
+        pip install -r requirements.txt
+        pip install httpx==0.27.0
+        pip install pytest==8.1.1
+        pip install pytest-mock==3.14.0
+        cd tests
+        pytest
   deploy:
     runs-on: ubuntu-latest
 
