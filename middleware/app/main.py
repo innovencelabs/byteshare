@@ -301,33 +301,6 @@ def initiate_upload_with_upload_id_return_upload_url(
     return {"upload_url": upload_url}
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 @app.post("/postUpload/{upload_id}")
 def post_upload_return_link_qr(
     body: PostUpload, upload_id: str, token_data: None = Depends(_authenticate)
