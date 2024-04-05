@@ -8,6 +8,7 @@ import JSZip from 'jszip'
 import { saveAs } from 'file-saver'
 import { DownloadIcon } from '@radix-ui/react-icons'
 import { lookup } from 'mime-types'
+import { useSearchParams } from 'next/navigation'
 import {
   ColumnDef,
   VisibilityState,
@@ -65,6 +66,11 @@ function SharePage({ params }: Params) {
   const [data, setData] = React.useState<File[]>([])
   const [source, setSource] = useState(null)
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+
+  const searchParams = useSearchParams()
+ 
+  const autodownload = searchParams.get('autodownload')
+
   useEffect(() => {
     const fetchData = async () => {
       const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
@@ -105,6 +111,9 @@ function SharePage({ params }: Params) {
         setData((prevdata) => [...prevdata, file])
       }
       setIsLoading(false)
+      if(autodownload){
+        handleDownloadAll()
+      }
     }
     if (isMounted) {
       fetchData()
