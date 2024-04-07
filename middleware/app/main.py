@@ -184,7 +184,7 @@ def initiate_upload_return_upload_url(
     - file_name: name of the file to be uploaded
     - creator_email: email of the creator
     - creator_ip: ip address of the creator
-    - Fontent-Length: file size of the uploaded file
+    - Content-Length: file size of the uploaded file
 
     Returns:
     - Upload URL for upload and Upload id
@@ -413,8 +413,8 @@ def post_upload_return_link_qr(
             <p>If you have any questions or concerns, feel free to contact us at contact@byteshare.io</p>
             <p>Thank you for using ByteShare!</p>
 
-            <p>Best regards,</p>
-            <p>The ByteShare Team</p>
+            <p>Best regards,<br/>
+            The ByteShare Team</p>
 
             </body>
             """.format(
