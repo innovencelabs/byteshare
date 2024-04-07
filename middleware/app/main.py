@@ -349,7 +349,7 @@ def post_upload_return_link_qr(
         box_size=10,
         border=4,
     )
-    qr.add_data(file_url + '?autodownload=true')
+    qr.add_data(file_url)
     qr.make(fit=True)
 
     img = qr.make_image(fill_color="black", back_color="white")
