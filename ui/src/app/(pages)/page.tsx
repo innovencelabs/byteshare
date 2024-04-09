@@ -8,6 +8,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { Header } from '@/components/header'
 import { Button } from '@/components/ui/button'
 import axios from 'axios'
+import Dropzone from 'react-dropzone'
 import {
   Drawer,
   DrawerClose,
@@ -21,7 +22,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Progress } from '@/components/ui/progress'
-import { CheckIcon, CopyIcon } from '@radix-ui/react-icons'
+import { CheckIcon, CopyIcon, UploadIcon } from '@radix-ui/react-icons'
 import {
   Tooltip,
   TooltipContent,
@@ -34,6 +35,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
+import { cn } from '@/lib/utils'
 
 export default function Home() {
   const router = useRouter()
@@ -122,11 +124,11 @@ export default function Home() {
     }
   }
 
-  const handleUploadChange = (event) => {
-    setSubmitDisabled(false)
+  const handleUploadChange = useCallback((files) => {
+    setSubmitDisabled(true)
     setDisabledViewSelected(false)
     setFilesSizeExceededColor(false)
-    const files = event.target.files
+    
     let totalSize = 0
     for (const file of files) {
       totalSize += file.size
@@ -135,6 +137,8 @@ export default function Home() {
       setSubmitDisabled(true)
       setDisabledViewSelected(true)
       setUploadSize('0 KB')
+      setSelectedFiles(Array.from(files))
+      return
     } else if (totalSize >= 2 * 1024 * 1024 * 1024) {
       setUploadSize(
         (totalSize / (1024 * 1024 * 1024)).toFixed(2) +
@@ -142,6 +146,8 @@ export default function Home() {
       )
       setSubmitDisabled(true)
       setFilesSizeExceededColor(true)
+      setSelectedFiles(Array.from(files))
+      return
     } else if (totalSize >= 1024 * 1024 * 1024) {
       setUploadSize((totalSize / (1024 * 1024 * 1024)).toFixed(2) + ' GB')
     } else if (totalSize >= 1024 * 1024) {
@@ -151,9 +157,9 @@ export default function Home() {
     } else {
       setUploadSize(totalSize + ' Bytes')
     }
-
     setSelectedFiles(Array.from(files))
-  }
+    setSubmitDisabled(false)
+  }, [selectedFiles])
 
   const handleDrawerClose = () => {
     setUploadSize('0 KB')
@@ -503,13 +509,63 @@ export default function Home() {
               <>
                 <form onSubmit={handleUploadSubmit}>
                   <div className="p-4">
-                    <Label htmlFor="files" className={`${filesSizeExceededColor ? 'text-red-500' : 'text-black'}`}>Files (Size: {uploadSize})<Button variant="link" onClick={(e)=> e.preventDefault()} disabled={disabledViewSelected}>View selected</Button></Label>
-                    <Input
-                      id="files"
-                      type="file"
-                      multiple
-                      onChange={handleUploadChange}
-                    />
+                    <Label
+                      htmlFor="files"
+                      className={`${filesSizeExceededColor ? 'text-red-500' : 'text-black'}`}
+                    >
+                      Files (Size: {uploadSize})
+                      <Button
+                        variant="link"
+                        onClick={(e) => e.preventDefault()}
+                        disabled={disabledViewSelected}
+                      >
+                        View selected
+                      </Button>
+                    </Label>
+                    <Dropzone onDrop={handleUploadChange} multiple>
+                      {({ getRootProps, getInputProps, isDragActive }) => (
+                        <div
+                          {...getRootProps()}
+                          className={cn(
+                            'group relative grid h-52 w-full cursor-pointer place-items-center rounded-lg border-2 border-dashed border-muted-foreground/25 px-5 py-2.5 text-center transition hover:bg-muted/25',
+                            'ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+                            isDragActive && 'border-muted-foreground/50',
+                            // className,
+                          )}
+                        >
+                          <input {...getInputProps()} />
+                          {isDragActive ? (
+                            <div className="flex flex-col items-center justify-center gap-4 sm:px-5">
+                              <div className="rounded-full border border-dashed p-3">
+                                <UploadIcon
+                                  className="size-7 text-muted-foreground"
+                                  aria-hidden="true"
+                                />
+                              </div>
+                              <p className="font-normal text-muted-foreground">
+                                Drop the files here
+                              </p>
+                            </div>
+                          ) : (
+                            <div className="flex flex-col items-center justify-center gap-4 sm:px-5">
+                              <div className="rounded-full border border-dashed p-3">
+                                <UploadIcon
+                                  className="size-7 text-muted-foreground"
+                                  aria-hidden="true"
+                                />
+                              </div>
+                              <div className="space-y-px">
+                                <p className="font-normal text-muted-foreground">
+                                  Drag {`'n'`} drop files or folder here, or click to
+                                  select files
+                                </p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </Dropzone>
+
                     <Label htmlFor="receiver-email"></Label>
                     <Input
                       className="mt-2"
