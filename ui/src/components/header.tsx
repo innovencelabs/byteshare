@@ -90,7 +90,7 @@ export const Header = ({ authorised, statusLoaded, name, email }) => {
             ByteShare
           </span>
         </Button>
-        <div className="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
+        <div className="flex md:order-2 space-x-2 md:space-x-0 rtl:space-x-reverse">
           {statusLoaded ? (
             <Button
               variant="ghost"
