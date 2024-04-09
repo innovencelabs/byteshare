@@ -9,6 +9,7 @@ import { Header } from '@/components/header'
 import { Button } from '@/components/ui/button'
 import axios from 'axios'
 import Dropzone from 'react-dropzone'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   Drawer,
   DrawerClose,
@@ -22,7 +23,12 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Progress } from '@/components/ui/progress'
-import { CheckIcon, CopyIcon, UploadIcon } from '@radix-ui/react-icons'
+import {
+  CheckIcon,
+  CopyIcon,
+  UploadIcon,
+  Cross2Icon,
+} from '@radix-ui/react-icons'
 import {
   Tooltip,
   TooltipContent,
@@ -35,6 +41,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
 
 export default function Home() {
@@ -124,6 +138,18 @@ export default function Home() {
     }
   }
 
+  const formatSize = (size: number) => {
+    if (size >= 1024 * 1024 * 1024) {
+      return (size / (1024 * 1024 * 1024)).toFixed(2) + ' GB'
+    } else if (size >= 1024 * 1024) {
+      return (size / (1024 * 1024)).toFixed(2) + ' MB'
+    } else if (size >= 1024) {
+      return (size / 1024).toFixed(2) + ' KB'
+    } else {
+      return size + ' Bytes'
+    }
+  }
+
   const handleUploadChange = useCallback((files) => {
     setSubmitDisabled(true)
     setDisabledViewSelected(false)
@@ -148,14 +174,8 @@ export default function Home() {
       setFilesSizeExceededColor(true)
       setSelectedFiles(Array.from(files))
       return
-    } else if (totalSize >= 1024 * 1024 * 1024) {
-      setUploadSize((totalSize / (1024 * 1024 * 1024)).toFixed(2) + ' GB')
-    } else if (totalSize >= 1024 * 1024) {
-      setUploadSize((totalSize / (1024 * 1024)).toFixed(2) + ' MB')
-    } else if (totalSize >= 1024) {
-      setUploadSize((totalSize / 1024).toFixed(2) + ' KB')
     } else {
-      setUploadSize(totalSize + ' Bytes')
+      setUploadSize(formatSize(totalSize))
     }
     setSelectedFiles(Array.from(files))
     setSubmitDisabled(false)
@@ -432,6 +452,56 @@ export default function Home() {
     return { shareURL, shareQR, expirationDate, downloadsAllowed }
   }
 
+  function onRemove(index: number) {
+    if (!selectedFiles) return
+    const newFiles = selectedFiles.filter((_, i) => i !== index)
+    setSelectedFiles(newFiles)
+    handleUploadChange?.(newFiles)
+  }
+
+  const FileCard = ({ file, onRemove }) => {
+    return (
+      <div className="relative flex items-center space-x-4">
+        <div className="flex flex-1 space-x-4">
+          <div className="flex w-full flex-col gap-2">
+            <div className="space-y-px">
+              <p className="line-clamp-1 text-sm font-medium text-foreground/80">
+                {truncateFileName(file.name)}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {formatSize(file.size)}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            className="size-7"
+            onClick={onRemove}
+          >
+            <Cross2Icon className="size-4 " aria-hidden="true" />
+            <span className="sr-only">Remove file</span>
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
+  const truncateFileName = (fileName) => {
+    const extensionIndex = fileName.lastIndexOf('.')
+    const extension = fileName.slice(extensionIndex)
+    let truncatedName = fileName.slice(0, extensionIndex)
+
+    if (truncatedName.length > 12) {
+      truncatedName = truncatedName.slice(0, 12) + '...'
+    }
+
+    return truncatedName + extension
+  }
+
   return (
     <div className="min-h-screen flex flex-col justify-between">
       <Header
@@ -514,13 +584,35 @@ export default function Home() {
                       className={`${filesSizeExceededColor ? 'text-red-500' : 'text-black'}`}
                     >
                       Files (Size: {uploadSize})
-                      <Button
-                        variant="link"
-                        onClick={(e) => e.preventDefault()}
-                        disabled={disabledViewSelected}
-                      >
-                        View selected
-                      </Button>
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="link"
+                            disabled={disabledViewSelected}
+                          >
+                            View selected
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[425px] rounded-md">
+                          <DialogHeader>
+                            <DialogTitle>View Selected</DialogTitle>
+                            <DialogDescription>
+                              {selectedFiles.length} file ({uploadSize})
+                            </DialogDescription>
+                          </DialogHeader>
+                          <ScrollArea className="h-fit w-full px-3">
+                            <div className="max-h-48 space-y-4">
+                              {selectedFiles?.map((file, index) => (
+                                <FileCard
+                                  key={index}
+                                  file={file}
+                                  onRemove={() => onRemove(index)}
+                                />
+                              ))}
+                            </div>
+                          </ScrollArea>
+                        </DialogContent>
+                      </Dialog>
                     </Label>
                     <Dropzone onDrop={handleUploadChange} multiple>
                       {({ getRootProps, getInputProps, isDragActive }) => (
@@ -556,8 +648,8 @@ export default function Home() {
                               </div>
                               <div className="space-y-px">
                                 <p className="font-normal text-muted-foreground">
-                                  Drag {`'n'`} drop files or folder here, or click to
-                                  select files
+                                  Drag {`'n'`} drop files or folder here, or
+                                  click to select files
                                 </p>
                               </div>
                             </div>
