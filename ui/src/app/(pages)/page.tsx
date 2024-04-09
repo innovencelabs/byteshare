@@ -8,6 +8,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { Header } from '@/components/header'
 import { Button } from '@/components/ui/button'
 import axios from 'axios'
+import Dropzone from 'react-dropzone'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   Drawer,
   DrawerClose,
@@ -21,7 +23,12 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Progress } from '@/components/ui/progress'
-import { CheckIcon, CopyIcon } from '@radix-ui/react-icons'
+import {
+  CheckIcon,
+  CopyIcon,
+  UploadIcon,
+  Cross2Icon,
+} from '@radix-ui/react-icons'
 import {
   Tooltip,
   TooltipContent,
@@ -34,6 +41,15 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { cn } from '@/lib/utils'
 
 export default function Home() {
   const router = useRouter()
@@ -60,6 +76,8 @@ export default function Home() {
   const [downloadsAllowed, setDownloadsAllowed] = useState('')
   const [batchCount, setBatchCount] = useState(0)
   const [totalBatch, setTotalBatch] = useState(0)
+  const [filesSizeExceededColor, setFilesSizeExceededColor] = useState(false)
+  const [disabledViewSelected, setDisabledViewSelected] = useState(true)
   const audioRef = useRef(null)
 
   const playSound = () => {
@@ -120,39 +138,54 @@ export default function Home() {
     }
   }
 
-  const handleUploadChange = (event) => {
-    setSubmitDisabled(false)
-    const files = event.target.files
+  const formatSize = (size: number) => {
+    if (size >= 1024 * 1024 * 1024) {
+      return (size / (1024 * 1024 * 1024)).toFixed(2) + ' GB'
+    } else if (size >= 1024 * 1024) {
+      return (size / (1024 * 1024)).toFixed(2) + ' MB'
+    } else if (size >= 1024) {
+      return (size / 1024).toFixed(2) + ' KB'
+    } else {
+      return size + ' Bytes'
+    }
+  }
+
+  const handleUploadChange = useCallback((files) => {
+    setSubmitDisabled(true)
+    setDisabledViewSelected(false)
+    setFilesSizeExceededColor(false)
+    
     let totalSize = 0
     for (const file of files) {
       totalSize += file.size
     }
     if (totalSize == 0) {
       setSubmitDisabled(true)
+      setDisabledViewSelected(true)
       setUploadSize('0 KB')
+      setSelectedFiles(Array.from(files))
+      return
     } else if (totalSize >= 2 * 1024 * 1024 * 1024) {
       setUploadSize(
         (totalSize / (1024 * 1024 * 1024)).toFixed(2) +
-          ' GB' +
-          ') (FILE SIZE EXCEEDED',
+          ' GB',
       )
       setSubmitDisabled(true)
-    } else if (totalSize >= 1024 * 1024 * 1024) {
-      setUploadSize((totalSize / (1024 * 1024 * 1024)).toFixed(2) + ' GB')
-    } else if (totalSize >= 1024 * 1024) {
-      setUploadSize((totalSize / (1024 * 1024)).toFixed(2) + ' MB')
-    } else if (totalSize >= 1024) {
-      setUploadSize((totalSize / 1024).toFixed(2) + ' KB')
+      setFilesSizeExceededColor(true)
+      setSelectedFiles(Array.from(files))
+      return
     } else {
-      setUploadSize(totalSize + ' Bytes')
+      setUploadSize(formatSize(totalSize))
     }
-
     setSelectedFiles(Array.from(files))
-  }
+    setSubmitDisabled(false)
+  }, [selectedFiles])
 
   const handleDrawerClose = () => {
     setUploadSize('0 KB')
     setSubmitDisabled(true)
+    setDisabledViewSelected(true)
+    setFilesSizeExceededColor(false)
     setIsDrawerOpen(false)
     setSelectedFiles([])
     setProgress(0)
@@ -183,6 +216,7 @@ export default function Home() {
     event.preventDefault()
     setProgress(0)
     setSubmitDisabled(true)
+    setDisabledViewSelected(true)
     let totalSize = 0
     let fileNames = []
     for (const file of selectedFiles) {
@@ -316,6 +350,8 @@ export default function Home() {
         setUploading(false)
         setPostProcessing(false)
         setSubmitDisabled(true)
+        setDisabledViewSelected(true)
+        setFilesSizeExceededColor(false)
         setUploadSize('0 KB')
         setSelectedFiles([])
         setBatchCount(0)
@@ -416,6 +452,56 @@ export default function Home() {
     return { shareURL, shareQR, expirationDate, downloadsAllowed }
   }
 
+  function onRemove(index: number) {
+    if (!selectedFiles) return
+    const newFiles = selectedFiles.filter((_, i) => i !== index)
+    setSelectedFiles(newFiles)
+    handleUploadChange?.(newFiles)
+  }
+
+  const FileCard = ({ file, onRemove }) => {
+    return (
+      <div className="relative flex items-center space-x-4">
+        <div className="flex flex-1 space-x-4">
+          <div className="flex w-full flex-col gap-2">
+            <div className="space-y-px">
+              <p className="line-clamp-1 text-sm font-medium text-foreground/80">
+                {truncateFileName(file.name)}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {formatSize(file.size)}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            className="size-7"
+            onClick={onRemove}
+          >
+            <Cross2Icon className="size-4 " aria-hidden="true" />
+            <span className="sr-only">Remove file</span>
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
+  const truncateFileName = (fileName) => {
+    const extensionIndex = fileName.lastIndexOf('.')
+    const extension = fileName.slice(extensionIndex)
+    let truncatedName = fileName.slice(0, extensionIndex)
+
+    if (truncatedName.length > 12) {
+      truncatedName = truncatedName.slice(0, 12) + '...'
+    }
+
+    return truncatedName + extension
+  }
+
   return (
     <div className="min-h-screen flex flex-col justify-between">
       <Header
@@ -493,13 +579,85 @@ export default function Home() {
               <>
                 <form onSubmit={handleUploadSubmit}>
                   <div className="p-4">
-                    <Label htmlFor="files">Files (Size: {uploadSize})</Label>
-                    <Input
-                      id="files"
-                      type="file"
-                      multiple
-                      onChange={handleUploadChange}
-                    />
+                    <Label
+                      htmlFor="files"
+                      className={`${filesSizeExceededColor ? 'text-red-500' : 'text-black'}`}
+                    >
+                      Files (Size: {uploadSize})
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="link"
+                            disabled={disabledViewSelected}
+                          >
+                            View selected
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[425px] rounded-md">
+                          <DialogHeader>
+                            <DialogTitle>View Selected</DialogTitle>
+                            <DialogDescription>
+                              {selectedFiles.length} file ({uploadSize})
+                            </DialogDescription>
+                          </DialogHeader>
+                          <ScrollArea className="h-fit w-full px-3">
+                            <div className="max-h-48 space-y-4">
+                              {selectedFiles?.map((file, index) => (
+                                <FileCard
+                                  key={index}
+                                  file={file}
+                                  onRemove={() => onRemove(index)}
+                                />
+                              ))}
+                            </div>
+                          </ScrollArea>
+                        </DialogContent>
+                      </Dialog>
+                    </Label>
+                    <Dropzone onDrop={handleUploadChange} multiple>
+                      {({ getRootProps, getInputProps, isDragActive }) => (
+                        <div
+                          {...getRootProps()}
+                          className={cn(
+                            'group relative grid h-52 w-full cursor-pointer place-items-center rounded-lg border-2 border-dashed border-muted-foreground/25 px-5 py-2.5 text-center transition hover:bg-muted/25',
+                            'ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+                            isDragActive && 'border-muted-foreground/50',
+                            // className,
+                          )}
+                        >
+                          <input {...getInputProps()} />
+                          {isDragActive ? (
+                            <div className="flex flex-col items-center justify-center gap-4 sm:px-5">
+                              <div className="rounded-full border border-dashed p-3">
+                                <UploadIcon
+                                  className="size-7 text-muted-foreground"
+                                  aria-hidden="true"
+                                />
+                              </div>
+                              <p className="font-normal text-muted-foreground">
+                                Drop the files here
+                              </p>
+                            </div>
+                          ) : (
+                            <div className="flex flex-col items-center justify-center gap-4 sm:px-5">
+                              <div className="rounded-full border border-dashed p-3">
+                                <UploadIcon
+                                  className="size-7 text-muted-foreground"
+                                  aria-hidden="true"
+                                />
+                              </div>
+                              <div className="space-y-px">
+                                <p className="font-normal text-muted-foreground">
+                                  Drag {`'n'`} drop files or folder here, or
+                                  click to select files
+                                </p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </Dropzone>
+
                     <Label htmlFor="receiver-email"></Label>
                     <Input
                       className="mt-2"
