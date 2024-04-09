@@ -60,6 +60,8 @@ export default function Home() {
   const [downloadsAllowed, setDownloadsAllowed] = useState('')
   const [batchCount, setBatchCount] = useState(0)
   const [totalBatch, setTotalBatch] = useState(0)
+  const [filesSizeExceededColor, setFilesSizeExceededColor] = useState(false)
+  const [disabledViewSelected, setDisabledViewSelected] = useState(true)
   const audioRef = useRef(null)
 
   const playSound = () => {
@@ -122,6 +124,8 @@ export default function Home() {
 
   const handleUploadChange = (event) => {
     setSubmitDisabled(false)
+    setDisabledViewSelected(false)
+    setFilesSizeExceededColor(false)
     const files = event.target.files
     let totalSize = 0
     for (const file of files) {
@@ -129,14 +133,15 @@ export default function Home() {
     }
     if (totalSize == 0) {
       setSubmitDisabled(true)
+      setDisabledViewSelected(true)
       setUploadSize('0 KB')
     } else if (totalSize >= 2 * 1024 * 1024 * 1024) {
       setUploadSize(
         (totalSize / (1024 * 1024 * 1024)).toFixed(2) +
-          ' GB' +
-          ') (FILE SIZE EXCEEDED',
+          ' GB',
       )
       setSubmitDisabled(true)
+      setFilesSizeExceededColor(true)
     } else if (totalSize >= 1024 * 1024 * 1024) {
       setUploadSize((totalSize / (1024 * 1024 * 1024)).toFixed(2) + ' GB')
     } else if (totalSize >= 1024 * 1024) {
@@ -153,6 +158,8 @@ export default function Home() {
   const handleDrawerClose = () => {
     setUploadSize('0 KB')
     setSubmitDisabled(true)
+    setDisabledViewSelected(true)
+    setFilesSizeExceededColor(false)
     setIsDrawerOpen(false)
     setSelectedFiles([])
     setProgress(0)
@@ -183,6 +190,7 @@ export default function Home() {
     event.preventDefault()
     setProgress(0)
     setSubmitDisabled(true)
+    setDisabledViewSelected(true)
     let totalSize = 0
     let fileNames = []
     for (const file of selectedFiles) {
@@ -316,6 +324,8 @@ export default function Home() {
         setUploading(false)
         setPostProcessing(false)
         setSubmitDisabled(true)
+        setDisabledViewSelected(true)
+        setFilesSizeExceededColor(false)
         setUploadSize('0 KB')
         setSelectedFiles([])
         setBatchCount(0)
@@ -493,7 +503,7 @@ export default function Home() {
               <>
                 <form onSubmit={handleUploadSubmit}>
                   <div className="p-4">
-                    <Label htmlFor="files">Files (Size: {uploadSize})</Label>
+                    <Label htmlFor="files" className={`${filesSizeExceededColor ? 'text-red-500' : 'text-black'}`}>Files (Size: {uploadSize})<Button variant="link" onClick={(e)=> e.preventDefault()} disabled={disabledViewSelected}>View selected</Button></Label>
                     <Input
                       id="files"
                       type="file"
