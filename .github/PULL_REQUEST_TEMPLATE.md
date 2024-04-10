@@ -4,7 +4,7 @@
 
 ## Issue
 
-Fixes #(issue)
+Fixes #issue
 
 ## What changed?
 
