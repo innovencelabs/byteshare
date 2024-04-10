@@ -2,12 +2,13 @@ import os
 import uuid
 from datetime import datetime, timedelta, timezone
 from enum import Enum as PythonEnum
-from typing import Optional
+from typing import Optional, List
 
 import qrcode
 import resend
 from appwrite.client import Client
 from appwrite.services.account import Account
+import concurrent.futures
 from db import DynamoDBManager
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
@@ -57,6 +58,12 @@ class StatusEnum(PythonEnum):
 class Subscribe(BaseModel):
     email: str
 
+class BatchInitiateUpload(BaseModel):
+    file_names: List[str]
+    creator_id: str
+    creator_email: str
+    creator_ip: str
+    share_email_as_source: bool
 
 class InitiateUpload(BaseModel):
     file_name: str
@@ -171,24 +178,27 @@ def add_subscriber_return_done(body: Subscribe):
     return {"status": "Done"}
 
 
-@app.post("/initiateUpload")
-def initiate_upload_return_upload_url(
-    body: InitiateUpload, request: Request, token_data: None = Depends(_authenticate)
+@app.post("/batchInitiateUpload")
+def batch_initiate_upload(
+    body: BatchInitiateUpload,
+    request: Request,
+    token_data: None = Depends(_authenticate),
 ):
     """
-    Initiate upload to Storage.
-    checks for file size under limit for current user type, creates upload URL for upload and add to DB.
+    Batch initiate upload to Storage.
+    get the list of files names to initiate upload for, checks for file size under limit for current user type, creates upload URL for upload and add to DB.
     Stores the file as <UPLOAD_ID>/<FILE_NAME> in Storage
 
     Parameters:
-    - file_name: name of the file to be uploaded
+    - file_names: list of name of the file to be uploaded
     - creator_email: email of the creator
     - creator_ip: ip address of the creator
-    - Content-Length: file size of the uploaded file
+    - File-Length: total file size of the uploaded file
 
     Returns:
-    - Upload URL for upload and Upload id
+    - List of Upload URL for upload and Upload id
     """
+
     client_ip = request.headers.get("x-forwarded-for") or request.client.host
     content_length = int(request.headers.get("File-Length"))
     if content_length is None:
@@ -196,23 +206,44 @@ def initiate_upload_return_upload_url(
 
     max_file_size = 2 * 1024 * 1024 * 1024  # 2GB
 
+    if(len(body.file_names) == 0):
+        raise HTTPException(status_code=400, detail="No files present.")
+
     if int(content_length) > max_file_size:
         raise HTTPException(status_code=400, detail="File size exceeds the limit.")
 
-    file_name = body.file_name
+    file_names = body.file_names
     share_email_as_source = body.share_email_as_source
     upload_id = uuid.uuid4().hex
     continue_id = uuid.uuid4().hex
-    file_path = upload_id + "/" + file_name
-    expiration_time = 10800
-    upload_url = storage.generate_upload_url(file_path, expiration_time)
+
+    result = {}
+    result["upload_id"] = upload_id
+    result["upload_urls"] = {}
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+        future_to_file_name = {
+            executor.submit(_generate, upload_id, file_name): file_name for file_name in file_names
+        }
+
+        responses = []
+        for future in concurrent.futures.as_completed(future_to_file_name):
+            file_name = future_to_file_name[future]
+            try:
+                response = future.result()
+                responses.append(response)
+            except Exception as e:
+                print(f"Exception occurred for file {file_name}: {e}")
+
+        for response in responses:
+            result["upload_urls"][response["file_name"]] = response["upload_url"]
 
     time_now = datetime.now(timezone.utc)
 
     upload_metadata = {
         "upload_id": upload_id,
         "status": StatusEnum.initiated.name,
-        "title": "Upload with " + file_name,
+        "title": "Upload with " + file_names[0],
         "creator_id": body.creator_id,
         "creator_email": body.creator_email,
         "creator_ip": client_ip,
@@ -222,7 +253,7 @@ def initiate_upload_return_upload_url(
         "max_download": 5,
         "continue_id": continue_id,
         "total_size": content_length,
-        "storage_file_names": [file_name],
+        "storage_file_names": body.file_names,
         "storage_qr_name": "",
         "expires_at": "",
         "updated_at": "",
@@ -230,75 +261,7 @@ def initiate_upload_return_upload_url(
     }
     dynamodb.create_item(upload_metadata)
 
-    return {
-        "upload_url": upload_url,
-        "upload_id": upload_id,
-        "continue_id": continue_id,
-    }
-
-
-@app.post("/initiateUpload/{upload_id}")
-def initiate_upload_with_upload_id_return_upload_url(
-    body: ContinueUpload,
-    upload_id: str,
-    request: Request,
-    token_data: None = Depends(_authenticate),
-):
-    """
-    Initiate upload to Storage for existing upload_id.
-    checks for file size under limit for current user type, creates upload URL for upload and add to DB.
-    Stores the file as <UPLOAD_ID>/<FILE_NAME> in Storage
-
-    Parameters:
-    - upload_id: upload id of the upload process
-    - file_name: name of the file to be uploaded
-    - continue_id: continue id to continue multifile upload
-    - creator_email: email of the creator
-    - creator_ip: ip address of the creator
-    - content-length: file size of the uploaded file
-
-    Returns:
-    - Upload URL for upload
-    """
-
-    content_length = int(request.headers.get("File-Length"))
-    if content_length is None:
-        raise HTTPException(status_code=400, detail="File-Length header not found")
-
-    max_file_size = 2 * 1024 * 1024 * 1024  # 2GB
-
-    upload_metadata = dynamodb.read_item({"upload_id": upload_id})
-    if upload_metadata == None:
-        raise HTTPException(status_code=400, detail="Upload ID not valid")
-    if upload_metadata["continue_id"] != body.continue_id:
-        raise HTTPException(status_code=400, detail="Continue ID not valid")
-
-    if int(content_length) + int(upload_metadata["total_size"]) > max_file_size:
-        raise HTTPException(status_code=400, detail="File size exceeds the limit")
-
-    file_name = body.file_name
-    file_path = upload_id + "/" + file_name
-    expiration_time = 10800
-    upload_url = storage.generate_upload_url(file_path, expiration_time)
-    storage_file_names = list(
-        upload_metadata["storage_file_names"]
-        if upload_metadata["storage_file_names"] != None
-        else []
-    )
-    storage_file_names.append(file_name)
-    content_length = content_length + int(upload_metadata["total_size"])
-
-    time_now = datetime.now(timezone.utc)
-
-    keys = {"upload_id": upload_id}
-    update_data = {
-        "total_size": content_length,
-        "storage_file_names": storage_file_names,
-        "updated_at": time_now.isoformat(),
-    }
-    dynamodb.update_item(keys, update_data)
-
-    return {"upload_url": upload_url}
+    return result
 
 
 @app.post("/postUpload/{upload_id}")
@@ -639,6 +602,19 @@ def get_file_url_return_name_link(upload_id: str, user_id: str | None = None):
 
     return file_data
 
+
+def _generate(upload_id, file_name):
+    print(f"Generating for File name: {file_name}")
+
+    expiration_time = 10800
+    file_path = upload_id + "/" + file_name
+    upload_url = storage.generate_upload_url(file_path, expiration_time)
+
+    response_url = {"file_name": file_name, "upload_url": upload_url}
+
+    print(f"File name: {file_name} completed")
+
+    return response_url
 
 def _sort_by_date_desc(upload):
     return upload["created_at"]

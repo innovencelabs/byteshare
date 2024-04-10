@@ -50,6 +50,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
+import LoadingText from '@/components/loading'
 
 export default function Home() {
   const router = useRouter()
@@ -240,6 +241,8 @@ export default function Home() {
         const totalBatches = Math.ceil(totalFiles / batchSize)
         let filesUploaded = 0
 
+        setTotalBatch(totalBatches)
+
         const uploadBatch = async (files, batchUrls) => {
           return new Promise<void>(async (resolve, reject) => {
             const totalFilesInBatch = files.length
@@ -292,9 +295,12 @@ export default function Home() {
             }
           })
         }
+        
+        const initiateUploadResponse = await initiateFilesUpload(selectedFiles)
+        uploadID = initiateUploadResponse.uploadID
+        const uploadURLs = initiateUploadResponse.uploadURLs
         setBatchCount(1)
         for (let batch = 0; batch < totalBatches; batch++) {
-          setTotalBatch(totalBatches)
           const start = batch * batchSize
           const end = Math.min((batch + 1) * batchSize, totalFiles)
           const batchFiles = selectedFiles.slice(start, end)
@@ -302,22 +308,7 @@ export default function Home() {
           let batchURL = []
 
           for (let i = start; i < end; i++) {
-            if (i == 0) {
-              const firstFileResponse = await uploadFirstFile(selectedFiles[0])
-              uploadID = firstFileResponse.uploadID
-              let uploadURL = firstFileResponse.uploadURL
-              continueID = firstFileResponse.continueID
-              batchURL.push(uploadURL)
-
-              continue
-            }
-            const fileResponse = await uploadFile(
-              selectedFiles[i],
-              uploadID,
-              continueID,
-            )
-            let uploadURL = fileResponse.uploadURL
-            batchURL.push(uploadURL)
+            batchURL.push(uploadURLs[selectedFiles[i].name])
           }
           setProgress(0)
           setBatchCount(batch + 1)
@@ -361,23 +352,35 @@ export default function Home() {
     }
   }
 
-  const uploadFile = async (file, uploadID, continueID) => {
+  const initiateFilesUpload = async(files) => {
     const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
     const apiKey = process.env.NEXT_PUBLIC_API_KEY
     const jwtToken = await appwriteService.getJWTToken()
 
-    const fileJSON = {
-      file_name: file.name,
-      continue_id: continueID,
+
+    let fileNames = []
+    let fileLength = 0
+    
+    for(const file of files) {
+      fileNames.push(file.name)
+      fileLength += file.size
+    }
+
+    const initiateUploadJSON = {
+      file_names: fileNames,
+      creator_id: user['$id'],
+      creator_email: userEmail,
+      creator_ip: '127.0.0.1',
+      share_email_as_source: true,
     }
 
     const initiateUploadResponse = await fetch(
-      apiBaseURL + '/initiateUpload' + '/' + uploadID,
+      apiBaseURL + '/batchInitiateUpload',
       {
         method: 'POST',
-        body: JSON.stringify(fileJSON),
+        body: JSON.stringify(initiateUploadJSON),
         headers: {
-          'File-Length': file.size,
+          'File-Length': fileLength.toString(),
           'Content-Type': 'application/json',
           'x-api-key': apiKey,
           Authorization: 'Bearer ' + jwtToken.jwt,
@@ -385,40 +388,10 @@ export default function Home() {
       },
     )
     const data = await initiateUploadResponse.json()
-    const uploadURL = data.upload_url
-
-    return { uploadURL }
-  }
-
-  const uploadFirstFile = async (file) => {
-    const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
-    const apiKey = process.env.NEXT_PUBLIC_API_KEY
-    const jwtToken = await appwriteService.getJWTToken()
-
-    const firstFileJSON = {
-      file_name: file.name,
-      creator_id: user['$id'],
-      creator_email: userEmail,
-      creator_ip: '127.0.0.1',
-      share_email_as_source: true,
-    }
-
-    const initiateUploadResponse = await fetch(apiBaseURL + '/initiateUpload', {
-      method: 'POST',
-      body: JSON.stringify(firstFileJSON),
-      headers: {
-        'File-Length': file.size,
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        Authorization: 'Bearer ' + jwtToken.jwt,
-      },
-    })
-    const data = await initiateUploadResponse.json()
-    const uploadURL = data.upload_url
-    const continueID = data.continue_id
     const uploadID = data.upload_id
-
-    return { uploadID, uploadURL, continueID }
+    const uploadURLs = data.upload_urls
+    
+    return { uploadID, uploadURLs }
   }
 
   const postUpload = async (fileNames, uploadID) => {
@@ -710,12 +683,15 @@ export default function Home() {
             ) : !uploaded ? (
               <>
                 <div className="pt-4">
-                  {!postProcessing ? (
+                  {batchCount == 0 && progress == 0 && totalBatch>100 ? (
+                    <LoadingText text="Initialising upload" />
+                  ) : !postProcessing ? (
                     <Label>
                       {progress.toFixed(1)}% ({batchCount}/{totalBatch} batch)
                     </Label>
                   ) : (
-                    <Label>Processing...</Label>
+                    <LoadingText text="Processing" />
+                    
                   )}
                   <Progress value={progress} className="m-auto w-[100%]" />
 
