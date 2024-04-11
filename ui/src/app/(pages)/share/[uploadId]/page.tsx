@@ -6,7 +6,7 @@ import useAuth from '@/context/useAuth'
 import appwriteService from '@/authentication/appwrite/config'
 import JSZip from 'jszip'
 import { saveAs } from 'file-saver'
-import { DownloadIcon } from '@radix-ui/react-icons'
+import { DownloadIcon, EyeOpenIcon } from '@radix-ui/react-icons'
 import { lookup } from 'mime-types'
 import {
   ColumnDef,
@@ -62,6 +62,7 @@ function SharePage({ params }: Params) {
   const [progress, setProgress] = useState(0)
   const [downloadingAll, setDownloadingAll] = useState(false)
   const [downloadingOne, setDownloadingOne] = useState(false)
+  const [previewVisible, setPreviewVisible] = useState(false)
   const [data, setData] = React.useState<File[]>([])
   const [source, setSource] = useState(null)
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
@@ -174,17 +175,31 @@ function SharePage({ params }: Params) {
       enableHiding: false,
       cell: ({ row }) => {
         return (
-          <Button
-            variant="ghost"
-            className="h-8 w-8 p-0"
-            disabled={downloadingOne}
-            onClick={() => {
-              handleSingleDownload(row.original.downloadLink, row.original.name)
-            }}
-          >
-            <span className="sr-only">Download</span>
-            <DownloadIcon className="h-4 w-4" />
-          </Button>
+          <>
+            <Button
+              variant="ghost"
+              className="h-8 w-8 p-0 hidden md:hidden lg:inline-flex"
+              disabled={downloadingOne}
+              onClick={() => setPreviewVisible(true)}
+            >
+              <span className="sr-only">Preview</span>
+              <EyeOpenIcon className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              className="h-8 w-8 p-0"
+              disabled={downloadingOne}
+              onClick={() => {
+                handleSingleDownload(
+                  row.original.downloadLink,
+                  row.original.name,
+                )
+              }}
+            >
+              <span className="sr-only">Download</span>
+              <DownloadIcon className="h-4 w-4" />
+            </Button>
+          </>
         )
       },
     },
