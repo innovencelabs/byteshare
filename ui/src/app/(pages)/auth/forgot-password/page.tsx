@@ -4,7 +4,7 @@ import ForgotPasswordForm from './components/forgot-form'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'ByteShare: Forgot Password',
+  title: 'Forgot Password',
   description: 'Forgot password page',
 }
 

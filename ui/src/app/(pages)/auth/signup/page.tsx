@@ -6,7 +6,7 @@ import { buttonVariants } from '@/components/ui/button'
 import { UserAuthForm } from './components/auth-form'
 
 export const metadata: Metadata = {
-  title: 'ByteShare: Signup',
+  title: 'Signup',
   description: 'Signup page',
 }
 

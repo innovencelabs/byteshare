@@ -4,7 +4,7 @@ import ResetPasswordForm from './components/reset-form'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'ByteShare: Reset Password',
+  title: 'Reset Password',
   description: 'Reset password page',
 }
 

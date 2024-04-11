@@ -1,6 +1,11 @@
 import React from 'react'
+import { Metadata } from 'next'
 import termsData from 'public/Data/terms-page-data.json';
 
+export const metadata: Metadata = {
+  title: 'Terms',
+  description: 'Terms page',
+}
 
 function Terms () {
   const { welcomeMessage,paragraphMessage,note, sections } = termsData.termsOfUse;
