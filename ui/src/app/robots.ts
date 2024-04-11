@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: '/private/',
+      disallow: ['/history', '/share/*'],
     },
     sitemap: 'https://byteshare.io/sitemap.xml',
   }

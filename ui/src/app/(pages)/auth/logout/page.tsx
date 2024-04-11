@@ -1,9 +1,8 @@
 'use client'
 
-import React from 'react'
-import { useRouter } from 'next/navigation'
 import appwriteService from '@/authentication/appwrite/config'
 import useAuth from '@/context/useAuth'
+import { useRouter } from 'next/navigation'
 
 function Logout() {
   const router = useRouter()

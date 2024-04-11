@@ -1,5 +1,4 @@
-import React from 'react'
-import { Metadata } from 'next'
+import { Metadata } from 'next';
 import termsData from 'public/Data/terms-page-data.json';
 
 export const metadata: Metadata = {

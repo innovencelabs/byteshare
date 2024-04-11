@@ -1,7 +1,6 @@
-import React from 'react'
 import { Metadata } from 'next'
-import ForgotPasswordForm from './components/forgot-form'
 import Link from 'next/link'
+import ForgotPasswordForm from './components/forgot-form'
 
 export const metadata: Metadata = {
   title: 'Forgot Password',

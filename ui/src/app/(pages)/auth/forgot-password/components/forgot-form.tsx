@@ -1,18 +1,18 @@
 'use client'
 
-import { cn } from '@/lib/utils'
+import appwriteService from '@/authentication/appwrite/config'
 import { Icons } from '@/components/icons'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import appwriteService from '@/authentication/appwrite/config'
+import { cn } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
-import React, {
+import {
   FormEvent,
   HTMLAttributes,
-  useState,
   useEffect,
   useRef,
+  useState,
 } from 'react'
 import { toast } from 'sonner'
 

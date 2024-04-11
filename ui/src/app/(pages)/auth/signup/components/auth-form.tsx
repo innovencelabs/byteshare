@@ -1,14 +1,14 @@
 'use client'
 
-import { cn } from '@/lib/utils'
+import appwriteService from '@/authentication/appwrite/config'
 import { Icons } from '@/components/icons'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import appwriteService from '@/authentication/appwrite/config'
 import useAuth from '@/context/useAuth'
+import { cn } from '@/lib/utils'
 import { useRouter, useSearchParams } from 'next/navigation'
-import React, { FormEvent, HTMLAttributes, useCallback, useState } from 'react'
+import { FormEvent, HTMLAttributes, useCallback, useState } from 'react'
 import { toast } from 'sonner'
 
 interface UserAuthFormProps extends HTMLAttributes<HTMLDivElement> {}

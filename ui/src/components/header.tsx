@@ -1,22 +1,19 @@
 import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import React, { useEffect, useState } from 'react'
 import { Button } from './ui/button'
-import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
-import { Label } from './ui/label'
-import { Input } from './ui/input'
-import { Textarea } from './ui/textarea'
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from './ui/dropdown-menu'
-import appwriteService from '@/authentication/appwrite/config'
+import { Input } from './ui/input'
+import { Label } from './ui/label'
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
+import { Textarea } from './ui/textarea'
 
 export const Header = ({ authorised, statusLoaded, name, email }) => {
   const [feedbackName, setFeedbackName] = useState('')
