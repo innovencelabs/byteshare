@@ -1,11 +1,17 @@
 import boto3
+import os
 from fastapi import HTTPException
 
 
 class DynamoDBManager:
     def __init__(self, table_name):
         self.table_name = table_name
-        self.dynamodb = boto3.resource("dynamodb")
+        self.dynamodb = boto3.resource(
+            "dynamodb",
+            aws_access_key_id=os.getenv("AWS_APP_ACCESS_KEY"),
+            aws_secret_access_key=os.getenv("AWS_APP_SECRET_ACCESS_KEY"),
+            region_name=os.getenv("AWS_APP_REGION"),
+        )
         self.table = self.dynamodb.Table(table_name)
 
     def health_check(self):
