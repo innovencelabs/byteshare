@@ -1,10 +1,9 @@
-import React from 'react'
 import { Metadata } from 'next'
-import ResetPasswordForm from './components/reset-form'
 import Link from 'next/link'
+import ResetPasswordForm from './components/reset-form'
 
 export const metadata: Metadata = {
-  title: 'ByteShare: Reset Password',
+  title: 'Reset Password',
   description: 'Reset password page',
 }
 

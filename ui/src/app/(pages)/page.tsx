@@ -1,15 +1,16 @@
 'use client'
-import { toast } from 'sonner'
-import { useRouter, useSearchParams } from 'next/navigation'
-import useAuth from '@/context/useAuth'
 import appwriteService from '@/authentication/appwrite/config'
-import Image from 'next/image'
-import { useCallback, useEffect, useRef, useState } from 'react'
 import { Header } from '@/components/header'
+import LoadingText from '@/components/loading'
 import { Button } from '@/components/ui/button'
-import axios from 'axios'
-import Dropzone from 'react-dropzone'
-import { ScrollArea } from '@/components/ui/scroll-area'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
 import {
   Drawer,
   DrawerClose,
@@ -23,34 +24,27 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Progress } from '@/components/ui/progress'
-import {
-  CheckIcon,
-  CopyIcon,
-  UploadIcon,
-  Cross2Icon,
-} from '@radix-ui/react-icons'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-import { Checkbox } from '@/components/ui/checkbox'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog'
+import useAuth from '@/context/useAuth'
 import { cn } from '@/lib/utils'
-import LoadingText from '@/components/loading'
+import {
+  CheckIcon,
+  CopyIcon,
+  Cross2Icon,
+  UploadIcon,
+} from '@radix-ui/react-icons'
+import axios from 'axios'
+import Image from 'next/image'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import Dropzone from 'react-dropzone'
+import { toast } from 'sonner'
 
 export default function Home() {
   const router = useRouter()

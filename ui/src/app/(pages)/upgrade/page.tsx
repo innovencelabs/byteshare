@@ -1,9 +1,9 @@
 'use client'
+import appwriteService from '@/authentication/appwrite/config'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { toast } from 'sonner'
-import appwriteService from '@/authentication/appwrite/config'
 
 function UpgradePage() {
   const [email, setEmail] = useState('')

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
 import { Label } from '@/components/ui/label'
+import { useEffect, useState } from 'react'
 
 const LoadingText = ({text}) => {
   const [dots, setDots] = useState('')

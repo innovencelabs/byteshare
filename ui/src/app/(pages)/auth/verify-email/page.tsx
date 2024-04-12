@@ -1,7 +1,7 @@
 'use client'
-import { useCallback, useEffect } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
 import appwriteService from '@/authentication/appwrite/config'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useCallback, useEffect } from 'react'
 import { toast } from 'sonner'
 
 function VerifyEmailPage() {
