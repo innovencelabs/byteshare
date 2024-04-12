@@ -18,6 +18,12 @@ Parameters:
     Type: String
   AppwriteProjectID:
     Type: String
+  AWSDefaultRegion:
+    Type: String
+  AWSAppAccessKey:
+    Type: String
+  AWSAppSecretAccessKey:
+    Type: String
 
 Globals:
   Function:
@@ -52,6 +58,9 @@ Resources:
           RESEND_API_KEY: !Ref ResendAPIKey
           APPWRITE_URL: !Ref AppwriteURL
           APPWRITE_PROJECT_ID: !Ref AppwriteProjectID
+          AWS_APP_REGION: !Ref AWSDefaultRegion
+          AWS_APP_ACCESS_KEY: !Ref AWSAppAccessKey
+          AWS_APP_SECRET_ACCESS_KEY: !Ref AWSAppSecretAccessKey
       Events:
         ApiEventWithProxy:
           Type: Api
