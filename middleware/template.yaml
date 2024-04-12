@@ -47,7 +47,6 @@ Resources:
       Tracing: Active
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AmazonDynamoDBFullAccess
         - AWSXrayWriteOnlyAccess
       Environment:
         Variables:
