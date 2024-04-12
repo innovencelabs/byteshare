@@ -1,3 +1,9 @@
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Help',
+  description: 'Help page',
+}
 
 function HelpPage() {
   return (
