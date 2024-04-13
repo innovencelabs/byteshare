@@ -4,7 +4,7 @@ services:
   traefik:
     image: traefik:v2.11.2
     container_name: byteshare-traefik
-    command: 
+    command:
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
       - --entrypoints.web.address=:80
@@ -20,6 +20,7 @@ services:
       - ./letsencrypt:/letsencrypt
     labels:
       - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.localhost`)"
       - "traefik.http.routers.traefik.entrypoints=websecure"
       - "traefik.http.routers.traefik.service=api@internal"
       - "traefik.http.routers.traefik.tls.certresolver=sslresolver"
@@ -28,7 +29,8 @@ services:
   middleware:
     build:
       context: ./middleware
-    container_name: byteshare-middleware:${BYTESHARE_VERSION}
+    image: byteshare-middleware:${BYTESHARE_VERSION}
+    container_name: byteshare-middleware
     restart: unless-stopped
     depends_on:
       - traefik
@@ -45,7 +47,7 @@ services:
       - AWS_APP_SECRET_ACCESS_KEY
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.middleware.rule=Host(`middleware`)"
+      - "traefik.http.routers.middleware.rule=Host(`api.localhost`)"
       - "traefik.http.routers.middleware.entrypoints=websecure"
       - "traefik.http.routers.middleware.tls.certresolver=sslresolver"
     networks:
@@ -53,7 +55,8 @@ services:
   ui:
     build:
       context: ./ui
-    container_name: byteshare-ui:${BYTESHARE_VERSION}
+    image: byteshare-ui:${BYTESHARE_VERSION}
+    container_name: byteshare-ui
     restart: unless-stopped
     depends_on:
       - middleware
@@ -68,7 +71,7 @@ services:
       - 3000:3000
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.middleware.rule=Host(`byteshare`)"
+      - "traefik.http.routers.middleware.rule=Host(`ui.localhost`)"
       - "traefik.http.routers.middleware.entrypoints=websecure"
       - "traefik.http.routers.middleware.tls.certresolver=sslresolver"
     networks:
