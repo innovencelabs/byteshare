@@ -83,6 +83,9 @@ class PostUpload(BaseModel):
     receiver_email: str
     sender_name: str
 
+class EditTitle(BaseModel):
+    title: str
+    user_id: str
 
 class AddUser(BaseModel):
     id: str = Field(..., alias="$id")
@@ -512,6 +515,44 @@ def get_history_return_all_shares_list(
         history.sort(key=_sort_by_date_desc, reverse=True)
 
     return history
+
+
+@app.put("/title/{upload_id}")
+def update_upload_title_return_done(
+    body: EditTitle, upload_id: str, token_data: None = Depends(_authenticate)
+):
+    """
+    Edit the upload title
+    Find the upload with ID in DB and update with new title.
+
+    Parameters:
+    - title: new title
+    - user_id: user id
+    - upload_id: upload id to be edited
+
+    Returns:
+    - Done
+    """
+    upload_metadata = dynamodb.read_item({"upload_id": upload_id})
+    if upload_metadata["creator_id"] != body.user_id:
+        raise HTTPException(
+            status_code=400, detail="User is not the owner of the upload"
+        )
+    if not body.title:
+        raise HTTPException(
+            status_code=400, detail="Title is not valid"
+        )
+
+    time_now = datetime.now(timezone.utc)
+
+    keys = {"upload_id": upload_id}
+    update_data = {
+        "title": body.title,
+        "updated_at": time_now.isoformat(),
+    }
+    dynamodb.update_item(keys, update_data)
+
+    return {"status": "Done"}
 
 
 @app.delete("/upload/{upload_id}")

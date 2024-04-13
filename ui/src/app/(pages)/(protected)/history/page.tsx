@@ -2,6 +2,7 @@
 import appwriteService from '@/authentication/appwrite/config'
 import { Header } from '@/components/header'
 import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -50,8 +51,12 @@ function HistoryPage() {
   const [user, setUser] = useState(null)
   const [userEmail, setUserEmail] = useState('')
   const [userName, setUserName] = useState('')
+  const [newTitle, setNewTitle] = useState('')
+  const [newTitleUploadID, setNewTitleUploadID] = useState('')
+  const [editing, setEditing] = useState(false)
   const [data, setData] = React.useState<History[]>([])
   const [downloading, setDownloading] = useState(false)
+  const [openEditDialog, setOpenEditDialog] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
@@ -229,6 +234,55 @@ function HistoryPage() {
     }
   }
 
+  const handleEditTitle = async(event) => {
+    event.preventDefault()
+    if(!editing){
+      setEditing(true)
+      setOpenEditDialog(false)
+
+      try{
+        const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+        const apiKey = process.env.NEXT_PUBLIC_API_KEY
+        const jwtToken = await appwriteService.getJWTToken()
+
+        const editJSON = {
+          user_id: user['$id'],
+          title: newTitle,
+        }
+        const editResponse = await fetch(apiBaseURL + '/title' + '/' + newTitleUploadID, {
+          method: 'PUT',
+          body: JSON.stringify(editJSON),
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey,
+            Authorization: 'Bearer ' + jwtToken.jwt,
+          },
+        })
+        if (editResponse.ok) {
+          const index = data.findIndex((history) => history.id == newTitleUploadID)
+          if (index !== -1) {
+            const updatedData = data.map((history) => {
+              if (history.id == newTitleUploadID) {
+                return { ...history, title: newTitle}
+              }
+              return history
+            })
+            setData(updatedData)
+          }
+          toast.success('Successfully updated.')
+        }
+      } catch (err){
+        
+      } finally {
+        setNewTitle('')
+        setEditing(false)
+        setNewTitleUploadID('')
+      }
+  }
+    
+
+  }
+
   const columns: ColumnDef<History>[] = [
     {
       accessorKey: 'title',
@@ -320,6 +374,17 @@ function HistoryPage() {
                 </Dialog>
               </DropdownMenuItem> */}
               {/* <DropdownMenuSeparator /> */}
+              <DropdownMenuItem
+                onClick={() => {
+                  setOpenEditDialog(true)
+                  setNewTitle('')
+                  setNewTitleUploadID(row.original.id)
+                }}
+                disabled={editing}
+              >
+                Edit title
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => handleDownload(row.original.id)}
                 disabled={downloading}
@@ -476,7 +541,37 @@ function HistoryPage() {
           className="z-0"
         />
       </div>
+      <Dialog
+        open={openEditDialog}
+        onOpenChange={() => {
+          setOpenEditDialog(false)
+          setNewTitle('')
+          setNewTitleUploadID('')
+        }}
+      >
+        <DialogContent className="sm:max-w-[425px] rounded-md ">
+          <form onSubmit={handleEditTitle}>
+            <DialogHeader>
+              <DialogTitle>Edit Title</DialogTitle>
+            </DialogHeader>
 
+            <div className="grid gap-4 py-1">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Input
+                  id="title"
+                  value={newTitle}
+                  onChange={(event) => setNewTitle(event.target.value)}
+                  placeholder="Title"
+                  className="col-span-4"
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="submit">Save changes</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
       <div className="absolute inset-0 bg-black opacity-5 z-1"></div>
     </div>
   )
