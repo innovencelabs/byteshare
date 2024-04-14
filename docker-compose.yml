@@ -1,36 +1,50 @@
 version: '3.8'
 
+x-logging-config: &logger-config
+  logging:
+    driver: "json-file"
+    options:
+      max-size: "10m"
+      max-file: "3"
+      labels: "service={{SERVICE_NAME}}"
+
 services:
   traefik:
     image: traefik:v2.11.2
     container_name: byteshare-traefik
+    <<: *logger-config
     command:
+      - --api.insecure=true
       - --providers.docker=true
+      - --accesslog=true
       - --providers.docker.exposedbydefault=false
       - --entrypoints.web.address=:80
       - --entrypoints.websecure.address=:443
       - --certificatesresolvers.sslresolver.acme.tlschallenge=true
       - --certificatesresolvers.sslresolver.acme.email=${EMAIL}
-      - --certificatesresolvers.sslresolver.acme.storage=/letsencrypt/acme.json
+      - --certificatesresolvers.sslresolver.acme.storage=/certificates/acme.json
     ports:
       - "80:80"
       - "443:443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./letsencrypt:/letsencrypt
+      - ./certificates:/certificates:rw
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.traefik.rule=Host(`traefik.localhost`)"
-      - "traefik.http.routers.traefik.entrypoints=websecure"
-      - "traefik.http.routers.traefik.service=api@internal"
-      - "traefik.http.routers.traefik.tls.certresolver=sslresolver"
+      - "traefik.http.routers.api.rule=Host(`traefik.localhost`)"
+      - "traefik.http.routers.api.service=api@internal"
+      - "traefik.http.routers.api.middlewares=auth"
+      - "traefik.http.middlewares.auth.basicauth.users=admin:gK>I06}WAH;tjpBal8:mM0>~1x9GN(0T"
+      - "traefik.http.routers.api.entrypoints=websecure"
+      - "traefik.http.routers.api.tls=true"
     networks:
       - byteshare-network
-  middleware:
+  byteshare-middleware:
     build:
       context: ./middleware
     image: byteshare-middleware:${BYTESHARE_VERSION}
-    container_name: byteshare-middleware
+    container_name: byteshare-middleware-2
+    <<: *logger-config
     restart: unless-stopped
     depends_on:
       - traefik
@@ -47,19 +61,19 @@ services:
       - AWS_APP_SECRET_ACCESS_KEY
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.middleware.rule=Host(`api.localhost`)"
-      - "traefik.http.routers.middleware.entrypoints=websecure"
-      - "traefik.http.routers.middleware.tls.certresolver=sslresolver"
+      - "traefik.http.routers.byteshare-middleware.rule=Host(`api.localhost`)"
+      - "traefik.http.routers.byteshare-middleware.entrypoints=websecure"
     networks:
       - byteshare-network
-  ui:
+  byteshare-ui:
     build:
       context: ./ui
     image: byteshare-ui:${BYTESHARE_VERSION}
     container_name: byteshare-ui
+    <<: *logger-config
     restart: unless-stopped
     depends_on:
-      - middleware
+      - byteshare-middleware
       - traefik
     environment:
       - NEXT_PUBLIC_API_BASE_URL
@@ -71,9 +85,23 @@ services:
       - 3000:3000
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.middleware.rule=Host(`ui.localhost`)"
-      - "traefik.http.routers.middleware.entrypoints=websecure"
-      - "traefik.http.routers.middleware.tls.certresolver=sslresolver"
+      - "traefik.http.routers.byteshare-ui.rule=Host(`ui.localhost`)"
+      - "traefik.http.routers.byteshare-ui.entrypoints=websecure"
+    networks:
+      - byteshare-network
+  byteshare-cert-manager:
+    build:
+      context: ./certificates/manager
+    image: byteshare-cert-manager:${BYTESHARE_VERSION}
+    container_name: byteshare-cert-manager
+    <<: *logger-config
+    volumes:
+      - ./certificates:/certificates:rw
+    environment:
+      - TRAEFIK_API_URL=http://traefik:8080
+      - DOMAIN_NAME=localhost
+    depends_on:
+      - traefik
     networks:
       - byteshare-network
   
