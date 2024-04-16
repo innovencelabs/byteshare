@@ -4,7 +4,7 @@ import { Toaster } from 'sonner'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
-
+  
 export const metadata: Metadata = {
   title: {
     default: 'ByteShare',
@@ -21,7 +21,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={`bg-darkbg {inter.className}`}>
         {children}
         <Toaster richColors />
       </body>

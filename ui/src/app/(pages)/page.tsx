@@ -11,6 +11,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
+import DesktopHero from 'public/Svgs/hero_desktop.svg'
+import MobileHero from 'public/Svgs/hero_mobile.svg'
+import Boxi from 'public/Svgs/box.svg'
+import Waves from 'public/Svgs/waves.svg'
 import {
   Drawer,
   DrawerClose,
@@ -470,7 +474,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col justify-between">
+    <div className="min-h-screen flex flex-col">
       <Header
         authorised={authorised}
         statusLoaded={statusLoaded}
@@ -479,18 +483,21 @@ export default function Home() {
       />
       {/* <p className="flex align-items-center z-10">hey</p> */}
       <Drawer open={isDrawerOpen} onClose={handleDrawerClose}>
-        <div className="flex-grow flex items-center justify-center z-10">
+        <div style={{height: "calc(100vh - 130px)"}} className="mt-0 flex flex-col items-center flex-col-reverse justify-center md:flex-row md:justify-around ">        
           <DrawerTrigger asChild>
             {/* <div className="px-12 py-8 border-2 border-black rounded-2xl"> */}
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
-                    className="font-semibold text-3xl border-2 border-blue-100 shadow-lg px-20 py-20 bg-blue-100 text-blue-800 hover:bg-slate-200 hover:text-blue-800 rounded-2xl"
+                    className="group animate-bounce font-semibold text-3xl shadow-2 py-10 bg-primary text-gray-100 hover:pointer hover:bg-blue-900 hover:text-white rounded-2xl hover:animate-none hover:opacity-80"
                     onClick={() => handleSend()}
                     disabled={!statusLoaded}
                   >
-                    Send
+                    SEND
+                    <span>
+                    <Image className="w-10  sm:w-12  ml-2 lg:w-15 animate-heartbeat opacity-80 hover:animate-none" src={Boxi} alt="box"/>
+                    </span>
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent className="bg-white text-black">
@@ -501,6 +508,21 @@ export default function Home() {
 
             {/* </div> */}
           </DrawerTrigger>
+          <div className="flex flex-col mb-4 text-center items-center justify-center">
+            <span className="flex flex-col items-center text-white text-3xl sm:text-4xl md:text-4xl lg:text-4xl xl:text-4xl ">
+            <div className="hidden md:block">
+                <Image src={DesktopHero} className="w-full" alt="we svg" />
+             </div>
+             <div className="block md:hidden">
+                <Image src={MobileHero} className="w-full" alt="we svg" />
+             </div>
+              We help You share data
+            </span>
+            <p className="pl-5 text-primary text-4xl sm:text-5xl md:text-5xl lg:text-5xl xl:text-5xl ">
+              Fast, <span className='text-white'>Secure </span><br/><p className='text-white text-3xl'>& </p>Effortless
+            </p>
+          </div>
+
           {/* <Button
             className="font-semibold text-3xl shadow-lg ml-10 px-20 py-20 bg-slate-200 text-blue-800 hover:bg-blue-100 hover:text-blue-800 rounded-2xl"
             onClick={() => handleSend()}
@@ -747,7 +769,9 @@ export default function Home() {
         </DrawerContent>
       </Drawer>
       <audio ref={audioRef} src="/popsound.mp3" />
-      <div className="absolute inset-0">
+      
+      <Image style={{position:'absolute', right:"0"}} src={Waves} alt="box"/>
+      {/* <div className="absolute inset-0">
         <Image
           src="/background.jpg"
           alt="Background Image"
@@ -755,16 +779,8 @@ export default function Home() {
           objectFit="cover"
           className="z-0"
         />
-      </div>
-      <div className="text-left absolute bottom-3">
-        <p className="text-black text-xl sm:text-1xl md:text-2xl lg:text-3xl xl:text-4xl font-semibold">
-          Manage,
-        </p>
-        <p className="text-blue-100 text-xl sm:text-1xl md:text-2xl lg:text-3xl xl:text-4xl font-semibold">
-          Share, Secure. Effortlessly.
-        </p>
-      </div>
-      <div className="absolute inset-0 bg-black opacity-5 z-1"></div>
+      </div> */}
+      
     </div>
   )
 }
