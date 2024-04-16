@@ -3,7 +3,6 @@ import appwriteService from '@/authentication/appwrite/config'
 import { Header } from '@/components/header'
 import LoadingText from '@/components/loading'
 import { Button } from '@/components/ui/button'
-<<<<<<< HEAD
 import {
   Dialog,
   DialogContent,
@@ -12,16 +11,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-=======
-import axios from 'axios'
-import Dropzone from 'react-dropzone'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import DesktopHero from 'public/Svgs/hero_desktop.svg'
-import MobileHero from 'public/Svgs/hero_mobile.svg'
-
-import Boxi from 'public/Svgs/box.svg'
-import Waves from 'public/Svgs/waves.svg'
->>>>>>> 16948c4 (updated ui with some changes and  little animation improvement)
 import {
   Drawer,
   DrawerClose,
@@ -56,7 +45,11 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Dropzone from 'react-dropzone'
 import { toast } from 'sonner'
+import DesktopHero from 'public/Svgs/hero_desktop.svg'
+import MobileHero from 'public/Svgs/hero_mobile.svg'
 
+import Boxi from 'public/Svgs/box.svg'
+import Waves from 'public/Svgs/waves.svg'
 export default function Home() {
   const router = useRouter()
   const { authorised, statusLoaded } = useAuth()
