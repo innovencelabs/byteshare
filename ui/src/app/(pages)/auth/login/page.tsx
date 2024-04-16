@@ -18,7 +18,7 @@ function LoginPage() {
         <Link
           href="/auth/signup"
           className={cn(
-            buttonVariants({ variant: 'ghost' }),
+            buttonVariants({ variant: 'default' }),
             'hidden md:inline-block absolute right-4 top-4 lg:right-8 lg:top-8',
           )}
         >
@@ -49,10 +49,10 @@ function LoginPage() {
         <div className="lg:p-8">
           <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
             <div className="flex flex-col space-y-2 text-center">
-              <h1 className="text-2xl font-semibold tracking-tight">
+              <h1 className="text-lightgray-foreground text-2xl font-semibold tracking-tight">
                 Login to your account
               </h1>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-lightgray">
                 Welcome back to ByteShare!
               </p>
             </div>

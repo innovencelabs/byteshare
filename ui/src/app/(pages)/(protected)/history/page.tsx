@@ -430,7 +430,7 @@ function HistoryPage() {
   })
 
   return (
-    <div className="h-screen flex flex-col justify-between">
+    <div className="bg-darkbg h-screen flex flex-col justify-between">
       <Header
         authorised={authorised}
         statusLoaded={statusLoaded}
@@ -532,15 +532,7 @@ function HistoryPage() {
           </div>
         </div>
       </div>
-      <div className="absolute inset-0">
-        <Image
-          src="/background.jpg"
-          alt="Background Image"
-          layout="fill"
-          objectFit="cover"
-          className="z-0"
-        />
-      </div>
+      
       <Dialog
         open={openEditDialog}
         onOpenChange={() => {
