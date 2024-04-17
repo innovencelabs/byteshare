@@ -13,3 +13,6 @@ ui-bkp
 ui/.next
 issue.txt
 terraform.tfvars
+reverse-proxy/certs/*.crt
+reverse-proxy/certs/*.key
+reverse-proxy/certs/acme.json

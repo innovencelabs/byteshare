@@ -1,0 +1,13 @@
+http:
+  routers:
+    frontend-router:
+      rule: "Host(`ui.localhost`)"
+      service: "byteshare-ui"
+      entryPoints:
+        # - http
+        - https
+  services:
+    byteshare-ui:
+      loadBalancer:
+        servers:
+          - url: "byteshare-ui:3000"

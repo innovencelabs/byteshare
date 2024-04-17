@@ -23,8 +23,8 @@ doc/
 *.iml
 
 .venv/
-.env
-.env.example
+app/.env
+app/.env.example
 
 build/
 dist/
