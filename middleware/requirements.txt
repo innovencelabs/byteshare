@@ -1,10 +1,10 @@
-uvicorn==0.25.0
-fastapi==0.106.0
-boto3==1.34.7
-botocore==1.34.7
+uvicorn==0.29.0
+fastapi==0.110.2
+boto3==1.34.87
+botocore==1.34.87
 six==1.16.0
 mangum==0.17.0
 qrcode==7.4.2
 python-dotenv==1.0.0
-resend==0.7.2
+resend==0.8.0
 appwrite==5.0.2
