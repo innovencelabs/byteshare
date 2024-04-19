@@ -1,3 +1,16 @@
+# Version 0.2.0
+
+## What's Changed
+### Features
+* Add Drag and drop feature for upload by @ambujraj in https://github.com/ambujraj/ByteShare/pull/137
+* Add batch upload in UI and Middleware by @ambujraj in https://github.com/ambujraj/ByteShare/pull/140
+* Add SEO improvements in the UI app by @ambujraj in https://github.com/ambujraj/ByteShare/pull/143
+* Add Dockerfile for UI and Middleware by @ambujraj in https://github.com/ambujraj/ByteShare/pull/144
+* Add Edit Title option in History page by @ambujraj in https://github.com/ambujraj/ByteShare/pull/146
+
+
+**Full Changelog**: https://github.com/ambujraj/ByteShare/compare/v0.1.1...0.2.0
+
 # Version 0.1.1
 
 ## What's Changed
@@ -10,7 +23,7 @@
 
 # Version 0.1.0
 
-## Features
+### Features
 * Add live progress and parallel upload by @ambujraj in https://github.com/ambujraj/ByteShare/pull/40
 * Add personalisation and source email option to share by @ambujraj in https://github.com/ambujraj/ByteShare/pull/50
 * Add send email on new user by username and password by @ambujraj in https://github.com/ambujraj/ByteShare/pull/54
