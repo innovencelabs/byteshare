@@ -1,4 +1,6 @@
 /** @type {import('next').NextConfig} */
+const environment = process.env.ENVIRONMENT || "production"
+
 const nextConfig = {
   images: {
     remotePatterns: [
@@ -8,7 +10,7 @@ const nextConfig = {
       },
     ],
   },
-  output: 'standalone'
+  ...(environment === 'dev' && { output: 'standalone' }),
 }
 
 module.exports = nextConfig
