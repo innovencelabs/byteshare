@@ -52,21 +52,6 @@ services:
       - 3000:3000
     networks:
       - byteshare-network
-  # byteshare-cert-manager:
-  #   build:
-  #     context: ./certificates/manager
-  #   image: byteshare-cert-manager:${BYTESHARE_VERSION}
-  #   container_name: byteshare-cert-manager
-  #   <<: *logger-config
-  #   volumes:
-  #     - ./certificates:/certificates:rw
-  #   environment:
-  #     - TRAEFIK_API_URL=http://traefik:8080
-  #     - DOMAIN_NAME=localhost
-  #   depends_on:
-  #     - traefik
-  #   networks:
-  #     - proxy
   
 networks:
   byteshare-network:
