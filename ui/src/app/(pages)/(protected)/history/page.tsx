@@ -555,7 +555,7 @@ function HistoryPage() {
               <DialogTitle>Edit Title</DialogTitle>
             </DialogHeader>
 
-            <div className="grid gap-4 py-1">
+            <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4">
                 <Input
                   id="title"
