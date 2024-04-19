@@ -37,8 +37,8 @@ jobs:
         RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
         APPWRITE_URL: ${{ secrets.APPWRITE_URL }}
         APPWRITE_PROJECT_ID: ${{ secrets.APPWRITE_PROJECT_ID }}
-        AWS_APP_ACCESS_KEY: $ {{ secrets.AWS_APP_ACCESS_KEY }}
-        AWS_APP_SECRET_ACCESS_KEY: $ {{ secrets.AWS_APP_SECRET_ACCESS_KEY }}
+        AWS_APP_ACCESS_KEY: ${{ secrets.AWS_APP_ACCESS_KEY }}
+        AWS_APP_SECRET_ACCESS_KEY: ${{ secrets.AWS_APP_SECRET_ACCESS_KEY }}
       run: |
         cd middleware
         pip install -r ./requirements.txt  --target ./python
