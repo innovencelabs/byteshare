@@ -27,7 +27,7 @@ ENV PORT 3000
 COPY --from=builder /app/.next/standalone ./standalone
 COPY --from=builder /app/public /app/standalone/public
 COPY --from=builder /app/.next/static /app/standalone/.next/static
-COPY --from=builder /app/.next/cache /app/standalone/.next/cache
+RUN mkdir /app/standalone/.next/cache
 RUN chown -R node:node /app/standalone/.next/cache
 USER node
 EXPOSE 3000
