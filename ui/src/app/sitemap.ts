@@ -14,9 +14,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
         priority: 0.8,
     },
     {
-        url: `${baseURL}/auth/login`,
+        url: `${baseURL}/upgrade`,
         lastModified: new Date(),
         priority: 0.5,
+    },
+    {
+        url: `${baseURL}/auth/login`,
+        lastModified: new Date(),
+        priority: 0.8,
     },
     {
         url: `${baseURL}/auth/signup`,
