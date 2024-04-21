@@ -1,7 +1,5 @@
 # THIS DOCKER COMPOSE FILE IS FOR DEVELOPMENT PURPOSE ONLY
 
-version: '3.8'
-
 x-logging-config: &logger-config
   logging:
     driver: "json-file"
@@ -36,18 +34,18 @@ services:
   byteshare-ui:
     build:
       context: ./ui
+      args:
+      - NEXT_PUBLIC_API_BASE_URL
+      - NEXT_PUBLIC_APP_URL=${WEB_BASE_URL}
+      - NEXT_PUBLIC_APPWRITE_URL=${APPWRITE_URL}
+      - NEXT_PUBLIC_APPWRITE_PROJECT_ID
+      - NEXT_PUBLIC_API_KEY
     image: byteshare-ui:${BYTESHARE_VERSION}
     container_name: byteshare-ui
     <<: *logger-config
     restart: unless-stopped
     depends_on:
       - byteshare-middleware
-    environment:
-      - NEXT_PUBLIC_API_BASE_URL
-      - NEXT_PUBLIC_APP_URL=${WEB_BASE_URL}
-      - NEXT_PUBLIC_APPWRITE_URL=${APPWRITE_URL}
-      - NEXT_PUBLIC_APPWRITE_PROJECT_ID
-      - NEXT_PUBLIC_API_KEY
     ports:
       - 3000:3000
     networks:
