@@ -19,10 +19,9 @@ Your contributions are invaluable to our open-source community. Whether you're a
 ## How to get started?
 - Before creating a new issue or PR, check if that [Issues](https://github.com/ambujraj/byteshare/issues) or [PRs](https://github.com/ambujraj/byteshare/pulls) already exists.
 - Prerequisites
-  - Python v3.10
-  - Node v20.11
+  - Docker
   - Terraform
-  - AWS CLI configured with your AWS account
+  - AWS CLI configured with your AWS account (to create resources)
   - [Cloudflare account](https://www.cloudflare.com/)
   - [Appwrite account](https://appwrite.io/)
 - Steps to run locally
@@ -46,33 +45,14 @@ Your contributions are invaluable to our open-source community. Whether you're a
   cd ../..
   ```
   5. Create your Organisation and Project in Appwrite [TUTORIAL](https://youtu.be/pk92hS_d_ns?t=11&si=emSqp8Mdra_iF-dc)
-  6. Install UI dependencies and add .env file
+  6. Add the credential values in .env
   ```bash
-  cd ui
-  npm install
   cp .env.example .env
   # Add your credentials in .env
-  cd ..
   ```
-  7. Install Middleware(Backend) dependencies and add .env file
+  7. Run the application through Docker Compose
   ```bash
-  cd middleware
-  python3 -m venv .venv
-  source .venv/bin/activate
-  pip3 install -r requirements.txt
-  cd app
-  cp .env.example .env
-  # Add your credentials in .env
-  cd ../..
-  ```
-  8. Run the application
-  ```bash
-  cd ui
-  npm run dev
-
-  --new tab--
-  cd middleware/app
-  uvicorn main:app --reload
+  docker compose up --build
   ```
 
 #### By default, UI runs on port **3000** and Middleware runs on port **8000**
