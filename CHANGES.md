@@ -1,3 +1,14 @@
+# Version 0.2.1
+
+## What's Changed
+### Bug Fixes
+* Fixed noindex issue in meta by @ambujraj in https://github.com/ambujraj/ByteShare/pull/158
+* Add missing /upgrade to sitemap by @ambujraj in https://github.com/ambujraj/ByteShare/pull/158
+
+
+**Full Changelog**: https://github.com/ambujraj/ByteShare/compare/0.2.0...0.2.1
+
+
 # Version 0.2.0
 
 ## What's Changed
