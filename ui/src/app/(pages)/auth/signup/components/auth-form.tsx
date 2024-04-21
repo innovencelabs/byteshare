@@ -7,34 +7,31 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import useAuth from '@/context/useAuth'
 import { cn } from '@/lib/utils'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { FormEvent, HTMLAttributes, useCallback, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { FormEvent, HTMLAttributes, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 interface UserAuthFormProps extends HTMLAttributes<HTMLDivElement> {}
 
 export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const router = useRouter()
-  const searchParams = useSearchParams()
+  const audioRef = useRef(null)
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     name: '',
   })
+  
+
+  const playSound = () => {
+    if (audioRef.current) {
+      audioRef.current.play()
+    }
+  }
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const { setAuthorised } = useAuth()
-
-  const createQueryString = useCallback(
-    (name: string, value: string) => {
-      const params = new URLSearchParams()
-      params.set(name, value)
-
-      return params.toString()
-    },
-    [searchParams],
-  )
 
   const create = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -46,7 +43,11 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       if (userData) {
         setAuthorised(true)
         await appwriteService.initiateVerification()
-        router.push('/' + '?' + createQueryString('from', 'signup'))
+        playSound()
+        toast.info(
+          'Please check your email for a verification link to complete your registration.',
+        )
+        router.push('/')
       }
     } catch (err: any) {
       toast.error(err.message)
@@ -187,6 +188,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         )}{' '}
         Continue with Google
       </Button>
+      <audio ref={audioRef} src="/popsound.mp3" />
     </div>
   )
 }

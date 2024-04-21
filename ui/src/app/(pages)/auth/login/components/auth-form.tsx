@@ -7,13 +7,11 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import useAuth from '@/context/useAuth'
 import { cn } from '@/lib/utils'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import {
   FormEvent,
   HTMLAttributes,
-  useEffect,
-  useRef,
-  useState,
+  useState
 } from 'react'
 import { toast } from 'sonner'
 
@@ -28,23 +26,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   })
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const { authorised, statusLoaded } = useAuth()
-  const searchParams = useSearchParams()
-  const from = searchParams.get('from')
-  const audioRef = useRef(null)
-
-  const playSound = () => {
-    if (audioRef.current) {
-      audioRef.current.play()
-    }
-  }
-
-  useEffect(() => {
-    if (statusLoaded) {
-      if (!authorised && from == 'home') {
-        toast.info('Please log in to your account to continue.')
-      }
-    }
-  }, [statusLoaded])
+  
 
   const login = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -196,7 +178,6 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         )}{' '}
         Continue with Google
       </Button>
-      <audio ref={audioRef} src="/popsound.mp3" />
     </div>
   )
 }
