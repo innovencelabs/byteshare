@@ -1,7 +1,7 @@
 'use client'
 import appwriteService from '@/authentication/appwrite/config'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 import { toast } from 'sonner'
 
 function VerifyEmailPage() {
@@ -11,23 +11,14 @@ function VerifyEmailPage() {
   const userId = searchParams.get('userId')
   const secret = searchParams.get('secret')
 
-  const createQueryString = useCallback(
-    (name: string, value: string) => {
-      const params = new URLSearchParams()
-      params.set(name, value)
-
-      return params.toString()
-    },
-    [searchParams],
-  )
-
   useEffect(() => {
     const completeVerification = async () => {
       if (userId && secret) {
         try {
           await appwriteService.completeVerification({ userId, secret })
+          toast.success('Email has been successfully verified.')
           return router.push(
-            '/' + '?' + createQueryString('from', 'verify-email'),
+            '/',
           )
         } catch (err) {
           toast.error(err.message)

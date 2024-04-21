@@ -41,7 +41,7 @@ import {
 } from '@radix-ui/react-icons'
 import axios from 'axios'
 import Image from 'next/image'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Dropzone from 'react-dropzone'
 import { toast } from 'sonner'
@@ -49,8 +49,6 @@ import { toast } from 'sonner'
 export default function Home() {
   const router = useRouter()
   const { authorised, statusLoaded } = useAuth()
-  const searchParams = useSearchParams()
-  const from = searchParams.get('from')
   const [uploadSize, setUploadSize] = useState('0 KB')
   const [submitDisabled, setSubmitDisabled] = useState(true)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
@@ -81,16 +79,6 @@ export default function Home() {
     }
   }
 
-  const createQueryString = useCallback(
-    (name: string, value: string) => {
-      const params = new URLSearchParams()
-      params.set(name, value)
-
-      return params.toString()
-    },
-    [searchParams],
-  )
-
   useEffect(() => {
     if (statusLoaded) {
       appwriteService.getCurrentUser().then((userResponse) => {
@@ -99,24 +87,6 @@ export default function Home() {
           setUserEmail(userResponse.email)
           setUserName(userResponse.name)
         }
-        if (
-          userResponse &&
-          from == 'signup' &&
-          authorised &&
-          !userResponse?.emailVerification
-        ) {
-          playSound()
-          toast.info(
-            'Please check your email for a verification link to complete your registration.',
-          )
-        } else if (
-          userResponse &&
-          from == 'verify-email' &&
-          authorised &&
-          userResponse?.emailVerification
-        ) {
-          toast.success('Email has been successfully verified.')
-        }
       })
     }
   }, [statusLoaded, router])
@@ -124,7 +94,9 @@ export default function Home() {
   const handleSend = async () => {
     setIsDrawerOpen(false)
     if (!authorised) {
-      router.push('/auth/login' + '?' + createQueryString('from', 'home'))
+      
+      toast.info('Please log in to your account to continue.')
+      router.push('/auth/login')
     } else if (!user?.emailVerification) {
       toast.error('Email is not verified.')
       await appwriteService.initiateVerification()
