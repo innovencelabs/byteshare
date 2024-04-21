@@ -474,7 +474,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="bg-darkbg min-h-screen flex flex-col">
       <Header
         authorised={authorised}
         statusLoaded={statusLoaded}
