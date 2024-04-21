@@ -1,5 +1,5 @@
 /** @type {import('next').NextConfig} */
-const environment = process.env.ENVIRONMENT || "production"
+const environment = process.env.NEXT_PUBLIC_ENVIRONMENT || "production"
 
 const nextConfig = {
   images: {

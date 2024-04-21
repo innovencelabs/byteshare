@@ -31,14 +31,13 @@ Meet ByteShare, your go-to platform for seamless and secure file sharing. Design
 git clone https://github.com/ambujraj/ByteShare.git
 cd ByteShare
 ```
-2. Install Python 3.10
-3. Install Terraform
-4. Configure your AWS account
+2. Install Terraform
+3. Configure your AWS account
 ```bash
 aws configure
 ```
-5. Setup Cloudflare R2
-6. Create AWS resource using Terraform (only in infrastructure/cloud folder)
+4. Setup Cloudflare R2
+5. Create AWS resource using Terraform (only in infrastructure/cloud folder)
 ```bash
 cd ByteShare/infrastructure/cloud
 cp terraform.tfvars.example terraform.tfvars
@@ -48,36 +47,16 @@ terraform plan
 terraform apply
 cd ../../
 ```
-7. Setup your Appwrite account [HERE](https://appwrite.io/)
-8. Create your Organisation and Project in Appwrite [TUTORIAL](https://youtu.be/pk92hS_d_ns?t=11&si=emSqp8Mdra_iF-dc)
-9.  Install UI dependencies and add .env file
+6. Setup your Appwrite account [HERE](https://appwrite.io/)
+7. Create your Organisation and Project in Appwrite [TUTORIAL](https://youtu.be/pk92hS_d_ns?t=11&si=emSqp8Mdra_iF-dc)
+8.  Add the credential values in .env
 ```bash
-cd ui
-npm install
 cp .env.example .env
 # Add your credentials in .env
-cd ..
 ```
-10.   Fill the values in .env file for backend url and Appwrite creds
-11.    Install Middleware(Backend) dependencies and add .env file
+9. Run the application through Docker Compose
 ```bash
-cd middleware
-python3 -m venv .venv
-source .venv/bin/activate
-pip3 install -r requirements.txt
-cd app
-cp .env.example .env
-# Add your credentials in .env
-cd ../..
-```
-12.     Run the application
-```bash
-cd ui
-npm run dev
-
---new tab--
-cd middleware/app
-uvicorn main:app --reload
+docker compose up --build
 ```
 
 #### By default, UI runs on port **3000** and Middleware runs on port **8000**
