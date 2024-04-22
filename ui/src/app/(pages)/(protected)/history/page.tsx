@@ -73,7 +73,7 @@ function HistoryPage() {
       const userID = user['$id']
 
       const historyResponse = await fetch(
-        apiBaseURL + '/history' + '/' + userID,
+        apiBaseURL + '/upload/history' + '/' + userID,
         {
           method: 'GET',
           headers: {
@@ -249,15 +249,18 @@ function HistoryPage() {
           user_id: user['$id'],
           title: newTitle,
         }
-        const editResponse = await fetch(apiBaseURL + '/title' + '/' + newTitleUploadID, {
-          method: 'PUT',
-          body: JSON.stringify(editJSON),
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey,
-            Authorization: 'Bearer ' + jwtToken.jwt,
+        const editResponse = await fetch(
+          apiBaseURL + '/upload' + '/' + newTitleUploadID + '/title',
+          {
+            method: 'PUT',
+            body: JSON.stringify(editJSON),
+            headers: {
+              'Content-Type': 'application/json',
+              'x-api-key': apiKey,
+              Authorization: 'Bearer ' + jwtToken.jwt,
+            },
           },
-        })
+        )
         if (editResponse.ok) {
           const index = data.findIndex((history) => history.id == newTitleUploadID)
           if (index !== -1) {
@@ -377,7 +380,7 @@ function HistoryPage() {
               <DropdownMenuItem
                 onClick={() => {
                   setOpenEditDialog(true)
-                  setNewTitle('')
+                  setNewTitle(row.original.title)
                   setNewTitleUploadID(row.original.id)
                 }}
                 disabled={editing}
