@@ -92,6 +92,10 @@ git pull
 |       ├── context
 │       └── lib
 ├── middeware               # Backend application
+│   └── app                 # Source code
+|       ├── api             # API routes
+|       ├── database        # Database code
+│       └── storage         # Storage code
 └── infrastructure          # Terraform scripts for cloud and local(docker version)
     ├── cloud               # For clouds
     └── local               # For docker containers
