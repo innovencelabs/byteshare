@@ -140,7 +140,7 @@ function HistoryPage() {
   const handleDownload = async (uploadId: string) => {
     if (!downloading) {
       setDownloading(true)
-      toast.info('Download in progress...', { duration: 9999999 })
+      toast.loading('Download in progress...', { duration: 9999999 })
       const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
       const apiKey = process.env.NEXT_PUBLIC_API_KEY
 
@@ -237,6 +237,7 @@ function HistoryPage() {
   const handleEditTitle = async(event) => {
     event.preventDefault()
     if(!editing){
+      toast.loading('Edit in progress...', { duration: 9999999 })
       setEditing(true)
       setOpenEditDialog(false)
 
@@ -272,14 +273,16 @@ function HistoryPage() {
             })
             setData(updatedData)
           }
+          toast.dismiss()
           toast.success('Successfully updated.')
         }
       } catch (err){
-        
+        toast.dismiss()
       } finally {
         setNewTitle('')
         setEditing(false)
         setNewTitleUploadID('')
+        
       }
   }
     

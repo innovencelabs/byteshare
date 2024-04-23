@@ -130,7 +130,7 @@ function SharePage({ params }: Params) {
   ) => {
     try {
       setDownloadingOne(true)
-      toast.info('Download in progress...', { duration: 9999999 })
+      toast.loading('Download in progress...', { duration: 9999999 })
       const response = await fetch(downloadLink)
       const blob = await response.blob()
       saveAs(blob, fileName)
