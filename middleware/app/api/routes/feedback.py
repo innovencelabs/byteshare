@@ -1,9 +1,13 @@
 from fastapi import APIRouter
 from database.db import DynamoDBManager
 from pydantic import BaseModel
+import utils.logger as logger
 import uuid
 
 router = APIRouter()
+
+# Logger instance
+log = logger.get_logger()
 
 # DynamoDB
 feedback_table_name = "byteshare-feedback"
@@ -30,6 +34,8 @@ def post_feedback_return_none(body: Feedback):
     Returns:
     - None
     """
+    FUNCTION_NAME = "post_feedback_return_none()"
+    log.info("Entering {}".format(FUNCTION_NAME))
 
     feedback = {
         "feedback_id": uuid.uuid4().hex,
@@ -38,3 +44,5 @@ def post_feedback_return_none(body: Feedback):
         "message": body.message,
     }
     feedback_dynamodb.create_item(feedback)
+
+    log.info("Exiting {}".format(FUNCTION_NAME))

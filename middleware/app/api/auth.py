@@ -1,4 +1,5 @@
 import os
+import utils.logger as logger
 from dotenv import load_dotenv
 from typing import Optional
 from fastapi import Header, HTTPException
@@ -8,8 +9,14 @@ from appwrite.services.account import Account
 # Load Environment variables
 load_dotenv()
 
+# Logger instance
+log = logger.get_logger()
+
 
 async def authenticate(authorization: Optional[str] = Header(None)):
+    FUNCTION_NAME = "authenticate()"
+    log.info("Entering {}".format(FUNCTION_NAME))
+
     if authorization is None:
         raise HTTPException(
             status_code=401,
@@ -36,11 +43,13 @@ async def authenticate(authorization: Optional[str] = Header(None)):
         account = Account(client)
 
         result = account.get()
-
-        print(result)
-    except Exception:
+        log.info("Authenticated.")
+    except Exception as e:
+        log.error("ERROR authenticating: {}".format(str(e)))
         raise HTTPException(
             status_code=401,
             detail="Invalid token",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+    log.info("Exiting {}".format(FUNCTION_NAME))
