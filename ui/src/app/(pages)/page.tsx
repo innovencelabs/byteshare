@@ -341,7 +341,7 @@ export default function Home() {
     }
 
     const initiateUploadResponse = await fetch(
-      apiBaseURL + '/batchInitiateUpload',
+      apiBaseURL + '/upload/initiate',
       {
         method: 'POST',
         body: JSON.stringify(initiateUploadJSON),
@@ -371,7 +371,7 @@ export default function Home() {
       sender_name: userName,
     }
     const postUploadResponse = await fetch(
-      apiBaseURL + '/postUpload' + '/' + uploadID,
+      apiBaseURL + '/upload/finalise' + '/' + uploadID,
       {
         method: 'POST',
         body: JSON.stringify(fileJSON),
