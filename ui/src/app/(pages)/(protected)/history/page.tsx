@@ -202,9 +202,12 @@ function HistoryPage() {
   const handleCopyShareLink = async(uploadId: string) => {
     const shareURL = process.env.NEXT_PUBLIC_APP_URL + '/share/' + uploadId
     await navigator.clipboard.writeText(shareURL)
+    toast.info('Copied to clipboard')
   }
 
   const handleDelete = async (uploadId: string) => {
+    toast.loading("Delete in progress...")
+
     const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
     const apiKey = process.env.NEXT_PUBLIC_API_KEY
     const jwtToken = await appwriteService.getJWTToken()
@@ -230,7 +233,11 @@ function HistoryPage() {
         const newData = [...data.slice(0, index), ...data.slice(index + 1)]
         setData(newData)
       }
+      toast.dismiss()
       toast.success('Successfully deleted.')
+    } else{
+      toast.dismiss()
+      toast.error('Something went wrong.')
     }
   }
 
