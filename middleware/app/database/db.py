@@ -1,6 +1,10 @@
 import boto3
 import os
 from fastapi import HTTPException
+import utils.logger as logger
+
+# Logger instance
+log = logger.get_logger()
 
 
 class DynamoDBManager:
@@ -15,37 +19,69 @@ class DynamoDBManager:
         self.table = self.dynamodb.Table(table_name)
 
     def health_check(self):
+        FUNCTION_NAME = "health_check()"
+        log.info("Entering {}".format(FUNCTION_NAME))
+
         try:
             response = self.table.scan()
-
             if "Items" not in response:
+                log.error(
+                    "EXCEPTION occurred connecting to DB.\nERROR: {}".format(
+                        "Database connection failed."
+                    )
+                )
                 raise HTTPException(
                     status_code=503, detail="Database connection failed"
                 )
         except Exception as e:
-            print(f"Database connection failed: {str(e)}")
+            log.error("EXCEPTION occurred connecting to DB.\nERROR: {}".format(str(e)))
             raise HTTPException(status_code=503, detail="Database connection failed")
 
+        log.info("Exiting {}".format(FUNCTION_NAME))
+
     def create_item(self, item):
+        FUNCTION_NAME = "create_item()"
+        log.info("Entering {}".format(FUNCTION_NAME))
+
         try:
             response = self.table.put_item(Item=item)
-            print(f"Item created successfully: {response}")
+            log.info("Added to DB.")
         except Exception as e:
-            print(f"Error in adding new row for item: {item}\nError: {e}")
+            log.error(
+                "EXCEPTION occurred adding new row to DB.\nItem: {}\nERROR: {}".format(
+                    item, str(e)
+                )
+            )
+            return
+
+        log.info("Exiting {}".format(FUNCTION_NAME))
 
     def read_item(self, key):
+        FUNCTION_NAME = "read_item()"
+        log.info("Entering {}".format(FUNCTION_NAME))
+
         try:
             response = self.table.get_item(Key=key)
             item = response.get("Item")
             if item:
+                log.info("Exiting {}".format(FUNCTION_NAME))
                 return item
             else:
-                print("Item not found.")
+                log.warning(
+                    "BAD REQUEST for Key: {}\nERROR: {}".format(key, "Item not found.")
+                )
                 return None
         except Exception as e:
-            print(f"Error in reading row for key: {key}\nError: {e}")
+            log.error(
+                "EXCEPTION occurred in reading row to DB for Key:{}\nERROR: {}".format(
+                    key, str(e)
+                )
+            )
 
     def read_items(self, key_name, key_value):
+        FUNCTION_NAME = "read_items()"
+        log.info("Entering {}".format(FUNCTION_NAME))
+
         try:
             response = self.table.query(
                 IndexName="userid-gsi",
@@ -54,14 +90,27 @@ class DynamoDBManager:
             )
             items = response.get("Items", [])
             if items:
+                log.info("Exiting {}".format(FUNCTION_NAME))
                 return items
             else:
-                print("Items not found.")
+                log.warning(
+                    "BAD REQUEST for Key: {}\nERROR: {}".format(
+                        key_name, "Item not found."
+                    )
+                )
                 return []
         except Exception as e:
+            log.error(
+                "EXCEPTION occurred in reading row to DB for Key:{}\nERROR: {}".format(
+                    key_name, str(e)
+                )
+            )
             print(f"Error: {key_name}={key_value}\nError: {e}")
 
     def update_item(self, key, update_data):
+        FUNCTION_NAME = "update_item()"
+        log.info("Entering {}".format(FUNCTION_NAME))
+
         try:
             update_expression = "SET " + ", ".join(
                 [f"#{field} = :{field}" for field in update_data.keys()]
@@ -80,15 +129,27 @@ class DynamoDBManager:
                 ExpressionAttributeNames=expression_attribute_names,
                 ReturnValues="UPDATED_NEW",
             )
-            print(f"Item updated successfully: {response}")
+            log.info("Updated to DB.")
         except Exception as e:
-            print(
-                f"Error in updating row for key: {key} and update_date: {update_data}\nError: {e}"
+            log.error(
+                "EXCEPTION occurred in updating row to DB for Key:{}\nUpdate Data: {}\nERROR: {}".format(
+                    key, update_data, str(e)
+                )
             )
+        log.info("Exiting {}".format(FUNCTION_NAME))
 
     def delete_item(self, key):
+        FUNCTION_NAME = "delete_item()"
+        log.info("Entering {}".format(FUNCTION_NAME))
+
         try:
             response = self.table.delete_item(Key=key)
-            print(f"Item deleted successfully: {response}")
+            log.info("Deleted from DB.")
         except Exception as e:
-            print(f"Error in deleting row for key {key}\nError: {e}")
+            log.error(
+                "EXCEPTION occurred in deleting row to DB for Key:{}\nERROR: {}".format(
+                    key, str(e)
+                )
+            )
+
+        log.info("Exiting {}".format(FUNCTION_NAME))

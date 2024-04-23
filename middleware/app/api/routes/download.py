@@ -4,8 +4,12 @@ from datetime import datetime, timezone
 from fastapi import HTTPException
 from enum import Enum as PythonEnum
 from storage.cloudflare_r2 import CloudflareR2Manager
+import utils.logger as logger
 
 router = APIRouter()
+
+# Logger instance
+log = logger.get_logger()
 
 # Storage
 BUCKET_NAME = "byteshare-blob"
@@ -34,23 +38,45 @@ def get_file_url_return_name_link(upload_id: str, user_id: str | None = None):
     Returns:
     - File details and download url
     """
+    FUNCTION_NAME = "get_file_url_return_name_link()"
+    log.info("Entering {}".format(FUNCTION_NAME))
 
     file_data = {}
     time_now = datetime.now(timezone.utc).isoformat()
     upload_metadata = dynamodb.read_item({"upload_id": upload_id})
     if upload_metadata == None:
+        log.warning(
+            "BAD REQUEST for UploadID: {}\nERROR: {}".format(
+                upload_id, "Upload ID not valid."
+            )
+        )
         raise HTTPException(status_code=400, detail="Upload ID not valid")
     if upload_metadata["status"] != StatusEnum.uploaded.name:
-        raise HTTPException(status_code=400, detail="It is an incomplete upload")
+        log.warning(
+            "BAD REQUEST for UploadID: {}\nERROR: {}".format(
+                upload_id, "Incomplete upload."
+            )
+        )
+        raise HTTPException(status_code=400, detail="Incomplete upload")
 
     expires_at = upload_metadata["expires_at"]
     if time_now > expires_at:
+        log.warning(
+            "BAD REQUEST for UploadID: {}\nERROR: {}".format(
+                upload_id, "Link is expired."
+            )
+        )
         raise HTTPException(status_code=400, detail="Link is expired")
 
     download_count = upload_metadata["download_count"]
     max_count = upload_metadata["max_download"]
     if user_id == None or upload_metadata["creator_id"] != user_id:
         if download_count >= max_count:
+            log.warning(
+                "BAD REQUEST for UploadID: {}\nERROR: {}".format(
+                    upload_id, "Download limit exceeded"
+                )
+            )
             raise HTTPException(status_code=400, detail="Download limit exceeded")
 
     file_names = set(upload_metadata["storage_file_names"])
@@ -80,6 +106,7 @@ def get_file_url_return_name_link(upload_id: str, user_id: str | None = None):
         }
         dynamodb.update_item(keys, update_data)
 
+    log.info("Exiting {}".format(FUNCTION_NAME))
     return file_data
 
 

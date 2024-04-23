@@ -1,11 +1,15 @@
 from fastapi import APIRouter
 from database.db import DynamoDBManager
 from pydantic import BaseModel, Field
+import utils.logger as logger
 from dotenv import load_dotenv
 import resend
 import os
 
 router = APIRouter()
+
+# Logger instance
+log = logger.get_logger()
 
 # Load Environment variables
 load_dotenv()
@@ -39,6 +43,8 @@ def webhook_post_user_send_email(body: AddUser):
     Returns:
     - Sends a welcome email to the user.
     """
+    FUNCTION_NAME = "webhook_post_user_send_email()"
+    log.info("Entering {}".format(FUNCTION_NAME))
 
     user = {
         "user_id": body.id,
@@ -78,3 +84,5 @@ def webhook_post_user_send_email(body: AddUser):
     }
 
     resend.Emails.send(params)
+
+    log.info("Exiting {}".format(FUNCTION_NAME))

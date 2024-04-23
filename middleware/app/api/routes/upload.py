@@ -8,6 +8,7 @@ from typing import List
 import concurrent.futures
 from enum import Enum as PythonEnum
 from dotenv import load_dotenv
+import utils.logger as logger
 import qrcode
 import resend
 import uuid
@@ -15,6 +16,8 @@ import os
 
 router = APIRouter()
 
+# Logger instance
+log = logger.get_logger()
 
 # Load Environment variables
 load_dotenv()
@@ -82,18 +85,23 @@ def initiate_upload(
     Returns:
     - List of Upload URL for upload and Upload id
     """
+    FUNCTION_NAME = "initiate_upload()"
+    log.info("Entering {}".format(FUNCTION_NAME))
 
     client_ip = request.headers.get("x-forwarded-for") or request.client.host
     content_length = int(request.headers.get("File-Length"))
     if content_length is None:
+        log.warning("BAD REQUEST\nERROR: {}".format("file-Length header not found."))
         raise HTTPException(status_code=400, detail="file-Length header not found.")
 
     max_file_size = 2 * 1024 * 1024 * 1024  # 2GB
 
     if len(body.file_names) == 0:
+        log.warning("BAD REQUEST\nERROR: {}".format("No files present."))
         raise HTTPException(status_code=400, detail="No files present.")
 
     if int(content_length) > max_file_size:
+        log.warning("BAD REQUEST\nERROR: {}".format("File size exceeds the limit."))
         raise HTTPException(status_code=400, detail="File size exceeds the limit.")
 
     file_names = body.file_names
@@ -118,7 +126,11 @@ def initiate_upload(
                 response = future.result()
                 responses.append(response)
             except Exception as e:
-                print(f"Exception occurred for file {file_name}: {e}")
+                log.error(
+                    "EXCEPTION occurred for Upload ID: {}\nFile {}: \nERROR:{}".format(
+                        upload_id, file_name, str(e)
+                    )
+                )
 
         for response in responses:
             result["upload_urls"][response["file_name"]] = response["upload_url"]
@@ -146,6 +158,7 @@ def initiate_upload(
     }
     dynamodb.create_item(upload_metadata)
 
+    log.info("Exiting {}".format(FUNCTION_NAME))
     return result
 
 
@@ -166,11 +179,23 @@ def post_upload_return_link_qr(
     Returns:
     - Sharable Link and QR code of frontend page
     """
+    FUNCTION_NAME = "post_upload_return_link_qr()"
+    log.info("Entering {}".format(FUNCTION_NAME))
 
     upload_metadata = dynamodb.read_item({"upload_id": upload_id})
     if upload_metadata == None:
+        log.warning(
+            "BAD REQUEST for UploadID: {}\nERROR: {}".format(
+                upload_id, "Upload ID not valid."
+            )
+        )
         raise HTTPException(status_code=400, detail="Upload ID not valid")
     if upload_metadata["status"] == StatusEnum.uploaded.name:
+        log.warning(
+            "BAD REQUEST for UploadID: {}\nERROR: {}".format(
+                upload_id, "Upload already completed."
+            )
+        )
         raise HTTPException(status_code=400, detail="Upload already completed")
 
     file_names = body.file_names
@@ -180,6 +205,11 @@ def post_upload_return_link_qr(
         # Check for file present in Storage
         is_file_present = storage.is_file_present(file_path)
         if not is_file_present:
+            log.warning(
+                "BAD REQUEST for UploadID: {}\nERROR: {}".format(
+                    upload_id, "Upload not found."
+                )
+            )
             raise HTTPException(status_code=400, detail="Upload not found")
 
     # Generate share link
@@ -272,6 +302,7 @@ def post_upload_return_link_qr(
 
         resend.Emails.send(params)
 
+    log.info("Exiting {}".format(FUNCTION_NAME))
     return {
         "url": file_url,
         "QR": qr_download_url,
@@ -295,8 +326,16 @@ def delete_upload_return_done(
     Returns:
     - Done
     """
+    FUNCTION_NAME = "delete_upload_return_done()"
+    log.info("Entering {}".format(FUNCTION_NAME))
+
     upload_metadata = dynamodb.read_item({"upload_id": upload_id})
     if upload_metadata["creator_id"] != body.user_id:
+        log.warning(
+            "BAD REQUEST for UploadID: {}\nERROR: {}".format(
+                upload_id, "User is not the owner of the upload."
+            )
+        )
         raise HTTPException(
             status_code=400, detail="User is not the owner of the upload"
         )
@@ -304,6 +343,7 @@ def delete_upload_return_done(
     keys = {"upload_id": upload_id}
     dynamodb.delete_item(keys)
 
+    log.info("Exiting {}".format(FUNCTION_NAME))
     return {"status": "Done"}
 
 
@@ -323,12 +363,25 @@ def update_upload_title_return_done(
     Returns:
     - Done
     """
+    FUNCTION_NAME = "update_upload_title_return_done()"
+    log.info("Entering {}".format(FUNCTION_NAME))
+
     upload_metadata = dynamodb.read_item({"upload_id": upload_id})
     if upload_metadata["creator_id"] != body.user_id:
+        log.warning(
+            "BAD REQUEST for UploadID: {}\nERROR: {}".format(
+                upload_id, "User is not the owner of the upload."
+            )
+        )
         raise HTTPException(
             status_code=400, detail="User is not the owner of the upload"
         )
     if not body.title:
+        log.warning(
+            "BAD REQUEST for UploadID: {}\nERROR: {}".format(
+                upload_id, "Title is not valid."
+            )
+        )
         raise HTTPException(status_code=400, detail="Title is not valid")
 
     time_now = datetime.now(timezone.utc)
@@ -340,6 +393,7 @@ def update_upload_title_return_done(
     }
     dynamodb.update_item(keys, update_data)
 
+    log.info("Exiting {}".format(FUNCTION_NAME))
     return {"status": "Done"}
 
 
@@ -357,6 +411,9 @@ def get_history_return_all_shares_list(
     Returns:
     - List of json of the transfer details.
     """
+    FUNCTION_NAME = "get_history_return_all_shares_list()"
+    log.info("Entering {}".format(FUNCTION_NAME))
+
     history = []
 
     # Note: will be uncommented later
@@ -380,11 +437,13 @@ def get_history_return_all_shares_list(
         # Sort the history by date in place
         history.sort(key=_sort_by_date_desc, reverse=True)
 
+    log.info("Exiting {}".format(FUNCTION_NAME))
     return history
 
 
 def _generate(upload_id, file_name):
-    print(f"Generating for File name: {file_name}")
+    FUNCTION_NAME = "_generate()"
+    log.info("Entering {}".format(FUNCTION_NAME))
 
     expiration_time = 10800
     file_path = upload_id + "/" + file_name
@@ -392,8 +451,9 @@ def _generate(upload_id, file_name):
 
     response_url = {"file_name": file_name, "upload_url": upload_url}
 
-    print(f"File name: {file_name} completed")
+    log.info("File name: {} completed".format(file_name))
 
+    log.info("Exiting {}".format(FUNCTION_NAME))
     return response_url
 
 
