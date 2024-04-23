@@ -140,7 +140,7 @@ function HistoryPage() {
   const handleDownload = async (uploadId: string) => {
     if (!downloading) {
       setDownloading(true)
-      toast.loading('Download in progress...', { duration: 9999999 })
+      const downloadInprogressToastID = toast.loading('Download in progress...', { duration: 9999999 })
       const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
       const apiKey = process.env.NEXT_PUBLIC_API_KEY
 
@@ -156,7 +156,7 @@ function HistoryPage() {
       )
       if (!downloadResponse.ok) {
         setDownloading(false)
-        toast.dismiss()
+        toast.dismiss(downloadInprogressToastID)
         toast.error('Upload ID is not valid')
         return
       }
@@ -189,9 +189,9 @@ function HistoryPage() {
         const zipBlob = await zip.generateAsync({ type: 'blob' })
         const zipFileName = 'ByteShare_Preview_' + uploadId + '.zip'
         saveAs(zipBlob, zipFileName)
-        toast.dismiss()
+        toast.dismiss(downloadInprogressToastID)
       } catch (err) {
-        toast.dismiss()
+        toast.dismiss(downloadInprogressToastID)
         toast.error('Error downloading zip file.')
       } finally {
         setDownloading(false)
@@ -206,7 +206,7 @@ function HistoryPage() {
   }
 
   const handleDelete = async (uploadId: string) => {
-    toast.loading("Delete in progress...")
+    const deleteInprogressToastID = toast.loading('Delete in progress...', { duration: 9999999 })
 
     const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
     const apiKey = process.env.NEXT_PUBLIC_API_KEY
@@ -233,10 +233,10 @@ function HistoryPage() {
         const newData = [...data.slice(0, index), ...data.slice(index + 1)]
         setData(newData)
       }
-      toast.dismiss()
+      toast.dismiss(deleteInprogressToastID)
       toast.success('Successfully deleted.')
     } else{
-      toast.dismiss()
+      toast.dismiss(deleteInprogressToastID)
       toast.error('Something went wrong.')
     }
   }
@@ -244,7 +244,7 @@ function HistoryPage() {
   const handleEditTitle = async(event) => {
     event.preventDefault()
     if(!editing){
-      toast.loading('Edit in progress...', { duration: 9999999 })
+      const editInprogressToastID = toast.loading('Edit in progress...', { duration: 9999999 })
       setEditing(true)
       setOpenEditDialog(false)
 
@@ -280,11 +280,11 @@ function HistoryPage() {
             })
             setData(updatedData)
           }
-          toast.dismiss()
+          toast.dismiss(editInprogressToastID)
           toast.success('Successfully updated.')
         }
       } catch (err){
-        toast.dismiss()
+        toast.dismiss(editInprogressToastID)
       } finally {
         setNewTitle('')
         setEditing(false)
