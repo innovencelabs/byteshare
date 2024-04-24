@@ -45,7 +45,7 @@ async def authenticate(authorization: Optional[str] = Header(None)):
         result = account.get()
         log.info("Authenticated.")
     except Exception as e:
-        log.error("ERROR authenticating: {}".format(str(e)))
+        log.error("EXCEPTION authenticating: {}".format(str(e)))
         raise HTTPException(
             status_code=401,
             detail="Invalid token",

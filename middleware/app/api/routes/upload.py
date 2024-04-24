@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 import utils.logger as logger
 import qrcode
 import resend
+import pika
 import uuid
 import os
 
@@ -61,6 +62,12 @@ storage = CloudflareR2Manager(BUCKET_NAME)
 # DynamoDB
 table_name = "byteshare-upload-metadata"
 dynamodb = DynamoDBManager(table_name)
+
+# RabbitMQ
+params = pika.URLParameters(os.getenv("RABBITMQ_URL"))
+connection = pika.BlockingConnection(params)
+channel = connection.channel()
+channel.queue_declare(queue=os.getenv("RABBITMQ_QUEUE"))
 
 web_base_url = str(os.getenv("WEB_BASE_URL"))
 
@@ -301,6 +308,10 @@ def post_upload_return_link_qr(
         }
 
         resend.Emails.send(params)
+
+    channel.basic_publish(
+        exchange="", routing_key=os.getenv("RABBITMQ_QUEUE"), body=upload_id
+    )
 
     log.info("Exiting {}".format(FUNCTION_NAME))
     return {

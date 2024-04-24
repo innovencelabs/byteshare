@@ -27,6 +27,8 @@ services:
       - AWS_APP_REGION
       - AWS_APP_ACCESS_KEY
       - AWS_APP_SECRET_ACCESS_KEY
+      - RABBITMQ_QUEUE
+      - RABBITMQ_URL
     ports:
       - 8000:8000
     networks:
