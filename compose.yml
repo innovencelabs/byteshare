@@ -12,11 +12,12 @@ services:
   byteshare-middleware:
     build:
       context: ./middleware
-    image: byteshare-middleware:${BYTESHARE_VERSION}
+    image: byteshare/middleware:${BYTESHARE_VERSION}
     container_name: byteshare-middleware
     <<: *logger-config
     restart: unless-stopped
     environment:
+      - ENVIRONMENT
       - WEB_BASE_URL
       - RESEND_API_KEY
       - R2_ACCOUNT_ID
@@ -42,7 +43,7 @@ services:
       - NEXT_PUBLIC_APPWRITE_URL=${APPWRITE_URL}
       - NEXT_PUBLIC_APPWRITE_PROJECT_ID
       - NEXT_PUBLIC_API_KEY
-    image: byteshare-ui:${BYTESHARE_VERSION}
+    image: byteshare/ui:${BYTESHARE_VERSION}
     container_name: byteshare-ui
     <<: *logger-config
     restart: unless-stopped
