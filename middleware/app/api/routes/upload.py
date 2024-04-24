@@ -148,6 +148,7 @@ def initiate_upload(
         "upload_id": upload_id,
         "status": StatusEnum.initiated.name,
         "title": "Upload with " + file_names[0],
+        "scanned": False,
         "creator_id": body.creator_id,
         "creator_email": body.creator_email,
         "creator_ip": client_ip,
