@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { Metadata } from 'next'
 import Link from 'next/link'
 import ForgotPasswordForm from './components/forgot-form'
@@ -30,6 +31,12 @@ function ForgotPasswordPage() {
             >
               <path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3" />
             </svg> */}
+            <Image
+              src="/byteshare.png"
+              alt="ByteShare Logo"
+              width={32}
+              height={32}
+            />
             ByteShare
           </Link>
           <div className="relative z-20 mt-auto"></div>
