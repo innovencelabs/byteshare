@@ -34,7 +34,7 @@ function UpgradePage() {
   return (
     <>
       <form onSubmit={handleSubscribe}>
-        <div className="bg-[#303EA2] flex h-screen justify-center items-center z-10">
+        <div className="bg-darkbg flex h-screen justify-center items-center z-10">
           <div className="bg-transparent p-8 rounded-md shadow-md max-w-sm">
             <h4 className="text-2xl font-semibold mb-4 text-white">
               Subscribe to Waitinglist and get{' '}

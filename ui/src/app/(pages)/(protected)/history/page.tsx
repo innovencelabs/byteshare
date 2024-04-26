@@ -462,7 +462,7 @@ function HistoryPage() {
   })
 
   return (
-    <div className="h-screen flex flex-col justify-between">
+    <div className="bg-darkbg h-screen flex flex-col justify-between">
       <Header
         authorised={authorised}
         statusLoaded={statusLoaded}

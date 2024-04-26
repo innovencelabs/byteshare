@@ -11,6 +11,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
+import DesktopHero from 'public/Svgs/hero_desktop.svg'
+import MobileHero from 'public/Svgs/hero_mobile.svg'
+import Boxi from 'public/Svgs/box.svg'
+import Waves from 'public/Svgs/waves.svg'
 import {
   Drawer,
   DrawerClose,
