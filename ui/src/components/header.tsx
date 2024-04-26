@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -77,12 +78,12 @@ export const Header = ({ authorised, statusLoaded, name, email }) => {
           variant="ghost"
           className="flex items-center space-x-3 rtl:space-x-reverse hover:bg-transparent"
         >
-          {/* <Image
-            src="/images/logo.svg"
+          <Image
+            src="/byteshare.png"
             alt="ByteShare Logo"
             width={32}
             height={32}
-          /> */}
+          />
           <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
             ByteShare
           </span>
