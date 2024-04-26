@@ -20,6 +20,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
@@ -317,7 +323,22 @@ function HistoryPage() {
     {
       accessorKey: 'title',
       header: () => <div className="text-left">Title</div>,
-      cell: ({ row }) => <div>{row.original.title}</div>,
+      cell: ({ row }) => (
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="cursor-pointer">
+                {row.original.title.length > 30
+                  ? `${row.original.title.slice(0, 30)}...`
+                  : row.original.title}
+              </div>
+            </TooltipTrigger>
+            <TooltipContent className="text-white">
+              <p>{row.original.title}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      ),
     },
     {
       accessorKey: 'created',
@@ -376,34 +397,7 @@ function HistoryPage() {
               >
                 Preview
               </DropdownMenuItem> */}
-              {/* <DropdownMenuItem>
-                <Dialog>
-                  <DialogTrigger><button>Edit title</button></DialogTrigger>
-                  <DialogContent className="sm:max-w-[425px]">
-                    <DialogHeader>
-                    <DialogTitle>abc</DialogTitle>
-                    <DialogDescription>
-                      Make changes to your profile here. Click save when you're
-                      done.
-                    </DialogDescription>
-                  </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        
-                        <Input
-                          id="name"
-                          value="Pedro Duarte"
-                          className="col-span-3"
-                        />
-                      </div>
-                    </div>
-                    <DialogFooter>
-                      <Button type="submit">Save changes</Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-              </DropdownMenuItem> */}
-              {/* <DropdownMenuSeparator /> */}
+              
               <DropdownMenuItem
                 onClick={() => {
                   setOpenEditDialog(true)

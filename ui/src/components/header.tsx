@@ -77,7 +77,7 @@ export const Header = ({ authorised, statusLoaded, name, email }) => {
         <Button
           onClick={() => router.push('/')}
           variant="ghost"
-          className="flex items-center space-x-3 rtl:space-x-reverse hover:bg-transparent"
+          className="flex items-center space-x-1 rtl:space-x-reverse hover:bg-transparent"
         >
           <Image
             src="/byteshare.png"
@@ -85,7 +85,7 @@ export const Header = ({ authorised, statusLoaded, name, email }) => {
             width={32}
             height={32}
           />
-          <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
+          <span className="hidden sm:block self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
             ByteShare
           </span>
         </Button>
