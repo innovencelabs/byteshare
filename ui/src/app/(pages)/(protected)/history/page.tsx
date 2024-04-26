@@ -53,7 +53,7 @@ import JSZip from 'jszip'
 import Image from 'next/image'
 import React, { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import Waves from 'public/Svgs/waves.svg';
+import Waves from 'public/svg/waves.svg';
 
 type History = {
   id: string

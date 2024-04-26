@@ -14,7 +14,7 @@ import {
 import { Label } from '@/components/ui/label'
 import { Progress } from '@/components/ui/progress'
 import { Skeleton } from '@/components/ui/skeleton'
-import Waves from 'public/Svgs/waves.svg'
+import Waves from 'public/svg/waves.svg'
 import {
   Table,
   TableBody,
