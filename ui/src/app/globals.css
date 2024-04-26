@@ -26,6 +26,11 @@
     --radius: 0.5rem;
     --lightgray: 0 0 57%;
     --lightgray-foreground: 0 0 85%;
+    --dark-blue:#010048;
+    --light-dark-blue:#090088;
+    --grape:#6F2DA8;
+    --grape-violet:#8F00FF;
+
   }
 
   .dark {
@@ -49,7 +54,12 @@
     --input: 217.2 32.6% 17.5%;
     --ring: 224.3 76.3% 48%;
     --lightgray: 0 0 57%;
-    --lightgray-foreground: 0 0 85%
+    --lightgray-foreground: 0 0 85%;
+    --dark-blue:#010048;
+    --light-dark-blue:#090088;
+    --grape:#6F2DA8;
+    --grape-violet:#8F00FF
+
   }
 }
 
