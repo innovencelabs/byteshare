@@ -47,6 +47,7 @@ import JSZip from 'jszip'
 import Image from 'next/image'
 import React, { useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import Waves from 'public/Svgs/waves.svg';
 
 type History = {
   id: string
@@ -564,7 +565,7 @@ function HistoryPage() {
           </div>
         </div>
       </div>
-      <div className="absolute inset-0">
+      {/* <div className="absolute inset-0">
         <Image
           src="/background.jpg"
           alt="Background Image"
@@ -572,7 +573,7 @@ function HistoryPage() {
           objectFit="cover"
           className="z-0"
         />
-      </div>
+      </div> */}
       <AlertDialog
         open={openDeleteConfirmation}
         onOpenChange={() => {
@@ -589,7 +590,10 @@ function HistoryPage() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction variant="destructive" onClick={() => handleDelete(deleteUploadID)}>
+            <AlertDialogAction
+              variant="destructive"
+              onClick={() => handleDelete(deleteUploadID)}
+            >
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -626,7 +630,12 @@ function HistoryPage() {
           </form>
         </DialogContent>
       </Dialog>
-      <div className="absolute inset-0 bg-black opacity-5 z-1"></div>
+      <Image
+        style={{ position: 'absolute', right: '0' }}
+        src={Waves}
+        alt="box"
+      />
+      {/* <div className="absolute inset-0 bg-black opacity-5 z-1"></div> */}
     </div>
   )
 }

@@ -11,10 +11,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import DesktopHero from 'public/Svgs/hero_desktop.svg'
-import MobileHero from 'public/Svgs/hero_mobile.svg'
-import Boxi from 'public/Svgs/box.svg'
-import Waves from 'public/Svgs/waves.svg'
 import {
   Drawer,
   DrawerClose,
@@ -25,16 +21,11 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from '@/components/ui/drawer'
+import { HeroHighlight, Highlight } from '@/components/ui/hero-highlight'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Progress } from '@/components/ui/progress'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip'
 import useAuth from '@/context/useAuth'
 import { cn } from '@/lib/utils'
 import {
@@ -44,16 +35,16 @@ import {
   UploadIcon,
 } from '@radix-ui/react-icons'
 import axios from 'axios'
+import { motion } from 'framer-motion'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
+import Boxi from 'public/Svgs/box.svg'
+import DesktopHero from 'public/Svgs/hero_desktop.svg'
+import Waves from 'public/Svgs/waves.svg'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Dropzone from 'react-dropzone'
 import { toast } from 'sonner'
-import DesktopHero from 'public/Svgs/hero_desktop.svg'
-import MobileHero from 'public/Svgs/hero_mobile.svg'
 
-import Boxi from 'public/Svgs/box.svg'
-import Waves from 'public/Svgs/waves.svg'
 export default function Home() {
   const router = useRouter()
   const { authorised, statusLoaded } = useAuth()
@@ -459,45 +450,64 @@ export default function Home() {
       />
       {/* <p className="flex align-items-center z-10">hey</p> */}
       <Drawer open={isDrawerOpen} onClose={handleDrawerClose}>
-        <div style={{height: "calc(100vh - 130px)"}} className="mt-0 flex flex-col items-center flex-col-reverse justify-center md:flex-row md:justify-around ">
+        <div
+          style={{ height: 'calc(100vh - 130px)' }}
+          className="mt-0 flex flex-col items-center justify-center md:flex-row md:justify-around"
+        >
+          <div className="flex flex-col mb-4 text-center items-center justify-center">
+            <span className="flex flex-col items-center text-white text-xl sm:text-xl md:text-xl lg:text-xl xl:text-xl ">
+              <div className="hidden md:block">
+                <Image src={DesktopHero} className="w-full" alt="we svg" />
+              </div>
+              <div className="block md:hidden">
+                <Image src={DesktopHero} className="w-full" alt="we svg" />
+              </div>
+              <HeroHighlight>
+                <motion.h1
+                  initial={{
+                    opacity: 0,
+                    y: 20,
+                  }}
+                  animate={{
+                    opacity: 1,
+                    y: [20, -5, 0],
+                  }}
+                  transition={{
+                    duration: 0.5,
+                    ease: [0.4, 0.0, 0.2, 1],
+                  }}
+                  className=" px-4 text-sm lg:text-lg  font-bold text-white dark:text-white max-w-xl leading-relaxed lg:leading-snug text-center mx-auto "
+                >
+                  Experience seamless file sharing with ByteShare.
+                  <br />
+                  Send files effortlessly,{' '}
+                  <Highlight className="text-black dark:text-white">
+                    keeping data safe and manageable.
+                  </Highlight>
+                </motion.h1>
+              </HeroHighlight>
+              
+            </span>
+          </div>
           <DrawerTrigger asChild>
             {/* <div className="px-12 py-8 border-2 border-black rounded-2xl"> */}
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    className="group animate-bounce font-semibold text-3xl shadow-2 py-10 bg-primary text-gray-100 hover:pointer hover:bg-blue-900 hover:text-white rounded-2xl hover:animate-none hover:opacity-80"
-                    onClick={() => handleSend()}
-                    disabled={!statusLoaded}
-                  >
-                    SEND
-                    <span>
-                    <Image className="w-10  sm:w-12  ml-2 lg:w-15 animate-heartbeat opacity-80 hover:animate-none" src={Boxi} alt="box"/>
-                    </span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent className="bg-white text-black">
-                  <p>Send files</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <Button
+              className="group animate-bounce font-semibold text-3xl shadow-2 py-10 bg-primary text-gray-100 hover:pointer hover:bg-blue-900 hover:text-white rounded-2xl hover:animate-none hover:opacity-80"
+              onClick={() => handleSend()}
+              disabled={!statusLoaded}
+            >
+              SEND
+              <span>
+                <Image
+                  className="w-10  sm:w-12  ml-2 lg:w-15 animate-heartbeat opacity-80 hover:animate-none"
+                  src={Boxi}
+                  alt="box"
+                />
+              </span>
+            </Button>
 
             {/* </div> */}
           </DrawerTrigger>
-          <div className="flex flex-col mb-4 text-center items-center justify-center">
-            <span className="flex flex-col items-center text-white text-3xl sm:text-4xl md:text-4xl lg:text-4xl xl:text-4xl ">
-            <div className="hidden md:block">
-                <Image src={DesktopHero} className="w-full" alt="we svg" />
-             </div>
-             <div className="block md:hidden">
-                <Image src={MobileHero} className="w-full" alt="we svg" />
-             </div>
-              We help You share data
-            </span>
-            <p className="pl-5 text-primary text-4xl sm:text-5xl md:text-5xl lg:text-5xl xl:text-5xl ">
-              Fast, <span className='text-white'>Secure </span><br/><p className='text-white text-3xl'>& </p>Effortless
-            </p>
-          </div>
 
           {/* <Button
             className="font-semibold text-3xl shadow-lg ml-10 px-20 py-20 bg-slate-200 text-blue-800 hover:bg-blue-100 hover:text-blue-800 rounded-2xl"
@@ -675,7 +685,7 @@ export default function Home() {
             ) : !uploaded ? (
               <>
                 <div className="pt-4">
-                  {batchCount == 0 && progress == 0 && totalBatch>100 ? (
+                  {batchCount == 0 && progress == 0 && totalBatch > 100 ? (
                     <LoadingText text="Initialising upload" />
                   ) : !postProcessing ? (
                     <Label>
@@ -683,7 +693,6 @@ export default function Home() {
                     </Label>
                   ) : (
                     <LoadingText text="Processing" />
-                    
                   )}
                   <Progress value={progress} className="m-auto w-[100%]" />
 
@@ -745,8 +754,12 @@ export default function Home() {
         </DrawerContent>
       </Drawer>
       <audio ref={audioRef} src="/popsound.mp3" />
-      
-      <Image style={{position:'absolute', right:"0"}} src={Waves} alt="box"/>
+
+      <Image
+        style={{ position: 'absolute', right: '0' }}
+        src={Waves}
+        alt="box"
+      />
       {/* <div className="absolute inset-0">
         <Image
           src="/background.jpg"
@@ -756,7 +769,6 @@ export default function Home() {
           className="z-0"
         />
       </div> */}
-      
     </div>
   )
 }

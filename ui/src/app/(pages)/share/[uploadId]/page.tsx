@@ -14,6 +14,7 @@ import {
 import { Label } from '@/components/ui/label'
 import { Progress } from '@/components/ui/progress'
 import { Skeleton } from '@/components/ui/skeleton'
+import Waves from 'public/Svgs/waves.svg'
 import {
   Table,
   TableBody,
@@ -377,9 +378,13 @@ function SharePage({ params }: Params) {
           </div>
         </div>
       </div>
-      
+      <Image
+        style={{ position: 'absolute', right: '0' }}
+        src={Waves}
+        alt="box"
+      />
 
-      <div className="absolute inset-0 bg-black opacity-5 z-1"></div>
+      {/* <div className="absolute inset-0 bg-black opacity-5 z-1"></div> */}
     </div>
   )
 }
