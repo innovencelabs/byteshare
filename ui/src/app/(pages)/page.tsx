@@ -49,7 +49,11 @@ import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Dropzone from 'react-dropzone'
 import { toast } from 'sonner'
+import DesktopHero from 'public/Svgs/hero_desktop.svg'
+import MobileHero from 'public/Svgs/hero_mobile.svg'
 
+import Boxi from 'public/Svgs/box.svg'
+import Waves from 'public/Svgs/waves.svg'
 export default function Home() {
   const router = useRouter()
   const { authorised, statusLoaded } = useAuth()
@@ -345,7 +349,7 @@ export default function Home() {
     }
 
     const initiateUploadResponse = await fetch(
-      apiBaseURL + '/batchInitiateUpload',
+      apiBaseURL + '/upload/initiate',
       {
         method: 'POST',
         body: JSON.stringify(initiateUploadJSON),
@@ -375,7 +379,7 @@ export default function Home() {
       sender_name: userName,
     }
     const postUploadResponse = await fetch(
-      apiBaseURL + '/postUpload' + '/' + uploadID,
+      apiBaseURL + '/upload/finalise' + '/' + uploadID,
       {
         method: 'POST',
         body: JSON.stringify(fileJSON),
@@ -446,7 +450,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="bg-darkbg min-h-screen flex flex-col">
       <Header
         authorised={authorised}
         statusLoaded={statusLoaded}
@@ -455,7 +459,7 @@ export default function Home() {
       />
       {/* <p className="flex align-items-center z-10">hey</p> */}
       <Drawer open={isDrawerOpen} onClose={handleDrawerClose}>
-        <div style={{height: "calc(100vh - 130px)"}} className="mt-0 flex flex-col items-center flex-col-reverse justify-center md:flex-row md:justify-around ">        
+        <div style={{height: "calc(100vh - 130px)"}} className="mt-0 flex flex-col items-center flex-col-reverse justify-center md:flex-row md:justify-around ">
           <DrawerTrigger asChild>
             {/* <div className="px-12 py-8 border-2 border-black rounded-2xl"> */}
             <TooltipProvider>

@@ -1,6 +1,16 @@
 'use client'
 import appwriteService from '@/authentication/appwrite/config'
 import { Header } from '@/components/header'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import {
@@ -57,6 +67,8 @@ function HistoryPage() {
   const [data, setData] = React.useState<History[]>([])
   const [downloading, setDownloading] = useState(false)
   const [openEditDialog, setOpenEditDialog] = useState(false)
+  const [openDeleteConfirmation, setOpenDeleteConfirmation] = useState(false)
+  const [deleteUploadID, setDeleteUploadID] = useState('')
   const [isMounted, setIsMounted] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
@@ -73,7 +85,7 @@ function HistoryPage() {
       const userID = user['$id']
 
       const historyResponse = await fetch(
-        apiBaseURL + '/history' + '/' + userID,
+        apiBaseURL + '/upload/history' + '/' + userID,
         {
           method: 'GET',
           headers: {
@@ -140,7 +152,7 @@ function HistoryPage() {
   const handleDownload = async (uploadId: string) => {
     if (!downloading) {
       setDownloading(true)
-      toast.info('Download in progress...', { duration: 9999999 })
+      const downloadInprogressToastID = toast.loading('Download in progress...', { duration: 9999999 })
       const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
       const apiKey = process.env.NEXT_PUBLIC_API_KEY
 
@@ -156,7 +168,7 @@ function HistoryPage() {
       )
       if (!downloadResponse.ok) {
         setDownloading(false)
-        toast.dismiss()
+        toast.dismiss(downloadInprogressToastID)
         toast.error('Upload ID is not valid')
         return
       }
@@ -189,9 +201,9 @@ function HistoryPage() {
         const zipBlob = await zip.generateAsync({ type: 'blob' })
         const zipFileName = 'ByteShare_Preview_' + uploadId + '.zip'
         saveAs(zipBlob, zipFileName)
-        toast.dismiss()
+        toast.dismiss(downloadInprogressToastID)
       } catch (err) {
-        toast.dismiss()
+        toast.dismiss(downloadInprogressToastID)
         toast.error('Error downloading zip file.')
       } finally {
         setDownloading(false)
@@ -202,9 +214,13 @@ function HistoryPage() {
   const handleCopyShareLink = async(uploadId: string) => {
     const shareURL = process.env.NEXT_PUBLIC_APP_URL + '/share/' + uploadId
     await navigator.clipboard.writeText(shareURL)
+    toast.info('Copied to clipboard')
   }
 
   const handleDelete = async (uploadId: string) => {
+    setOpenDeleteConfirmation(false)
+    const deleteInprogressToastID = toast.loading('Delete in progress...', { duration: 9999999 })
+    try{
     const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
     const apiKey = process.env.NEXT_PUBLIC_API_KEY
     const jwtToken = await appwriteService.getJWTToken()
@@ -230,13 +246,21 @@ function HistoryPage() {
         const newData = [...data.slice(0, index), ...data.slice(index + 1)]
         setData(newData)
       }
+      toast.dismiss(deleteInprogressToastID)
       toast.success('Successfully deleted.')
     }
+  } catch (err) {
+    toast.dismiss(deleteInprogressToastID)
+    toast.error('Something went wrong.')
+  } finally {
+    setDeleteUploadID('')
+  }
   }
 
   const handleEditTitle = async(event) => {
     event.preventDefault()
     if(!editing){
+      const editInprogressToastID = toast.loading('Edit in progress...', { duration: 9999999 })
       setEditing(true)
       setOpenEditDialog(false)
 
@@ -249,15 +273,18 @@ function HistoryPage() {
           user_id: user['$id'],
           title: newTitle,
         }
-        const editResponse = await fetch(apiBaseURL + '/title' + '/' + newTitleUploadID, {
-          method: 'PUT',
-          body: JSON.stringify(editJSON),
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey,
-            Authorization: 'Bearer ' + jwtToken.jwt,
+        const editResponse = await fetch(
+          apiBaseURL + '/upload' + '/' + newTitleUploadID + '/title',
+          {
+            method: 'PUT',
+            body: JSON.stringify(editJSON),
+            headers: {
+              'Content-Type': 'application/json',
+              'x-api-key': apiKey,
+              Authorization: 'Bearer ' + jwtToken.jwt,
+            },
           },
-        })
+        )
         if (editResponse.ok) {
           const index = data.findIndex((history) => history.id == newTitleUploadID)
           if (index !== -1) {
@@ -269,14 +296,16 @@ function HistoryPage() {
             })
             setData(updatedData)
           }
+          toast.dismiss(editInprogressToastID)
           toast.success('Successfully updated.')
         }
       } catch (err){
-        
+        toast.dismiss(editInprogressToastID)
       } finally {
         setNewTitle('')
         setEditing(false)
         setNewTitleUploadID('')
+        
       }
   }
     
@@ -377,7 +406,7 @@ function HistoryPage() {
               <DropdownMenuItem
                 onClick={() => {
                   setOpenEditDialog(true)
-                  setNewTitle('')
+                  setNewTitle(row.original.title)
                   setNewTitleUploadID(row.original.id)
                 }}
                 disabled={editing}
@@ -399,7 +428,10 @@ function HistoryPage() {
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="text-red-500"
-                onClick={() => handleDelete(row.original.id)}
+                onClick={() => {
+                  setOpenDeleteConfirmation(true)
+                  setDeleteUploadID(row.original.id)
+                }}
               >
                 Delete
               </DropdownMenuItem>
@@ -532,7 +564,37 @@ function HistoryPage() {
           </div>
         </div>
       </div>
-      
+      <div className="absolute inset-0">
+        <Image
+          src="/background.jpg"
+          alt="Background Image"
+          layout="fill"
+          objectFit="cover"
+          className="z-0"
+        />
+      </div>
+      <AlertDialog
+        open={openDeleteConfirmation}
+        onOpenChange={() => {
+          setOpenDeleteConfirmation(false)
+          setDeleteUploadID('')
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete your upload.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction variant="destructive" onClick={() => handleDelete(deleteUploadID)}>
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <Dialog
         open={openEditDialog}
         onOpenChange={() => {
