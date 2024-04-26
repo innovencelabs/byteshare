@@ -77,10 +77,10 @@ export const Header = ({ authorised, statusLoaded, name, email }) => {
         <Button
           onClick={() => router.push('/')}
           variant="ghost"
-          className="flex items-center space-x-1 rtl:space-x-reverse hover:bg-transparent"
+          className="flex items-center space-x-2 rtl:space-x-reverse hover:bg-transparent"
         >
           <Image
-            src="/byteshare.png"
+            src="/byteshare-white.png"
             alt="ByteShare Logo"
             width={32}
             height={32}
