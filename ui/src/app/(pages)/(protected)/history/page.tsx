@@ -1,6 +1,16 @@
 'use client'
 import appwriteService from '@/authentication/appwrite/config'
 import { Header } from '@/components/header'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import {
@@ -57,6 +67,8 @@ function HistoryPage() {
   const [data, setData] = React.useState<History[]>([])
   const [downloading, setDownloading] = useState(false)
   const [openEditDialog, setOpenEditDialog] = useState(false)
+  const [openDeleteConfirmation, setOpenDeleteConfirmation] = useState(false)
+  const [deleteUploadID, setDeleteUploadID] = useState('')
   const [isMounted, setIsMounted] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
@@ -206,8 +218,9 @@ function HistoryPage() {
   }
 
   const handleDelete = async (uploadId: string) => {
+    setOpenDeleteConfirmation(false)
     const deleteInprogressToastID = toast.loading('Delete in progress...', { duration: 9999999 })
-
+    try{
     const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
     const apiKey = process.env.NEXT_PUBLIC_API_KEY
     const jwtToken = await appwriteService.getJWTToken()
@@ -235,10 +248,13 @@ function HistoryPage() {
       }
       toast.dismiss(deleteInprogressToastID)
       toast.success('Successfully deleted.')
-    } else{
-      toast.dismiss(deleteInprogressToastID)
-      toast.error('Something went wrong.')
     }
+  } catch (err) {
+    toast.dismiss(deleteInprogressToastID)
+    toast.error('Something went wrong.')
+  } finally {
+    setDeleteUploadID('')
+  }
   }
 
   const handleEditTitle = async(event) => {
@@ -412,7 +428,10 @@ function HistoryPage() {
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="text-red-500"
-                onClick={() => handleDelete(row.original.id)}
+                onClick={() => {
+                  setOpenDeleteConfirmation(true)
+                  setDeleteUploadID(row.original.id)
+                }}
               >
                 Delete
               </DropdownMenuItem>
@@ -554,6 +573,28 @@ function HistoryPage() {
           className="z-0"
         />
       </div>
+      <AlertDialog
+        open={openDeleteConfirmation}
+        onOpenChange={() => {
+          setOpenDeleteConfirmation(false)
+          setDeleteUploadID('')
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete your upload.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction variant="destructive" onClick={() => handleDelete(deleteUploadID)}>
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <Dialog
         open={openEditDialog}
         onOpenChange={() => {
