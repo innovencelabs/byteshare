@@ -1,10 +1,11 @@
-from fastapi import APIRouter
-from database.db import DynamoDBManager
-from pydantic import BaseModel, Field
-import utils.logger as logger
-from dotenv import load_dotenv
-import resend
 import os
+
+import resend
+import utils.logger as logger
+from database.db import DynamoDBManager
+from dotenv import load_dotenv
+from fastapi import APIRouter
+from pydantic import BaseModel, Field
 
 router = APIRouter()
 

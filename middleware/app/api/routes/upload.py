@@ -1,19 +1,20 @@
-from fastapi import APIRouter, Request, HTTPException, Depends
-from database.db import DynamoDBManager
-from api.auth import authenticate
-from storage.cloudflare_r2 import CloudflareR2Manager
-from pydantic import BaseModel
-from datetime import datetime, timedelta, timezone
-from typing import List
 import concurrent.futures
+import os
+import uuid
+from datetime import datetime, timedelta, timezone
 from enum import Enum as PythonEnum
-from dotenv import load_dotenv
-import utils.logger as logger
+from typing import List
+
+import pika
 import qrcode
 import resend
-import pika
-import uuid
-import os
+import utils.logger as logger
+from api.auth import authenticate
+from database.db import DynamoDBManager
+from dotenv import load_dotenv
+from fastapi import APIRouter, Depends, HTTPException, Request
+from pydantic import BaseModel
+from storage.cloudflare_r2 import CloudflareR2Manager
 
 router = APIRouter()
 

@@ -1,10 +1,10 @@
 import os
 
 import boto3
+import utils.logger as logger
 from dotenv import load_dotenv
 from fastapi import HTTPException
 from storage.storage import BaseStorage
-import utils.logger as logger
 
 load_dotenv()
 

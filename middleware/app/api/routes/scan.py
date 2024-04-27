@@ -1,9 +1,10 @@
-from fastapi import APIRouter, HTTPException
-from database.db import DynamoDBManager
-from datetime import datetime, timedelta, timezone
-from pydantic import BaseModel
-import utils.logger as logger
+from datetime import datetime, timezone
+
 import resend
+import utils.logger as logger
+from database.db import DynamoDBManager
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
 
 router = APIRouter()
 
@@ -91,6 +92,6 @@ def finalise_scan_return_none(body: CompleteScan, upload_id: str):
     """,
         }
 
-        email = resend.Emails.send(params)
+        resend.Emails.send(params)
 
     log.info("Exiting {}".format(FUNCTION_NAME))
