@@ -40,6 +40,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import Boxi from 'public/svg/box.svg'
 import DesktopHero from 'public/svg/hero_desktop.svg'
+import MobileHero from 'public/svg/hero_mobile.svg'
 import Waves from 'public/svg/waves.svg'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Dropzone from 'react-dropzone'
@@ -460,7 +461,7 @@ export default function Home() {
                 <Image src={DesktopHero} className="w-full" alt="we svg" />
               </div>
               <div className="block md:hidden">
-                <Image src={DesktopHero} className="w-full" alt="we svg" />
+                <Image src={MobileHero} className="w-full" alt="we svg" />
               </div>
               <HeroHighlight>
                 <motion.h1
