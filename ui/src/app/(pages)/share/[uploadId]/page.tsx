@@ -14,7 +14,6 @@ import {
 import { Label } from '@/components/ui/label'
 import { Progress } from '@/components/ui/progress'
 import { Skeleton } from '@/components/ui/skeleton'
-import Waves from 'public/svg/waves.svg'
 import {
   Table,
   TableBody,
@@ -37,6 +36,7 @@ import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
 import { lookup } from 'mime-types'
 import Image from 'next/image'
+import Waves from 'public/svg/waves.svg'
 import React, { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
