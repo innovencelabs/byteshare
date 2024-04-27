@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import termsData from 'public/Data/terms-page-data.json';
+import termsData from 'public/data/terms-page-data.json';
 
 export const metadata: Metadata = {
   title: 'Terms',

@@ -21,7 +21,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`bg-darkbg {inter.className}`}>
+      <body className={`{inter.className}`}>
         {children}
         <Toaster richColors />
       </body>

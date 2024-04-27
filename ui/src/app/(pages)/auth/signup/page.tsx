@@ -19,7 +19,7 @@ function SignupPage() {
         <Link
           href="/auth/login"
           className={cn(
-            buttonVariants({ variant: 'default' }),
+            buttonVariants({ variant: 'ghost' }),
             'hidden md:inline-block absolute right-4 top-4 lg:right-8 lg:top-8',
           )}
         >
@@ -44,7 +44,7 @@ function SignupPage() {
               <path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3" />
             </svg> */}
             <Image
-              src="/byteshare.png"
+              src="/byteshare-white.png"
               alt="ByteShare Logo"
               width={32}
               height={32}
@@ -65,15 +65,15 @@ function SignupPage() {
         <div className="lg:p-8">
           <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
             <div className="flex flex-col space-y-2 text-center">
-              <h1 className="text-lightgray-foreground text-2xl font-semibold tracking-tight">
+              <h1 className="text-2xl font-semibold tracking-tight">
                 Create your account
               </h1>
-              <p className="text-sm text-lightgray">
+              <p className="text-sm text-muted-foreground">
                 Create your account by entering email and password.
               </p>
             </div>
             <UserAuthForm />
-            <p className="px-8 text-center text-sm text-lightgray">
+            <p className="px-8 text-center text-sm text-muted-foreground">
               By continuing, you agree to our{' '}
               <Link
                 href="/auth/terms"
