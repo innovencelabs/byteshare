@@ -20,12 +20,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
@@ -36,6 +30,12 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 import useAuth from '@/context/useAuth'
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 import {
@@ -51,9 +51,9 @@ import {
 import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
 import Image from 'next/image'
+import Waves from 'public/svg/waves.svg'
 import React, { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import Waves from 'public/svg/waves.svg';
 
 type History = {
   id: string

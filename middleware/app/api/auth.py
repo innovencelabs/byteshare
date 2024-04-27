@@ -1,10 +1,11 @@
 import os
-import utils.logger as logger
-from dotenv import load_dotenv
 from typing import Optional
-from fastapi import Header, HTTPException
+
+import utils.logger as logger
 from appwrite.client import Client
 from appwrite.services.account import Account
+from dotenv import load_dotenv
+from fastapi import Header, HTTPException
 
 # Load Environment variables
 load_dotenv()
@@ -42,7 +43,7 @@ async def authenticate(authorization: Optional[str] = Header(None)):
 
         account = Account(client)
 
-        result = account.get()
+        account.get()
         log.info("Authenticated.")
     except Exception as e:
         log.error("EXCEPTION authenticating: {}".format(str(e)))

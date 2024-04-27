@@ -1,7 +1,8 @@
-import boto3
 import os
-from fastapi import HTTPException
+
+import boto3
 import utils.logger as logger
+from fastapi import HTTPException
 
 # Logger instance
 log = logger.get_logger()

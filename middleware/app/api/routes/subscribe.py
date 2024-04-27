@@ -1,8 +1,9 @@
-from fastapi import APIRouter
-from database.db import DynamoDBManager
 from datetime import datetime, timezone
-from pydantic import BaseModel
+
 import utils.logger as logger
+from database.db import DynamoDBManager
+from fastapi import APIRouter
+from pydantic import BaseModel
 
 router = APIRouter()
 
