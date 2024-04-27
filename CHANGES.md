@@ -1,3 +1,19 @@
+# Version 0.3.0
+
+## What's Changed
+### Features
+* Enable running application locally with docker compose by @ambujraj in https://github.com/ambujraj/ByteShare/pull/163
+* Add Logger in middleware by @ambujraj in https://github.com/ambujraj/ByteShare/pull/165
+* Add loading toast for in-progress tasks by @ambujraj in https://github.com/ambujraj/ByteShare/pull/168
+* User experience enhancement in history page by @ambujraj in https://github.com/ambujraj/ByteShare/pull/170
+* Add content moderation in middleware by @ambujraj in https://github.com/ambujraj/ByteShare/pull/171
+* Add Delete confirmation dialog in History page by @ambujraj in https://github.com/ambujraj/ByteShare/pull/174
+* Introduced new official logo by @ambujraj in https://github.com/ambujraj/ByteShare/pull/177
+* Updated the UI landing page by @frtug in https://github.com/ambujraj/ByteShare/pull/138
+
+
+**Full Changelog**: https://github.com/ambujraj/ByteShare/compare/0.2.1...0.3.0
+
 # Version 0.2.1
 
 ## What's Changed
