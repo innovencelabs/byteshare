@@ -62,7 +62,6 @@ function SharePage({ params }: Params) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [progress, setProgress] = useState(0)
   const [downloadingAll, setDownloadingAll] = useState(false)
-  const [downloadingOne, setDownloadingOne] = useState(false)
   const [data, setData] = React.useState<File[]>([])
   const [source, setSource] = useState(null)
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
@@ -129,18 +128,17 @@ function SharePage({ params }: Params) {
     downloadLink: string,
     fileName: string,
   ) => {
+    const downloadInprogressToastID = toast.loading('Download in progress...', {
+      duration: 9999999,
+    })
     try {
-      setDownloadingOne(true)
-      toast.loading('Download in progress...', { duration: 9999999 })
       const response = await fetch(downloadLink)
       const blob = await response.blob()
       saveAs(blob, fileName)
-      toast.dismiss()
     } catch (err) {
-      toast.dismiss()
       toast.error('Error in downloading file')
     } finally {
-      setDownloadingOne(false)
+      toast.dismiss(downloadInprogressToastID)
     }
   }
 
@@ -178,7 +176,6 @@ function SharePage({ params }: Params) {
           <Button
             variant="ghost"
             className="h-8 w-8 p-0"
-            disabled={downloadingOne}
             onClick={() => {
               handleSingleDownload(row.original.downloadLink, row.original.name)
             }}

@@ -72,7 +72,6 @@ function HistoryPage() {
   const [newTitleUploadID, setNewTitleUploadID] = useState('')
   const [editing, setEditing] = useState(false)
   const [data, setData] = React.useState<History[]>([])
-  const [downloading, setDownloading] = useState(false)
   const [openEditDialog, setOpenEditDialog] = useState(false)
   const [openDeleteConfirmation, setOpenDeleteConfirmation] = useState(false)
   const [deleteUploadID, setDeleteUploadID] = useState('')
@@ -157,8 +156,6 @@ function HistoryPage() {
   }, [statusLoaded])
 
   const handleDownload = async (uploadId: string) => {
-    if (!downloading) {
-      setDownloading(true)
       const downloadInprogressToastID = toast.loading('Download in progress...', { duration: 9999999 })
       const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
       const apiKey = process.env.NEXT_PUBLIC_API_KEY
@@ -174,7 +171,7 @@ function HistoryPage() {
         },
       )
       if (!downloadResponse.ok) {
-        setDownloading(false)
+        
         toast.dismiss(downloadInprogressToastID)
         toast.error('Upload ID is not valid')
         return
@@ -207,15 +204,14 @@ function HistoryPage() {
 
         const zipBlob = await zip.generateAsync({ type: 'blob' })
         const zipFileName = 'ByteShare_Preview_' + uploadId + '.zip'
+        
         saveAs(zipBlob, zipFileName)
         toast.dismiss(downloadInprogressToastID)
       } catch (err) {
         toast.dismiss(downloadInprogressToastID)
         toast.error('Error downloading zip file.')
-      } finally {
-        setDownloading(false)
       }
-    }
+    
   }
 
   const handleCopyShareLink = async(uploadId: string) => {
@@ -411,7 +407,6 @@ function HistoryPage() {
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => handleDownload(row.original.id)}
-                disabled={downloading}
               >
                 Download
               </DropdownMenuItem>
