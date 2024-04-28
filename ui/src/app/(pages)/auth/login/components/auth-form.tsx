@@ -69,7 +69,6 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               Email
             </Label>
             <Input
-              className="text-lightgray-foreground"
               id="email"
               placeholder="Email address"
               type="email"
@@ -87,7 +86,6 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               Password
             </Label>
             <Input
-              className="text-lightgray-foreground"
               id="password"
               placeholder="Password"
               type="password"

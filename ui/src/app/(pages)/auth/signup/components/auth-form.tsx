@@ -81,7 +81,6 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               Name
             </Label>
             <Input
-              className="text-lightgray-foreground"
               id="name"
               placeholder="Your Name"
               type="text"
@@ -98,7 +97,6 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               Email
             </Label>
             <Input
-              className="text-lightgray-foreground"
               id="email"
               placeholder="Email Address"
               type="email"
@@ -116,7 +114,6 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               Email
             </Label>
             <Input
-              className="text-lightgray-foreground"
               id="password"
               placeholder="Password"
               type="password"
