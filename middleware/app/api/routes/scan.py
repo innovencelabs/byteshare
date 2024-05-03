@@ -77,7 +77,7 @@ def finalise_scan_return_none(body: CompleteScan, upload_id: str):
 
     <p>We hope this email finds you well.</p>
 
-    <p>We regret to inform you that upon scanning the file you recently uploaded, our system has detected several issues that require immediate attention. As a security measure, we have taken the necessary steps to remove the file from our servers to prevent any potential risks or threats to our system and users.</p>
+    <p>We regret to inform you that upon scanning the upload(Upload ID: {}) you recently uploaded, our system has detected several issues that require immediate attention. As a security measure, we have taken the necessary steps to remove the file from our servers to prevent any potential risks or threats to our system and users.</p>
 
     <p>We kindly request your cooperation in resolving the identified issues. We understand that this might inconvenience you, and we apologize for any disruption this may cause.</p>
     <p>To ensure the safety and integrity of our platform, we advise you to review the content of the file and address any issues or vulnerabilities it may contain. Once resolved, you are welcome to re-upload the file for further processing.</p>
@@ -89,7 +89,9 @@ def finalise_scan_return_none(body: CompleteScan, upload_id: str):
     ByteShare Team</p>
 
     </body>
-    """,
+    """.format(
+                upload_id
+            ),
         }
 
         resend.Emails.send(params)

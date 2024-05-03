@@ -228,7 +228,6 @@ def post_upload_return_link_qr(
     time_now = datetime.now(timezone.utc)
     upload_expiration_time = 604800  # 7 days
     expires_at = time_now + timedelta(seconds=upload_expiration_time)
-    formatted_expires_at = expires_at.strftime("%B %d, %Y UTC")
 
     # Generate QR code
     qr = qrcode.QRCode(
