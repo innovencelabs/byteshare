@@ -103,7 +103,7 @@ git pull
 ```
 
 ## Architecture
-![architecture](https://github.com/ambujraj/ByteShare/assets/29935993/cc41b0e0-4ab4-4f56-b7be-013ae9f14018)
+![architecture](https://github.com/ambujraj/ByteShare/assets/29935993/ced9c2cd-51ec-4285-a365-22cfde1c3826)
 
 ## Built with
 - NextJS
