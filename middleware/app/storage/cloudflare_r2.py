@@ -132,6 +132,25 @@ class CloudflareR2Manager(BaseStorage):
                 )
             )
             raise HTTPException(status_code=500, detail=str(e))
+    
+    def delete_folder(self, folder_name: str):
+        FUNCTION_NAME = "delete_folder()"
+        log.info("Entering {}".format(FUNCTION_NAME))
+
+        try:
+            response = self.r2.list_objects_v2(Bucket=self.bucket_name, Prefix=folder_name)
+            if "Contents" in response:
+                for obj in response["Contents"]:
+                    self.r2.delete_object(Bucket=self.bucket_name, Key=obj["Key"])
+        except Exception as e:
+            log.error(
+                "EXCEPTION occurred deleting folder in R2.\nERROR: {}".format(
+                    str(e)
+                )
+            )
+            raise HTTPException(status_code=500, detail=str(e))
+
+        log.info("Exiting {}".format(FUNCTION_NAME))
 
     def _get_exact_format(self, file_format):
         return file_format.split("/")[-1]
