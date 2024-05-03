@@ -61,6 +61,7 @@ export default function Home() {
   const [progress, setProgress] = useState(0)
   const [uploading, setUploading] = useState(false)
   const [uploaded, setUploaded] = useState(false)
+  const [sendDisabled, setSendDisabled] = useState(true)
   const [postProcessing, setPostProcessing] = useState(false)
   const [willShareEmail, setWillShareEmail] = useState(false)
   const [shareURL, setShareURL] = useState('')
@@ -88,7 +89,10 @@ export default function Home() {
           setUserEmail(userResponse.email)
           setUserName(userResponse.name)
         }
+      }).finally(() => {
+        setSendDisabled(false)
       })
+      
     }
   }, [statusLoaded, router])
 
@@ -503,7 +507,7 @@ export default function Home() {
             <Button
               className="group animate-bounce font-semibold text-3xl shadow-2 py-10 bg-primary text-gray-100 hover:pointer hover:bg-blue-900 hover:text-white rounded-2xl hover:animate-none hover:opacity-80"
               onClick={() => handleSend()}
-              disabled={!user || !statusLoaded}
+              disabled={sendDisabled}
             >
               SEND
               <span>
