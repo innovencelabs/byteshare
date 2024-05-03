@@ -1,3 +1,18 @@
+# Version 0.3.1
+
+## What's Changed
+### Features
+* Update page SVG by @ambujraj in https://github.com/ambujraj/ByteShare/pull/191
+* Enable multi download in history and share page by @ambujraj in https://github.com/ambujraj/ByteShare/pull/193
+* Invisible scroll bar in View Selected dialog by @ambujraj in https://github.com/ambujraj/ByteShare/pull/195
+* Add date time based on user timezone by @ambujraj in https://github.com/ambujraj/ByteShare/pull/196
+
+### Bug Fix
+* Fix email not verified issue by @ambujraj in https://github.com/ambujraj/ByteShare/pull/198
+
+
+**Full Changelog**: https://github.com/ambujraj/ByteShare/compare/0.3.0...0.3.1
+
 # Version 0.3.0
 
 ## What's Changed
