@@ -109,7 +109,10 @@ function HistoryPage() {
       const responseData = await historyResponse.json()
 
       for (const fileName of responseData) {
-        const created = fileName['created_at']
+        let created = fileName['created_at']
+        const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+        created = created.toLocaleString('en-US', { timeZone: userTimezone })
+
         const date = new Date(created)
         const options = {
           year: '2-digit',

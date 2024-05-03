@@ -35,6 +35,7 @@ import {
   UploadIcon,
 } from '@radix-ui/react-icons'
 import axios from 'axios'
+import { formatInTimeZone } from 'date-fns-tz'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
@@ -385,8 +386,14 @@ export default function Home() {
     const data = await postUploadResponse.json()
     const shareURL = data.url
     const shareQR = data.QR
-    const expirationDate = data.expiration_date
     const downloadsAllowed = data.downloads_allowed
+
+    const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+    const expirationDate = formatInTimeZone(
+      data.expiration_date,
+      userTimezone,
+      'yyyy-MM-dd HH:mm:ss zzz',
+    )
 
     return { shareURL, shareQR, expirationDate, downloadsAllowed }
   }
@@ -477,7 +484,7 @@ export default function Home() {
                     duration: 0.5,
                     ease: [0.4, 0.0, 0.2, 1],
                   }}
-                  className=" px-4 text-sm lg:text-lg  font-bold text-white dark:text-white max-w-xl leading-relaxed lg:leading-snug text-center mx-auto "
+                  className="px-4 text-xs lg:text-lg  font-bold text-white dark:text-white max-w-xl leading-relaxed lg:leading-snug text-center mx-auto "
                 >
                   Experience seamless file sharing with ByteShare.
                   <br />
