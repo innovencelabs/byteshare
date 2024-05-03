@@ -98,7 +98,7 @@ export default function Home() {
       
       toast.info('Please log in to your account to continue.')
       router.push('/auth/login')
-    } else if (!user?.emailVerification) {
+    } else if (!user.emailVerification) {
       toast.error('Email is not verified.')
       await appwriteService.initiateVerification()
     } else {
@@ -302,6 +302,7 @@ export default function Home() {
         setIsCopied(false)
         setExpirationDate('')
         setDownloadsAllowed('')
+        
         toast.error('Something went wrong.')
         return
       } finally {
@@ -502,7 +503,7 @@ export default function Home() {
             <Button
               className="group animate-bounce font-semibold text-3xl shadow-2 py-10 bg-primary text-gray-100 hover:pointer hover:bg-blue-900 hover:text-white rounded-2xl hover:animate-none hover:opacity-80"
               onClick={() => handleSend()}
-              disabled={!statusLoaded}
+              disabled={!user || !statusLoaded}
             >
               SEND
               <span>
