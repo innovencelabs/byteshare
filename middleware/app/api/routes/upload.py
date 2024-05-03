@@ -321,7 +321,7 @@ def post_upload_return_link_qr(
     return {
         "url": file_url,
         "QR": qr_download_url,
-        "expiration_date": formatted_expires_at,
+        "expiration_date": expires_at.isoformat(),
         "downloads_allowed": str(upload_metadata["max_download"]),
     }
 
