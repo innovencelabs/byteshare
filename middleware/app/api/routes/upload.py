@@ -356,6 +356,7 @@ def delete_upload_return_done(
 
     keys = {"upload_id": upload_id}
     dynamodb.delete_item(keys)
+    storage.delete_folder(upload_id)
 
     log.info("Exiting {}".format(FUNCTION_NAME))
     return {"status": "Done"}

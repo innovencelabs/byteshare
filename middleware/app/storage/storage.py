@@ -25,3 +25,7 @@ class BaseStorage(ABC):
     @abstractmethod
     def get_file_info(self, file_path: str):
         pass
+
+    @abstractmethod
+    def delete_folder(self, folder_name: str):
+        pass
