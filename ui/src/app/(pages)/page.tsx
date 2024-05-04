@@ -455,6 +455,7 @@ export default function Home() {
 
   return (
     <div className="bg-darkbg min-h-screen flex flex-col">
+      <h1 className="sr-only">ByteShare</h1>
       <Header
         authorised={authorised}
         statusLoaded={statusLoaded}

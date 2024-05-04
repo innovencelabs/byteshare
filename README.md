@@ -7,10 +7,10 @@
     An open-source file sharing app.
 </p>
 <p align="center">
-    <img alt="GitHub License" src="https://img.shields.io/github/license/ambujraj/ByteShare">
-    <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/ambujraj/byteShare/deploy-backend.yaml">
-    <img alt="GitHub closed pull requests" src="https://img.shields.io/github/issues-pr-closed/ambujraj/ByteShare">
-    <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/t/ambujraj/ByteShare">
+    <img alt="GitHub License" src="https://img.shields.io/github/license/innovencelabs/ByteShare">
+    <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/innovencelabs/byteShare/deploy-backend.yaml">
+    <img alt="GitHub closed pull requests" src="https://img.shields.io/github/issues-pr-closed/innovencelabs/ByteShare">
+    <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/t/innovencelabs/ByteShare">
     <img alt="Static Badge" src="https://img.shields.io/badge/Pricing-Free-green">
     <img alt="Static Badge" src="https://img.shields.io/badge/Join_Us-Contribute-red">
 </p>
@@ -23,14 +23,11 @@ Meet ByteShare, your go-to platform for seamless and secure file sharing. Design
     <img alt="Product Introduction" src="https://github.com/ambujraj/ByteShare/assets/29935993/640607c8-1139-4156-8973-16fd66cbab76">
 </p>
 
-
-## Repo Beat
-![Alt](https://repobeats.axiom.co/api/embed/2e1732e935eda7db6a2af19f0ac29b6f6aa6fc88.svg "Repobeats analytics image")
   
 ## Local Setup
 1. Clone the repository
 ```bash
-git clone https://github.com/ambujraj/ByteShare.git
+git clone https://github.com/innovencelabs/ByteShare.git
 cd ByteShare
 ```
 2. Install Terraform
