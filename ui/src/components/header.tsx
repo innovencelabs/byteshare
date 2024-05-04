@@ -93,11 +93,11 @@ export const Header = ({ authorised, statusLoaded, name, email }) => {
           {statusLoaded ? (
             <span className="text-black hidden lg:flex focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-2 mx-2 py-1 text-center">
               <GitHubButton
-                href="https://github.com/ambujraj/ByteShare"
+                href="https://github.com/innovencelabs/ByteShare"
                 data-icon="octicon-star"
                 data-size="large"
                 data-show-count="false"
-                aria-label="Star ambujraj/ByteShare on GitHub"
+                aria-label="Star innovencelabs/byteshare on GitHub"
               >
                 Star
               </GitHubButton>

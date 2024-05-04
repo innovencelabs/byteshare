@@ -70,7 +70,7 @@ def webhook_post_user_send_email(body: AddUser):
   <p>We established ByteShare to make file sharing easy, hassle-free and secure.</p>
 
   <p>I’d love to hear what you think of our product. Is there anything we should work on or improve? <a href="https://byteshare.io" style="color: #007bff; text-decoration: none;">Let us know</a>.</p>
-  <p>You can also <a href="https://github.com/ambujraj/ByteShare" style="color: #007bff; text-decoration: none;">star us on Github</a></p>
+  <p>You can also <a href="https://github.com/innovencelabs/ByteShare" style="color: #007bff; text-decoration: none;">star us on Github</a></p>
 
   <p>I'm always happy to help and read our customers' suggestions.</p>
   

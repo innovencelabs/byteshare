@@ -17,7 +17,7 @@ Welcome to ByteShare! ❤️
 Your contributions are invaluable to our open-source community. Whether you're a seasoned developer or a newcomer, your input is greatly appreciated. Thank you for considering contributing. **Let's build something amazing together**!
 
 ## How to get started?
-- Before creating a new issue or PR, check if that [Issues](https://github.com/ambujraj/byteshare/issues) or [PRs](https://github.com/ambujraj/byteshare/pulls) already exists.
+- Before creating a new issue or PR, check if that [Issues](https://github.com/innovencelabs/byteshare/issues) or [PRs](https://github.com/innovencelabs/byteshare/pulls) already exists.
 - Prerequisites
   - Docker
   - Terraform
