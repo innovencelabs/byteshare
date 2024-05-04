@@ -1,3 +1,14 @@
+# Version 0.3.2
+
+## What's Changed
+### Bug Fix
+* Fixed send button disabled issue by @ambujraj in https://github.com/innovencelabs/byteshare/pull/206
+
+### Miscellaneous
+* Adapt to repo transfer by @ambujraj in https://github.com/innovencelabs/byteshare/pull/207
+
+**Full Changelog**: https://github.com/innovencelabs/byteshare/compare/0.3.1...0.3.2
+
 # Version 0.3.1
 
 ## What's Changed
