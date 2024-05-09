@@ -218,7 +218,7 @@ function HistoryPage() {
   }
 
   const handleCopyShareLink = async(uploadId: string) => {
-    const shareURL = process.env.NEXT_PUBLIC_APP_URL + '/share/' + uploadId
+    const shareURL = process.env.NEXT_PUBLIC_APP_URL + '/share?id=' + uploadId
     await navigator.clipboard.writeText(shareURL)
     toast.info('Copied to clipboard')
   }
