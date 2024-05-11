@@ -7,8 +7,6 @@ terraform {
   }
 }
 
-variable "aws_access_key" {}
-variable "aws_secret_key" {}
 variable "r2_access_key" {}
 variable "r2_secret_key" {}
 variable "r2_account_id" {}
@@ -16,8 +14,6 @@ variable "r2_account_id" {}
 provider "aws" {
   alias = "aws"
   region = "us-east-2"
-  access_key = var.aws_access_key
-  secret_key = var.aws_secret_key
 }
 
 provider "aws" {
@@ -129,6 +125,24 @@ resource "aws_dynamodb_table" "byteshare-subscriber" {
   }
   attribute {
     name = "created_at"
+    type = "S"
+  }
+}
+
+
+resource "aws_dynamodb_table" "byteshare-apikey" {
+  provider = aws.aws
+  name         = "byteshare-subscriber"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "user_id"
+  range_key    = "apikey"
+
+  attribute {
+    name = "user_id"
+    type = "S"
+  }
+  attribute {
+    name = "apikey"
     type = "S"
   }
 }

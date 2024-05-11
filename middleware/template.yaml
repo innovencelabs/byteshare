@@ -20,10 +20,6 @@ Parameters:
     Type: String
   AWSDefaultRegion:
     Type: String
-  AWSAppAccessKey:
-    Type: String
-  AWSAppSecretAccessKey:
-    Type: String
   RabbitMQQueue:
     Type: String
   RabbitMQURL:
@@ -54,6 +50,8 @@ Resources:
       Policies:
         - AWSLambdaBasicExecutionRole
         - AWSXrayWriteOnlyAccess
+        - AmazonAPIGatewayAdministrator
+        - AmazonDynamoDBFullAccess
       Environment:
         Variables:
           R2_ACCOUNT_ID: !Ref R2AccountID
@@ -64,8 +62,6 @@ Resources:
           APPWRITE_URL: !Ref AppwriteURL
           APPWRITE_PROJECT_ID: !Ref AppwriteProjectID
           AWS_APP_REGION: !Ref AWSDefaultRegion
-          AWS_APP_ACCESS_KEY: !Ref AWSAppAccessKey
-          AWS_APP_SECRET_ACCESS_KEY: !Ref AWSAppSecretAccessKey
           RABBITMQ_QUEUE: !Ref RabbitMQQueue
           RABBITMQ_URL: !Ref RabbitMQURL
           ENVIRONMENT: !Ref Environment
@@ -148,6 +144,19 @@ Resources:
       ApiStages:
         - ApiId: !Ref ByteShareAPIGW
           Stage: prod
+  ByteShareDevUsagePlan:
+    Type: AWS::ApiGateway::UsagePlan
+    Properties:
+      ApiStages:
+        - ApiId: !Ref ByteShareAPIGW
+          Stage: prod
+      Quota:
+        Limit: 20
+        Offset: 0
+        Period: DAY
+      Throttle:
+        BurstLimit: 5
+        RateLimit: 10
   ByteShareApiKey:
     Type: AWS::ApiGateway::ApiKey
     Properties:

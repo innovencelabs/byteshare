@@ -1,5 +1,5 @@
-from api.routes import (download, feedback, health, scan, subscribe, upload,
-                        user)
+from api.routes import (developer, download, feedback, health, scan, subscribe,
+                        upload, user)
 from fastapi import APIRouter
 
 api_router = APIRouter()
@@ -10,3 +10,4 @@ api_router.include_router(feedback.router, prefix="/feedback", tags=["feedback"]
 api_router.include_router(subscribe.router, prefix="/subscribe", tags=["subscribe"])
 api_router.include_router(user.router, prefix="/user", tags=["user"])
 api_router.include_router(scan.router, prefix="/scan", tags=["scan"])
+api_router.include_router(developer.router, prefix="/developer", tags=["developer"])
