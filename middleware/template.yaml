@@ -115,6 +115,13 @@ Resources:
               Ref: ByteShareAPIGW
             Path: /scan/{proxy+}
             Method: any
+        DeveloperApi:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: ByteShareAPIGW
+            Path: /developer/{proxy+}
+            Method: any
   ByteShareAPIGW:
     Type: AWS::Serverless::Api
     Properties:
