@@ -33,25 +33,16 @@ class StatusEnum(PythonEnum):
 
 class InitiateUpload(BaseModel):
     file_names: List[str]
-    creator_id: str
-    creator_email: str
-    creator_ip: str
     share_email_as_source: bool
 
 
 class FinaliseUpload(BaseModel):
     file_names: list
     receiver_email: str
-    sender_name: str
 
 
 class EditTitle(BaseModel):
     title: str
-    user_id: str
-
-
-class DeleteUpload(BaseModel):
-    user_id: str
 
 
 # Storage
@@ -73,6 +64,7 @@ web_base_url = str(os.getenv("WEB_BASE_URL"))
 
 
 def initiate_upload(
+    token_data,
     body: InitiateUpload,
     request: Request,
 ):
@@ -133,8 +125,8 @@ def initiate_upload(
         "status": StatusEnum.initiated.name,
         "title": "Upload with " + file_names[0],
         "scanned": False,
-        "creator_id": body.creator_id,
-        "creator_email": body.creator_email,
+        "creator_id": token_data["$id"],
+        "creator_email": token_data["email"],
         "creator_ip": client_ip,
         "receiver_email": "",
         "share_email_as_source": share_email_as_source,
@@ -154,7 +146,7 @@ def initiate_upload(
     return result
 
 
-def post_upload_return_link_qr(body: FinaliseUpload, upload_id: str):
+def post_upload_return_link_qr(token_data, body: FinaliseUpload, upload_id: str):
     FUNCTION_NAME = "post_upload_return_link_qr()"
     log.info("Entering {}".format(FUNCTION_NAME))
 
@@ -244,7 +236,7 @@ def post_upload_return_link_qr(body: FinaliseUpload, upload_id: str):
 
     # Send the share link to email, if given
     if body.receiver_email:
-        name = body.sender_name
+        name = token_data["name"]
         params = {
             "from": "ByteShare <share@byteshare.io>",
             "to": [body.receiver_email],
@@ -291,12 +283,12 @@ def post_upload_return_link_qr(body: FinaliseUpload, upload_id: str):
     }
 
 
-def delete_upload_return_done(upload_id: str, body: DeleteUpload):
+def delete_upload_return_done(token_data, upload_id: str):
     FUNCTION_NAME = "delete_upload_return_done()"
     log.info("Entering {}".format(FUNCTION_NAME))
 
     upload_metadata = dynamodb.read_item({"upload_id": upload_id})
-    if upload_metadata["creator_id"] != body.user_id:
+    if upload_metadata["creator_id"] != token_data["$id"]:
         log.warning(
             "BAD REQUEST for UploadID: {}\nERROR: {}".format(
                 upload_id, "User is not the owner of the upload."
@@ -313,12 +305,12 @@ def delete_upload_return_done(upload_id: str, body: DeleteUpload):
     return {"status": "Done"}
 
 
-def update_upload_title_return_done(body: EditTitle, upload_id: str):
+def update_upload_title_return_done(token_data, body: EditTitle, upload_id: str):
     FUNCTION_NAME = "update_upload_title_return_done()"
     log.info("Entering {}".format(FUNCTION_NAME))
 
     upload_metadata = dynamodb.read_item({"upload_id": upload_id})
-    if upload_metadata["creator_id"] != body.user_id:
+    if upload_metadata["creator_id"] != token_data["$id"]:
         log.warning(
             "BAD REQUEST for UploadID: {}\nERROR: {}".format(
                 upload_id, "User is not the owner of the upload."
@@ -348,7 +340,7 @@ def update_upload_title_return_done(body: EditTitle, upload_id: str):
     return {"status": "Done"}
 
 
-def get_history_return_all_shares_list(user_id: str):
+def get_history_return_all_shares_list(token_data):
     FUNCTION_NAME = "get_history_return_all_shares_list()"
     log.info("Entering {}".format(FUNCTION_NAME))
 
@@ -359,7 +351,7 @@ def get_history_return_all_shares_list(user_id: str):
     # if(user==None):
     #     raise HTTPException(status_code=400, detail="User does not exist")
 
-    upload_metadatas = dynamodb.read_items("creator_id", user_id)
+    upload_metadatas = dynamodb.read_items("creator_id", token_data["$id"])
     for upload_metadata in upload_metadatas:
         upload = {
             "upload_id": upload_metadata["upload_id"],

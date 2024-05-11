@@ -25,15 +25,14 @@ async def authenticate(authorization: Optional[str] = Header(None)):
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    token_type, token = authorization.split()
-    if token_type.lower() != "bearer":
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid token type",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
     try:
+        token_type, token = authorization.split()
+        if token_type.lower() != "bearer":
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid token type",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
         client = Client()
         (
             client.set_endpoint(os.getenv("APPWRITE_URL"))
@@ -43,8 +42,10 @@ async def authenticate(authorization: Optional[str] = Header(None)):
 
         account = Account(client)
 
-        account.get()
         log.info("Authenticated.")
+        log.info("Exiting {}".format(FUNCTION_NAME))
+        return account.get()
+
     except Exception as e:
         log.error("EXCEPTION authenticating: {}".format(str(e)))
         raise HTTPException(
@@ -53,4 +54,31 @@ async def authenticate(authorization: Optional[str] = Header(None)):
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    log.info("Exiting {}".format(FUNCTION_NAME))
+
+async def optional_authenticate(authorization: Optional[str] = Header(None)):
+    FUNCTION_NAME = "optional_authenticate()"
+    log.info("Entering {}".format(FUNCTION_NAME))
+
+    if authorization is None:
+        return None
+
+    try:
+        token_type, token = authorization.split()
+        if token_type.lower() != "bearer":
+            return None
+        client = Client()
+        (
+            client.set_endpoint(os.getenv("APPWRITE_URL"))
+            .set_project(os.getenv("APPWRITE_PROJECT_ID"))
+            .set_jwt(token)
+        )
+
+        account = Account(client)
+
+        log.info("Authenticated.")
+        log.info("Exiting {}".format(FUNCTION_NAME))
+        return account.get()
+
+    except Exception as e:
+        log.error("EXCEPTION authenticating: {}".format(str(e)))
+        return None

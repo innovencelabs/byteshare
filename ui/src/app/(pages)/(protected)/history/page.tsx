@@ -88,10 +88,9 @@ function HistoryPage() {
       const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
       const apiKey = process.env.NEXT_PUBLIC_API_KEY
       const jwtToken = await appwriteService.getJWTToken()
-      const userID = user['$id']
 
       const historyResponse = await fetch(
-        apiBaseURL + '/upload/history' + '/' + userID,
+        apiBaseURL + '/upload/history',
         {
           method: 'GET',
           headers: {
@@ -162,14 +161,16 @@ function HistoryPage() {
       const downloadInprogressToastID = toast.loading('Download in progress...', { duration: 9999999 })
       const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
       const apiKey = process.env.NEXT_PUBLIC_API_KEY
+      const jwtToken = await appwriteService.getJWTToken()
 
       const downloadResponse = await fetch(
-        apiBaseURL + '/download' + '/' + uploadId + '?user_id=' + user['$id'],
+        apiBaseURL + '/download' + '/' + uploadId,
         {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
             'x-api-key': apiKey,
+            Authorization: 'Bearer ' + jwtToken.jwt,
           },
         },
       )
@@ -231,14 +232,11 @@ function HistoryPage() {
     const apiKey = process.env.NEXT_PUBLIC_API_KEY
     const jwtToken = await appwriteService.getJWTToken()
     
-    const deleteJSON = {
-      user_id: user['$id'],
-    }
+    
     const deleteResponse = await fetch(
       apiBaseURL + '/upload' + '/' + uploadId,
       {
         method: 'DELETE',
-        body: JSON.stringify(deleteJSON),
         headers: {
           'Content-Type': 'application/json',
           'x-api-key': apiKey,
@@ -276,7 +274,6 @@ function HistoryPage() {
         const jwtToken = await appwriteService.getJWTToken()
 
         const editJSON = {
-          user_id: user['$id'],
           title: newTitle,
         }
         const editResponse = await fetch(
