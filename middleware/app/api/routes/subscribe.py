@@ -1,7 +1,5 @@
-from datetime import datetime, timezone
-
+import api.services.subscribe as subscribe_service
 import utils.logger as logger
-from database.db import DynamoDBManager
 from fastapi import APIRouter
 from pydantic import BaseModel
 
@@ -9,10 +7,6 @@ router = APIRouter()
 
 # Logger instance
 log = logger.get_logger()
-
-# DynamoDB
-subscriber_table_name = "byteshare-subscriber"
-subscriber_dynamodb = DynamoDBManager(subscriber_table_name)
 
 
 class Subscribe(BaseModel):
@@ -33,11 +27,7 @@ def add_subscriber_return_done(body: Subscribe):
     FUNCTION_NAME = "add_subscriber_return_done()"
     log.info("Entering {}".format(FUNCTION_NAME))
 
-    subscriber = {
-        "email": body.email,
-        "created_at": datetime.now(timezone.utc).isoformat(),
-    }
-    subscriber_dynamodb.create_item(subscriber)
+    response = subscribe_service.add_subscriber_return_done(body)
 
     log.info("Exiting {}".format(FUNCTION_NAME))
-    return {"status": "Done"}
+    return response
