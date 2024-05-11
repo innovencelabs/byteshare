@@ -85,16 +85,18 @@ git pull
 ```
 ├── ui                      # Frontend application
 │   └── src                 # Source code
-|       ├── app
+│       ├── app
 │       ├── authentication
 │       ├── components
 │       ├── conf
-|       ├── context
+│       ├── context
 │       └── lib
 ├── middeware               # Backend application
 │   └── app                 # Source code
-|       ├── api             # API routes
-|       ├── database        # Database code
+│       ├── api             # APIs
+│       │   ├── routes      # API endpoint
+│       │   └── services    # API business logic
+│       ├── database        # Database code
 │       └── storage         # Storage code
 └── infrastructure          # Terraform scripts for cloud and local(docker version)
     ├── cloud               # For clouds
