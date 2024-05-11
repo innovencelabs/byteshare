@@ -2,7 +2,8 @@ from enum import Enum as PythonEnum
 
 import api.services.download as download_service
 import utils.logger as logger
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from utils.auth import optional_authenticate
 
 router = APIRouter()
 
@@ -16,7 +17,9 @@ class StatusEnum(PythonEnum):
 
 
 @router.get("/{upload_id}")
-def get_file_url_return_name_link(upload_id: str, user_id: str | None = None):
+def get_file_url_return_name_link(
+    upload_id: str, token_data: None = Depends(optional_authenticate)
+):
     """
     Get download url from Storage.
     Checks for the expires at, download count < max download and updates the count in DB
@@ -31,7 +34,7 @@ def get_file_url_return_name_link(upload_id: str, user_id: str | None = None):
     FUNCTION_NAME = "get_file_url_return_name_link()"
     log.info("Entering {}".format(FUNCTION_NAME))
 
-    response = download_service.get_file_url_return_name_link(upload_id, user_id)
+    response = download_service.get_file_url_return_name_link(token_data, upload_id)
 
     log.info("Exiting {}".format(FUNCTION_NAME))
     return response

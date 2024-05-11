@@ -71,15 +71,22 @@ function SharePage({ params }: Params) {
       const apiKey = process.env.NEXT_PUBLIC_API_KEY
       const jwtToken = await appwriteService.getJWTToken()
 
+      const header = jwtToken
+        ? {
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey,
+            Authorization: 'Bearer ' + jwtToken.jwt,
+          }
+        : {
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey,
+          }
+
       const downloadResponse = await fetch(
         apiBaseURL + '/download' + '/' + params.uploadId,
         {
           method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey,
-            Authorization: 'Bearer ' + jwtToken.jwt,
-          },
+          headers: header,
         },
       )
       if (!downloadResponse.ok) {

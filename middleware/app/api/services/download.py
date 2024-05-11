@@ -24,7 +24,7 @@ class StatusEnum(PythonEnum):
     uploaded = "uploaded"
 
 
-def get_file_url_return_name_link(upload_id: str, user_id: str | None = None):
+def get_file_url_return_name_link(token_data, upload_id: str):
     FUNCTION_NAME = "get_file_url_return_name_link()"
     log.info("Entering {}".format(FUNCTION_NAME))
 
@@ -57,7 +57,7 @@ def get_file_url_return_name_link(upload_id: str, user_id: str | None = None):
 
     download_count = upload_metadata["download_count"]
     max_count = upload_metadata["max_download"]
-    if user_id == None or upload_metadata["creator_id"] != user_id:
+    if token_data == None or upload_metadata["creator_id"] != token_data["$id"]:
         if download_count >= max_count:
             log.warning(
                 "BAD REQUEST for UploadID: {}\nERROR: {}".format(
@@ -85,7 +85,7 @@ def get_file_url_return_name_link(upload_id: str, user_id: str | None = None):
         file_data[file_name]["size"] = helper.format_size(file_size)
         file_data[file_name]["download_url"] = file_url
 
-    if user_id == None or upload_metadata["creator_id"] != user_id:
+    if token_data == None or upload_metadata["creator_id"] != token_data["$id"]:
         keys = {"upload_id": upload_id}
         update_data = {
             "download_count": download_count + 1,

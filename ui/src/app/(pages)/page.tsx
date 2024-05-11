@@ -340,9 +340,6 @@ export default function Home() {
 
     const initiateUploadJSON = {
       file_names: fileNames,
-      creator_id: user['$id'],
-      creator_email: userEmail,
-      creator_ip: '127.0.0.1',
       share_email_as_source: true,
     }
 
@@ -374,7 +371,6 @@ export default function Home() {
     const fileJSON = {
       file_names: fileNames,
       receiver_email: receiverEmail,
-      sender_name: userName,
     }
     const postUploadResponse = await fetch(
       apiBaseURL + '/upload/finalise' + '/' + uploadID,
