@@ -60,8 +60,8 @@ function UpgradePage() {
               </Button>
             </div>
             <Button
-              variant='default'
-              className="flex justify-center mx-auto mt-5 w-[100%]  text-black"
+              
+              className="flex justify-center mx-auto mt-5 w-[100%] bg-slate-700 hover:bg-slate-800 text-slate-300 hover:text-slate-400"
               onClick={(e) => {
                 e.preventDefault() 
                 router.push("/")
