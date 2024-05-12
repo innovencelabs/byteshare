@@ -47,7 +47,7 @@ export const Header = ({ authorised, statusLoaded, name, email }) => {
       message: feedbackMessage,
     }
 
-    await fetch(apiBaseURL + '/feedback', {
+    await fetch(apiBaseURL + '/secured/feedback', {
       method: 'POST',
       body: JSON.stringify(feedbackJSON),
       headers: {

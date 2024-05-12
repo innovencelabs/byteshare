@@ -1,4 +1,4 @@
-import api.services.user as user_service
+import api.services.secured.user as user_service
 import utils.logger as logger
 from fastapi import APIRouter
 from pydantic import BaseModel, Field

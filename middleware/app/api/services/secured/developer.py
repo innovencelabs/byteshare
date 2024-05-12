@@ -48,7 +48,7 @@ def get_apikey_return_apikey(token_data):
 def create_apikey_return_apikey(token_data):
     FUNCTION_NAME = "create_apikey_return_apikey()"
     log.info("Entering {}".format(FUNCTION_NAME))
-    
+
     user_id = token_data["$id"]
 
     api_key_response = api_gateway.create_api_key(name=uuid.uuid4())

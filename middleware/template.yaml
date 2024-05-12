@@ -87,40 +87,12 @@ Resources:
               Ref: ByteShareAPIGW
             Path: /download/{proxy+}
             Method: any
-        FeedbackApi:
+        SecuredApi:
           Type: Api
           Properties:
             RestApiId:
               Ref: ByteShareAPIGW
-            Path: /feedback/{proxy+}
-            Method: any
-        SubscribeApi:
-          Type: Api
-          Properties:
-            RestApiId:
-              Ref: ByteShareAPIGW
-            Path: /subscribe/{proxy+}
-            Method: any
-        UserApi:
-          Type: Api
-          Properties:
-            RestApiId:
-              Ref: ByteShareAPIGW
-            Path: /user/{proxy+}
-            Method: any
-        ScanApi:
-          Type: Api
-          Properties:
-            RestApiId:
-              Ref: ByteShareAPIGW
-            Path: /scan/{proxy+}
-            Method: any
-        DeveloperApi:
-          Type: Api
-          Properties:
-            RestApiId:
-              Ref: ByteShareAPIGW
-            Path: /developer/{proxy+}
+            Path: /secured/{proxy+}
             Method: any
   ByteShareAPIGW:
     Type: AWS::Serverless::Api

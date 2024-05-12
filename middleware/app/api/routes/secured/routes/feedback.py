@@ -1,4 +1,4 @@
-import api.services.feedback as feedback_service
+import api.services.secured.feedback as feedback_service
 import utils.logger as logger
 from fastapi import APIRouter
 from pydantic import BaseModel

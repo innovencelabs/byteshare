@@ -1,4 +1,4 @@
-import api.services.scan as scan_service
+import api.services.secured.scan as scan_service
 import utils.logger as logger
 from fastapi import APIRouter
 from pydantic import BaseModel

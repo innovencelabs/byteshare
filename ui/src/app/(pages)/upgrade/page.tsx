@@ -18,7 +18,7 @@ function UpgradePage() {
       email: email,
     }
 
-    await fetch(apiBaseURL + '/subscribe', {
+    await fetch(apiBaseURL + '/secured/subscribe', {
       method: 'POST',
       body: JSON.stringify(subscribeJSON),
       headers: {

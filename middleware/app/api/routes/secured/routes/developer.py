@@ -1,4 +1,4 @@
-import api.services.developer as developer_service
+import api.services.secured.developer as developer_service
 import utils.logger as logger
 from fastapi import APIRouter, Depends
 from utils.auth import authenticate
