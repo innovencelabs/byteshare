@@ -49,7 +49,7 @@ function UpgradePage() {
                 className="bg-white"
                 required
               />
-              <Button className="bg-black hover:bg-slate-800" type="submit">
+              <Button className="bg-blue-600 hover:bg-blue-400 text-white" type="submit">
                 Subscribe
               </Button>
             </div>
