@@ -1,4 +1,4 @@
-from api.routes.secured.routes import (developer, feedback, scan, subscribe)
+from api.routes.secured.routes import developer, feedback, scan, subscribe
 from fastapi import APIRouter
 
 secured_api_router = APIRouter(prefix="/secured")

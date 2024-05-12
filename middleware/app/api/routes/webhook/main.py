@@ -1,5 +1,5 @@
-from fastapi import APIRouter
 from api.routes.webhook.routes import user
+from fastapi import APIRouter
 
 webhook_api_router = APIRouter(prefix="/webhook")
 
