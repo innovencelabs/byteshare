@@ -1,7 +1,8 @@
 import api.services.secured.user as user_service
 import utils.logger as logger
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
+from utils.auth import authenticate_appwrite_webhook
 
 router = APIRouter()
 
@@ -17,7 +18,10 @@ class AddUser(BaseModel):
 
 
 @router.post("/")
-def webhook_post_user_send_email(body: AddUser):
+def webhook_post_user_send_email(
+    body: AddUser,
+    token_data: None = Depends(authenticate_appwrite_webhook),
+):
     """
     Add new user to DB
     sends a welcome email to the user

@@ -82,3 +82,15 @@ async def optional_authenticate(authorization: Optional[str] = Header(None)):
     except Exception as e:
         log.error("EXCEPTION authenticating: {}".format(str(e)))
         return None
+
+
+async def authenticate_appwrite_webhook(
+    username: Optional[str] = Header(None),
+    password: Optional[str] = Header(None),
+):
+    if username != os.getenv("APPWRITE_WEBHOOK_USER") or password != os.getenv(
+        "APPWRITE_WEBHOOK_PASS"
+    ):
+        raise HTTPException(
+            status_code=401, detail="Invalid authentication credentials"
+        )

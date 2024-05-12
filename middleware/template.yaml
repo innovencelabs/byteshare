@@ -26,6 +26,10 @@ Parameters:
     Type: String
   Environment:
     Type: String
+  AppwriteWebhookUser:
+    Type: String
+  AppwriteWebhookPass:
+    Type: String
 
 Globals:
   Function:
@@ -65,6 +69,8 @@ Resources:
           RABBITMQ_QUEUE: !Ref RabbitMQQueue
           RABBITMQ_URL: !Ref RabbitMQURL
           ENVIRONMENT: !Ref Environment
+          APPWRITE_WEBHOOK_USER: !Ref AppwriteWebhookUser
+          APPWRITE_WEBHOOK_PASS: !Ref AppwriteWebhookPass
       Events:
         HealthCheckApi:
           Type: Api
