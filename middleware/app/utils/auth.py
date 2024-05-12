@@ -88,8 +88,11 @@ async def authenticate_appwrite_webhook(
     username: Optional[str] = Header(None),
     password: Optional[str] = Header(None),
 ):
-    if username == None or password == None or username != os.getenv("APPWRITE_WEBHOOK_USER") or password != os.getenv(
-        "APPWRITE_WEBHOOK_PASS"
+    if (
+        username == None
+        or password == None
+        or username != os.getenv("APPWRITE_WEBHOOK_USER")
+        or password != os.getenv("APPWRITE_WEBHOOK_PASS")
     ):
         raise HTTPException(
             status_code=401, detail="Invalid authentication credentials"

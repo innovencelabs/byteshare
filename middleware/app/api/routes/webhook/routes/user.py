@@ -1,4 +1,4 @@
-import api.services.secured.user as user_service
+import api.services.webhook.user as user_service
 import utils.logger as logger
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
