@@ -4,9 +4,12 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
 
 function UpgradePage() {
   const [email, setEmail] = useState('')
+
+  const router = useRouter()
 
   const handleSubscribe = async (e) => {
     e.preventDefault()
@@ -49,10 +52,24 @@ function UpgradePage() {
                 className="bg-white"
                 required
               />
-              <Button className="bg-blue-600 hover:bg-blue-400 text-white" type="submit">
+              <Button
+                className="bg-blue-600 hover:bg-blue-400 text-white"
+                type="submit"
+              >
                 Subscribe
               </Button>
             </div>
+            <Button
+              variant='default'
+              className="flex justify-center mx-auto mt-5 w-[100%]  text-black"
+              onClick={(e) => {
+                e.preventDefault() 
+                router.push("/")
+              }
+              }
+            >
+              Go to Home
+            </Button>
           </div>
         </div>
       </form>
