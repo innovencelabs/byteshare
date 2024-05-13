@@ -75,11 +75,11 @@ function DeveloperPage() {
                     {/* Adjusted alignment for small screens */}
                     <p className="font-medium">Your API Key: </p>
                     <p className="font-mono text-gray-500 dark:text-gray-400 pl-1">
-                      xxxx-xxxx-xxxx-xxxx
+                      **********************
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center justify-end space-x-4">
                   <Button
                     size="sm"
                     variant="outline"
@@ -125,6 +125,7 @@ function DeveloperPage() {
                     ensure a smooth integration experience.
                   </p>
                 </div>
+
                 <div>
                   <h3 className="text-lg font-semibold mb-2">Authentication</h3>
                   <p className="text-gray-500 dark:text-gray-400">
@@ -137,37 +138,124 @@ function DeveloperPage() {
                   </p>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold mb-2">Health Routes</h3>
-                  <div className="grid gap-4">
-                    <Accordion type="single" collapsible className="w-full">
-                      <AccordionItem value="health-1">
-                        <AccordionTrigger>
-                          <span className="bg-blue-100 text-left border border-blue-600 outline-none w-[95%] text-blue-600 p-3 rounded-sm mx-0 text-sm">
-                            GET /health
-                          </span>
-                        </AccordionTrigger>
-                        <AccordionContent>
-                          Description of the API.
-                        </AccordionContent>
-                      </AccordionItem>
-                    </Accordion>
-                  </div>
+                  <h3 className="text-lg font-semibold mb-2">Base URL</h3>
+                  <p className="text-gray-500 dark:text-gray-400">
+                    https://api.byteshare.io
+                  </p>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold mb-2">Upload Routes</h3>
-                  <div className="grid gap-4">
-                    <Accordion type="single" collapsible className="w-full">
-                      <AccordionItem value="upload-1">
-                        <AccordionTrigger>
-                          <span className="bg-green-100 text-left border border-green-600 outline-none w-[95%] text-green-600 p-3 rounded-sm mx-0 text-sm">
-                            POST /upload/initiate
-                          </span>
-                        </AccordionTrigger>
-                        <AccordionContent>
-                          Description of the API.
-                        </AccordionContent>
-                      </AccordionItem>
-                    </Accordion>
+                  <h2 className="text-lg font-semibold mb-2">Endpoints</h2>
+                  <div>
+                    <div className="mb-2">
+                      <h3 className="text-sm font-semibold mb-1">
+                        Health Routes
+                      </h3>
+                      <div className="grid gap-2">
+                        <Accordion
+                          type="single"
+                          collapsible
+                          className="bg-blue-100 border border-blue-600  px-2 w-full rounded-sm"
+                        >
+                          <AccordionItem value="health-1">
+                            <AccordionTrigger>
+                              <span className="text-left outline-none w-[95%] text-blue-600 p-1 mx-0 text-xs font-semibold">
+                                GET /health
+                              </span>
+                            </AccordionTrigger>
+                            <AccordionContent>
+                              Description of the API.
+                            </AccordionContent>
+                          </AccordionItem>
+                        </Accordion>
+                      </div>
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-semibold mb-1">
+                        Upload Routes
+                      </h3>
+                      <div className="grid gap-2">
+                        <Accordion
+                          type="single"
+                          collapsible
+                          className="bg-green-100 border border-green-600  px-2 w-full rounded-sm"
+                        >
+                          <AccordionItem value="upload-1">
+                            <AccordionTrigger>
+                              <span className="text-left outline-none w-[95%] text-green-600 p-1 mx-0 text-xs font-semibold">
+                                POST /upload/initiate
+                              </span>
+                            </AccordionTrigger>
+                            <AccordionContent>
+                              Description of the API.
+                            </AccordionContent>
+                          </AccordionItem>
+                        </Accordion>
+                        <Accordion
+                          type="single"
+                          collapsible
+                          className="bg-green-100 border border-green-600  px-2 w-full rounded-sm"
+                        >
+                          <AccordionItem value="upload-2">
+                            <AccordionTrigger>
+                              <span className="text-left outline-none w-[95%] text-green-600 p-1 mx-0 text-xs font-semibold">
+                                POST /upload/finalise/[upload_id]
+                              </span>
+                            </AccordionTrigger>
+                            <AccordionContent>
+                              Description of the API.
+                            </AccordionContent>
+                          </AccordionItem>
+                        </Accordion>
+                        <Accordion
+                          type="single"
+                          collapsible
+                          className="bg-red-100 border border-red-600  px-2 w-full rounded-sm"
+                        >
+                          <AccordionItem value="upload-3">
+                            <AccordionTrigger>
+                              <span className="text-left outline-none w-[95%] text-red-600 p-1 mx-0 text-xs font-semibold">
+                                DELETE /upload/[upload_id]
+                              </span>
+                            </AccordionTrigger>
+                            <AccordionContent>
+                              Description of the API.
+                            </AccordionContent>
+                          </AccordionItem>
+                        </Accordion>
+                        <Accordion
+                          type="single"
+                          collapsible
+                          className="bg-orange-100 border border-orange-600  px-2 w-full rounded-sm"
+                        >
+                          <AccordionItem value="upload-4">
+                            <AccordionTrigger>
+                              <span className="text-left outline-none w-[95%] text-orange-600 p-1 mx-0 text-xs font-semibold">
+                                PUT /upload/[upload_id]/title
+                              </span>
+                            </AccordionTrigger>
+                            <AccordionContent>
+                              Description of the API.
+                            </AccordionContent>
+                          </AccordionItem>
+                        </Accordion>
+                        <Accordion
+                          type="single"
+                          collapsible
+                          className="bg-blue-100 border border-blue-600  px-2 w-full rounded-sm"
+                        >
+                          <AccordionItem value="upload-5">
+                            <AccordionTrigger>
+                              <span className="text-left outline-none w-[95%] text-blue-600 p-1 mx-0 text-xs font-semibold">
+                                GET /upload/history
+                              </span>
+                            </AccordionTrigger>
+                            <AccordionContent>
+                              Description of the API.
+                            </AccordionContent>
+                          </AccordionItem>
+                        </Accordion>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
