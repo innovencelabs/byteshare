@@ -147,7 +147,7 @@ function DeveloperPage() {
                   <h2 className="text-lg font-semibold mb-2">Endpoints</h2>
                   <div>
                     <div className="mb-2">
-                      <h3 className="text-sm font-semibold mb-1">
+                      <h3 className="text-sm font-semibold mb-2">
                         Health Routes
                       </h3>
                       <div className="grid gap-2">
@@ -159,7 +159,10 @@ function DeveloperPage() {
                           <AccordionItem value="health-1">
                             <AccordionTrigger>
                               <span className="text-left outline-none w-[95%] text-blue-600 p-1 mx-0 text-xs font-semibold">
-                                GET /health
+                                <span className="bg-blue-600 py-1 px-3 rounded-sm text-white mr-2">
+                                  GET
+                                </span>
+                                /health
                               </span>
                             </AccordionTrigger>
                             <AccordionContent>
@@ -169,8 +172,8 @@ function DeveloperPage() {
                         </Accordion>
                       </div>
                     </div>
-                    <div>
-                      <h3 className="text-sm font-semibold mb-1">
+                    <div className="mb-2">
+                      <h3 className="text-sm font-semibold mb-2">
                         Upload Routes
                       </h3>
                       <div className="grid gap-2">
@@ -182,7 +185,10 @@ function DeveloperPage() {
                           <AccordionItem value="upload-1">
                             <AccordionTrigger>
                               <span className="text-left outline-none w-[95%] text-green-600 p-1 mx-0 text-xs font-semibold">
-                                POST /upload/initiate
+                                <span className="bg-green-600 py-1 px-3 rounded-sm text-white mr-2">
+                                  POST
+                                </span>
+                                /upload/initiate
                               </span>
                             </AccordionTrigger>
                             <AccordionContent>
@@ -198,7 +204,10 @@ function DeveloperPage() {
                           <AccordionItem value="upload-2">
                             <AccordionTrigger>
                               <span className="text-left outline-none w-[95%] text-green-600 p-1 mx-0 text-xs font-semibold">
-                                POST /upload/finalise/[upload_id]
+                                <span className="bg-green-600 py-1 px-3 rounded-sm text-white mr-2">
+                                  POST
+                                </span>
+                                /upload/finalise/[upload_id]
                               </span>
                             </AccordionTrigger>
                             <AccordionContent>
@@ -214,7 +223,10 @@ function DeveloperPage() {
                           <AccordionItem value="upload-3">
                             <AccordionTrigger>
                               <span className="text-left outline-none w-[95%] text-red-600 p-1 mx-0 text-xs font-semibold">
-                                DELETE /upload/[upload_id]
+                                <span className="bg-red-600 py-1 px-3 rounded-sm text-white mr-2">
+                                  DELETE
+                                </span>
+                                /upload/[upload_id]
                               </span>
                             </AccordionTrigger>
                             <AccordionContent>
@@ -230,7 +242,10 @@ function DeveloperPage() {
                           <AccordionItem value="upload-4">
                             <AccordionTrigger>
                               <span className="text-left outline-none w-[95%] text-orange-600 p-1 mx-0 text-xs font-semibold">
-                                PUT /upload/[upload_id]/title
+                                <span className="bg-orange-600 py-1 px-3 rounded-sm text-white mr-2">
+                                  PUT
+                                </span>
+                                /upload/[upload_id]/title
                               </span>
                             </AccordionTrigger>
                             <AccordionContent>
@@ -246,7 +261,36 @@ function DeveloperPage() {
                           <AccordionItem value="upload-5">
                             <AccordionTrigger>
                               <span className="text-left outline-none w-[95%] text-blue-600 p-1 mx-0 text-xs font-semibold">
-                                GET /upload/history
+                                <span className="bg-blue-600 py-1 px-3 rounded-sm text-white mr-2">
+                                  GET
+                                </span>
+                                /upload/history
+                              </span>
+                            </AccordionTrigger>
+                            <AccordionContent>
+                              Description of the API.
+                            </AccordionContent>
+                          </AccordionItem>
+                        </Accordion>
+                      </div>
+                    </div>
+                    <div className="mb-2">
+                      <h3 className="text-sm font-semibold mb-2">
+                        Download Routes
+                      </h3>
+                      <div className="grid gap-2">
+                        <Accordion
+                          type="single"
+                          collapsible
+                          className="bg-blue-100 border border-blue-600  px-2 w-full rounded-sm"
+                        >
+                          <AccordionItem value="download-1">
+                            <AccordionTrigger>
+                              <span className="text-left outline-none w-[95%] text-blue-600 p-1 mx-0 text-xs font-semibold">
+                                <span className="bg-blue-600 py-1 px-3 rounded-sm text-white mr-2">
+                                  GET
+                                </span>
+                                /download/[upload_id]
                               </span>
                             </AccordionTrigger>
                             <AccordionContent>
