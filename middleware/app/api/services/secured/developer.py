@@ -51,30 +51,33 @@ def create_apikey_return_apikey(token_data):
 
     user_id = token_data["$id"]
 
-    api_key_response = api_gateway.create_api_key(name=uuid.uuid4())
+    api_key_response = api_gateway.create_api_key(name=str(uuid.uuid4()))
 
-    api_key = api_key_response["apiKey"]
+    api_key = api_key_response["value"]
+    api_key_id = api_key_response["id"]
     usage_plan_name = "ByteShareDevUsagePlan"
 
-    usage_plan_response = api_gateway.describe_usage_plans()
+    usage_plan_response = api_gateway.get_usage_plans()
     usage_plans = usage_plan_response["items"]
 
-    found_usage_plan = False
     for plan in usage_plans:
         if plan["name"] == usage_plan_name:
-            found_usage_plan = True
             usage_plan_id = plan["id"]
             break
-    if not found_usage_plan:
-        usage_plan_response = api_gateway.create_usage_plan(
-            name="ByteShareDevUsagePlan",
-            throttle={"burstLimit": 5, "rateLimit": 10},
-            quota={"limit": 20, "offset": 0, "period": "DAY"},
-        )
 
-        usage_plan_id = usage_plan_response["id"]
+    # TODO: Remove this
+    # if os.getenv("ENVIRONMENT") == "dev" and not found_usage_plan:
+    #     usage_plan_response = api_gateway.create_usage_plan(
+    #         name="ByteShareDevUsagePlan",
+    #         throttle={"burstLimit": 5, "rateLimit": 10},
+    #         quota={"limit": 20, "offset": 0, "period": "DAY"},
+    #     )
 
-    api_gateway.create_usage_plan_key(usagePlanId=usage_plan_id, apiKey=api_key)
+    #     usage_plan_id = usage_plan_response["id"]
+
+    api_gateway.create_usage_plan_key(
+        usagePlanId=usage_plan_id, keyId=api_key_id, keyType="API_KEY"
+    )
     time_now = datetime.now(timezone.utc)
 
     apikey_metadata = apikey_dynamodb.read_item({"user_id": user_id})
@@ -82,15 +85,19 @@ def create_apikey_return_apikey(token_data):
         apikey_metadata = {
             "user_id": user_id,
             "apikey": api_key,
+            "apikey_id": api_key_id,
             "used": 0,
             "updated_at": "",
             "created_at": time_now.isoformat(),
         }
         apikey_dynamodb.create_item(apikey_metadata)
     else:
+        api_gateway.delete_api_key(apiKey=apikey_metadata["apikey_id"])
+
         keys = {"user_id": user_id}
         update_data = {
             "apikey": api_key,
+            "apikey_id": api_key_id,
             "updated_at": time_now.isoformat(),
         }
         apikey_dynamodb.update_item(keys, update_data)
@@ -99,7 +106,7 @@ def create_apikey_return_apikey(token_data):
     return {"api_key": api_key}
 
 
-def delete_apikey_return_done(token_data, apikey):
+def delete_apikey_return_done(token_data):
     FUNCTION_NAME = "delete_apikey_return_done()"
     log.info("Entering {}".format(FUNCTION_NAME))
 
@@ -109,7 +116,7 @@ def delete_apikey_return_done(token_data, apikey):
     if not apikey_metadata:
         raise HTTPException(status_code=400, detail="No API key found")
     else:
-        api_gateway.delete_api_key(apiKey=apikey_metadata["apikey"])
+        api_gateway.delete_api_key(apiKey=apikey_metadata["apikey_id"])
         apikey_dynamodb.delete_item({"user_id": user_id})
 
     log.info("Exiting {}".format(FUNCTION_NAME))

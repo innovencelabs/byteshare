@@ -132,17 +132,12 @@ resource "aws_dynamodb_table" "byteshare-subscriber" {
 
 resource "aws_dynamodb_table" "byteshare-apikey" {
   provider = aws.aws
-  name         = "byteshare-subscriber"
+  name         = "byteshare-apikey"
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "user_id"
-  range_key    = "apikey"
 
   attribute {
     name = "user_id"
-    type = "S"
-  }
-  attribute {
-    name = "apikey"
     type = "S"
   }
 }

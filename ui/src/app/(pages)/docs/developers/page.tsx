@@ -8,14 +8,25 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion'
 import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 import useAuth from '@/context/useAuth'
+import { CheckIcon, CopyIcon } from '@radix-ui/react-icons'
+import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 
 function DeveloperPage() {
   const [userEmail, setUserEmail] = useState('')
   const [userName, setUserName] = useState('')
+  const [isCopied, setIsCopied] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [apiKeyExist, setApiKeyExist] = useState(false)
   
   const { authorised, statusLoaded } = useAuth()
+
+  const apiURL = "https://api.byteshare.io"
+
+  const router = useRouter()
 
   useEffect(() => {
     if (statusLoaded) {
@@ -27,6 +38,101 @@ function DeveloperPage() {
       })
     }
   }, [statusLoaded])
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true)
+      try{
+        const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+        const apiKey = process.env.NEXT_PUBLIC_API_KEY
+        const jwtToken = await appwriteService.getJWTToken()
+
+        const apiKeyExistResponse = await fetch(apiBaseURL + '/secured/developer/apikey', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey,
+            Authorization: 'Bearer ' + jwtToken.jwt,
+          },
+        })
+        if (!apiKeyExistResponse.ok) {
+          toast.error('User ID is not valid')
+          setIsLoading(false)
+          return
+        }
+        const responseData = await apiKeyExistResponse.json()
+        setApiKeyExist(responseData.exist)
+      } catch (err){
+        // toast.dismiss(downloadInprogressToastID)
+        toast.error('Error creating API Key.')
+      } finally {
+        setIsLoading(false)
+      }
+      
+      
+    }
+    fetchData()
+  }, [])
+
+  const handleRevokeAPIKey = async (e) => {
+    e.preventDefault()
+    const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+    const apiKey = process.env.NEXT_PUBLIC_API_KEY
+    const jwtToken = await appwriteService.getJWTToken()
+
+    const apiKeyRevokeResponse = await fetch(
+      apiBaseURL + '/secured/developer/apikey',
+      {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          Authorization: 'Bearer ' + jwtToken.jwt,
+        },
+      },
+    )
+    if (!apiKeyRevokeResponse.ok) {
+      toast.error('User ID is not valid')
+      return
+    }
+
+    const responseData = await apiKeyRevokeResponse.json()
+    setApiKeyExist(false)
+    toast.success('API key revoked successfully')
+  }
+
+  const handleGenerateAPIKey = async (e) => {
+    e.preventDefault()
+    const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+    const apiKey = process.env.NEXT_PUBLIC_API_KEY
+    const jwtToken = await appwriteService.getJWTToken()
+
+    const apiKeyResponse = await fetch(
+      apiBaseURL + '/secured/developer/apikey',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          Authorization: 'Bearer ' + jwtToken.jwt,
+        },
+      },
+    )
+    if (!apiKeyResponse.ok) {
+      toast.error('User ID is not valid')
+      return
+    }
+
+    const responseData = await apiKeyResponse.json()
+    setApiKeyExist(true)
+    toast.success('API key generated successfully')
+  }
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(apiURL)
+    setIsCopied(true)
+    setTimeout(() => setIsCopied(false), 2000)
+  }
   
   return (
     <div className="w-screen bg-black">
@@ -52,61 +158,98 @@ function DeveloperPage() {
               API Key
             </h2>
             <div className="bg-white dark:bg-gray-950 rounded-lg border border-gray-200 dark:border-gray-800 p-6 md:p-8 shadow-sm">
-              <div className="flex flex-col md:flex-row md:items-center justify-between">
-                <div className="flex items-center space-x-4 mb-4 md:mb-0">
-                  <svg
-                    className="h-6 w-6 text-gray-500 dark:text-gray-400"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <circle cx="7.5" cy="15.5" r="5.5" />
-                    <path d="m21 2-9.6 9.6" />
-                    <path d="m15.5 7.5 3 3L22 7l-3-3" />
-                  </svg>
-                  <div className="flex flex-col md:flex-row items-start md:items-center">
-                    {' '}
-                    {/* Adjusted alignment for small screens */}
-                    <p className="font-medium">Your API Key: </p>
-                    <p className="font-mono text-gray-500 dark:text-gray-400 pl-1">
-                      **********************
-                    </p>
+              {!statusLoaded ? (
+                <>
+                  <Skeleton className="ml-[20%] mb-2 h-4 w-[60%]" />
+                  <Skeleton className="ml-[20%]  mb-2 h-4 w-[60%]" />
+                </>
+              ) : !authorised ? (
+                <div className="flex flex-col md:flex-row md:items-center justify-center">
+                  <div className="flex items-center justify-center space-x-4">
+                    <Button size="sm" variant="ghost" onClick={() => router.push('/auth/login')}>
+                      Sign in to Generate API Key
+                    </Button>
                   </div>
                 </div>
-                <div className="flex items-center justify-end space-x-4">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="border-red-600 text-red-600"
-                  >
-                    Revoke
-                  </Button>
-                  <Button size="sm" variant="default">
+              ) : isLoading ? (
+                <>
+                  <Skeleton className="ml-[20%] mb-2 h-4 w-[60%]" />
+                  <Skeleton className="ml-[20%]  mb-2 h-4 w-[60%]" />
+                </>
+              ) : apiKeyExist ? (
+                <div className="flex flex-col md:flex-row md:items-center justify-between">
+                  <div className="flex items-center space-x-4 mb-2 md:mb-0">
                     <svg
-                      className="mr-1"
-                      width="15"
-                      height="15"
-                      viewBox="0 0 15 15"
-                      fill="none"
+                      className="h-6 w-6 text-gray-500 dark:text-gray-400"
                       xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                     >
-                      <path
-                        d="M1.84998 7.49998C1.84998 4.66458 4.05979 1.84998 7.49998 1.84998C10.2783 1.84998 11.6515 3.9064 12.2367 5H10.5C10.2239 5 10 5.22386 10 5.5C10 5.77614 10.2239 6 10.5 6H13.5C13.7761 6 14 5.77614 14 5.5V2.5C14 2.22386 13.7761 2 13.5 2C13.2239 2 13 2.22386 13 2.5V4.31318C12.2955 3.07126 10.6659 0.849976 7.49998 0.849976C3.43716 0.849976 0.849976 4.18537 0.849976 7.49998C0.849976 10.8146 3.43716 14.15 7.49998 14.15C9.44382 14.15 11.0622 13.3808 12.2145 12.2084C12.8315 11.5806 13.3133 10.839 13.6418 10.0407C13.7469 9.78536 13.6251 9.49315 13.3698 9.38806C13.1144 9.28296 12.8222 9.40478 12.7171 9.66014C12.4363 10.3425 12.0251 10.9745 11.5013 11.5074C10.5295 12.4963 9.16504 13.15 7.49998 13.15C4.05979 13.15 1.84998 10.3354 1.84998 7.49998Z"
-                        fill="currentColor"
-                        fill-rule="evenodd"
-                        clip-rule="evenodd"
-                      ></path>
+                      <circle cx="7.5" cy="15.5" r="5.5" />
+                      <path d="m21 2-9.6 9.6" />
+                      <path d="m15.5 7.5 3 3L22 7l-3-3" />
                     </svg>
-                    Regenerate
-                  </Button>
+                    <div className="flex flex-col md:flex-row items-start md:items-center">
+                      {' '}
+                      {/* Adjusted alignment for small screens */}
+                      <p className="font-medium">Your API Key:</p>
+                      <p className="font-mono text-gray-500 dark:text-gray-400 pl-1">
+                        **********************
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-end space-x-4">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="border-red-600 text-red-600"
+                      onClick={handleRevokeAPIKey}
+                    >
+                      Revoke
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="default"
+                      onClick={handleGenerateAPIKey}
+                    >
+                      <svg
+                        className="mr-1"
+                        width="15"
+                        height="15"
+                        viewBox="0 0 15 15"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M1.84998 7.49998C1.84998 4.66458 4.05979 1.84998 7.49998 1.84998C10.2783 1.84998 11.6515 3.9064 12.2367 5H10.5C10.2239 5 10 5.22386 10 5.5C10 5.77614 10.2239 6 10.5 6H13.5C13.7761 6 14 5.77614 14 5.5V2.5C14 2.22386 13.7761 2 13.5 2C13.2239 2 13 2.22386 13 2.5V4.31318C12.2955 3.07126 10.6659 0.849976 7.49998 0.849976C3.43716 0.849976 0.849976 4.18537 0.849976 7.49998C0.849976 10.8146 3.43716 14.15 7.49998 14.15C9.44382 14.15 11.0622 13.3808 12.2145 12.2084C12.8315 11.5806 13.3133 10.839 13.6418 10.0407C13.7469 9.78536 13.6251 9.49315 13.3698 9.38806C13.1144 9.28296 12.8222 9.40478 12.7171 9.66014C12.4363 10.3425 12.0251 10.9745 11.5013 11.5074C10.5295 12.4963 9.16504 13.15 7.49998 13.15C4.05979 13.15 1.84998 10.3354 1.84998 7.49998Z"
+                          fill="currentColor"
+                          fill-rule="evenodd"
+                          clip-rule="evenodd"
+                        ></path>
+                      </svg>
+                      Regenerate
+                    </Button>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="flex flex-col md:flex-row md:items-center justify-center">
+                  <div className="flex items-center justify-center space-x-4">
+                    <Button
+                      size="sm"
+                      variant="link"
+                      onClick={handleGenerateAPIKey}
+                    >
+                      Generate API Key
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
           </section>
           <section>
@@ -139,8 +282,21 @@ function DeveloperPage() {
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold mb-2">Base URL</h3>
-                  <p className="text-gray-500 dark:text-gray-400">
-                    https://api.byteshare.io
+                  <p className="text-slate-600 dark:text-slate-600">
+                    {apiURL}{' '}
+                    <Button
+                      type="submit"
+                      size="sm"
+                      className="ml-2 p-2 bg-black hover:bg-black"
+                      onClick={handleCopy}
+                    >
+                      <span className="sr-only">Copy</span>
+                      {!isCopied ? (
+                        <CopyIcon className="h-3 w-3" />
+                      ) : (
+                        <CheckIcon className="h-3 w-3 text-white" />
+                      )}
+                    </Button>
                   </p>
                 </div>
                 <div>
@@ -158,7 +314,7 @@ function DeveloperPage() {
                         >
                           <AccordionItem value="health-1">
                             <AccordionTrigger>
-                              <span className="text-left outline-none w-[95%] text-blue-600 p-1 mx-0 text-xs font-semibold">
+                              <span className="text-left outline-none w-[95%] text-blue-600 p-1 mx-0 font-semibold">
                                 <span className="bg-blue-600 py-1 px-3 rounded-sm text-white mr-2">
                                   GET
                                 </span>
@@ -184,7 +340,7 @@ function DeveloperPage() {
                         >
                           <AccordionItem value="upload-1">
                             <AccordionTrigger>
-                              <span className="text-left outline-none w-[95%] text-green-600 p-1 mx-0 text-xs font-semibold">
+                              <span className="text-left outline-none w-[95%] text-green-600 p-1 mx-0 font-semibold">
                                 <span className="bg-green-600 py-1 px-3 rounded-sm text-white mr-2">
                                   POST
                                 </span>
@@ -203,7 +359,7 @@ function DeveloperPage() {
                         >
                           <AccordionItem value="upload-2">
                             <AccordionTrigger>
-                              <span className="text-left outline-none w-[95%] text-green-600 p-1 mx-0 text-xs font-semibold">
+                              <span className="text-left outline-none w-[95%] text-green-600 p-1 mx-0 font-semibold">
                                 <span className="bg-green-600 py-1 px-3 rounded-sm text-white mr-2">
                                   POST
                                 </span>
@@ -222,7 +378,7 @@ function DeveloperPage() {
                         >
                           <AccordionItem value="upload-3">
                             <AccordionTrigger>
-                              <span className="text-left outline-none w-[95%] text-red-600 p-1 mx-0 text-xs font-semibold">
+                              <span className="text-left outline-none w-[95%] text-red-600 p-1 mx-0 font-semibold">
                                 <span className="bg-red-600 py-1 px-3 rounded-sm text-white mr-2">
                                   DELETE
                                 </span>
@@ -241,7 +397,7 @@ function DeveloperPage() {
                         >
                           <AccordionItem value="upload-4">
                             <AccordionTrigger>
-                              <span className="text-left outline-none w-[95%] text-orange-600 p-1 mx-0 text-xs font-semibold">
+                              <span className="text-left outline-none w-[95%] text-orange-600 p-1 mx-0 font-semibold">
                                 <span className="bg-orange-600 py-1 px-3 rounded-sm text-white mr-2">
                                   PUT
                                 </span>
@@ -260,7 +416,7 @@ function DeveloperPage() {
                         >
                           <AccordionItem value="upload-5">
                             <AccordionTrigger>
-                              <span className="text-left outline-none w-[95%] text-blue-600 p-1 mx-0 text-xs font-semibold">
+                              <span className="text-left outline-none w-[95%] text-blue-600 p-1 mx-0 font-semibold">
                                 <span className="bg-blue-600 py-1 px-3 rounded-sm text-white mr-2">
                                   GET
                                 </span>
@@ -286,7 +442,7 @@ function DeveloperPage() {
                         >
                           <AccordionItem value="download-1">
                             <AccordionTrigger>
-                              <span className="text-left outline-none w-[95%] text-blue-600 p-1 mx-0 text-xs font-semibold">
+                              <span className="text-left outline-none w-[95%] text-blue-600 p-1 mx-0 font-semibold">
                                 <span className="bg-blue-600 py-1 px-3 rounded-sm text-white mr-2">
                                   GET
                                 </span>

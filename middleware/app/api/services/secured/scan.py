@@ -31,7 +31,7 @@ def finalise_scan_return_none(body: CompleteScan, upload_id: str):
         raise HTTPException(status_code=500, detail="Cannot connect to DB")
     if not upload_metadata:
         log.warning(
-            "BAD REQUEST for UploadID: {}\nERROR: {}".format(
+            "BAD REQUEST for UploadID: {} ERROR: {}".format(
                 upload_id, "Upload ID not valid."
             )
         )

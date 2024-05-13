@@ -33,7 +33,7 @@ class DynamoDBManager:
             response = self.table.scan()
             if "Items" not in response:
                 log.error(
-                    "EXCEPTION occurred connecting to DB.\nERROR: {}".format(
+                    "EXCEPTION occurred connecting to DB. ERROR: {}".format(
                         "Database connection failed."
                     )
                 )
@@ -41,7 +41,7 @@ class DynamoDBManager:
                     status_code=503, detail="Database connection failed"
                 )
         except Exception as e:
-            log.error("EXCEPTION occurred connecting to DB.\nERROR: {}".format(str(e)))
+            log.error("EXCEPTION occurred connecting to DB. ERROR: {}".format(str(e)))
             raise HTTPException(status_code=503, detail="Database connection failed")
 
         log.info("Exiting {}".format(FUNCTION_NAME))
@@ -55,7 +55,7 @@ class DynamoDBManager:
             log.info("Added to DB.")
         except Exception as e:
             log.error(
-                "EXCEPTION occurred adding new row to DB.\nItem: {}\nERROR: {}".format(
+                "EXCEPTION occurred adding new row to DB.\nItem: {} ERROR: {}".format(
                     item, str(e)
                 )
             )
@@ -75,12 +75,12 @@ class DynamoDBManager:
                 return item
             else:
                 log.warning(
-                    "BAD REQUEST for Key: {}\nERROR: {}".format(key, "Item not found.")
+                    "BAD REQUEST for Key: {} ERROR: {}".format(key, "Item not found.")
                 )
                 return None
         except Exception as e:
             log.error(
-                "EXCEPTION occurred in reading row to DB for Key:{}\nERROR: {}".format(
+                "EXCEPTION occurred in reading row to DB for Key:{} ERROR: {}".format(
                     key, str(e)
                 )
             )
@@ -101,14 +101,14 @@ class DynamoDBManager:
                 return items
             else:
                 log.warning(
-                    "BAD REQUEST for Key: {}\nERROR: {}".format(
+                    "BAD REQUEST for Key: {} ERROR: {}".format(
                         key_name, "Item not found."
                     )
                 )
                 return []
         except Exception as e:
             log.error(
-                "EXCEPTION occurred in reading row to DB for Key:{}\nERROR: {}".format(
+                "EXCEPTION occurred in reading row to DB for Key:{} ERROR: {}".format(
                     key_name, str(e)
                 )
             )
@@ -139,7 +139,7 @@ class DynamoDBManager:
             log.info("Updated to DB.")
         except Exception as e:
             log.error(
-                "EXCEPTION occurred in updating row to DB for Key:{}\nUpdate Data: {}\nERROR: {}".format(
+                "EXCEPTION occurred in updating row to DB for Key:{}\nUpdate Data: {} ERROR: {}".format(
                     key, update_data, str(e)
                 )
             )
@@ -154,7 +154,7 @@ class DynamoDBManager:
             log.info("Deleted from DB.")
         except Exception as e:
             log.error(
-                "EXCEPTION occurred in deleting row to DB for Key:{}\nERROR: {}".format(
+                "EXCEPTION occurred in deleting row to DB for Key:{} ERROR: {}".format(
                     key, str(e)
                 )
             )
