@@ -8,6 +8,16 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion'
 import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
 import useAuth from '@/context/useAuth'
 import { CheckIcon, CopyIcon } from '@radix-ui/react-icons'
@@ -20,7 +30,10 @@ function DeveloperPage() {
   const [userName, setUserName] = useState('')
   const [isCopied, setIsCopied] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [apiKeyChangeLoading, setAPIKeyChangeLoading] = useState(false)
   const [apiKeyExist, setApiKeyExist] = useState(false)
+  const [openAPIKeyDialog, setOpenAPIKeyDialog] = useState(false)
+  const [apiKey, setApiKey] = useState('')
   
   const { authorised, statusLoaded } = useAuth()
 
@@ -63,8 +76,7 @@ function DeveloperPage() {
         const responseData = await apiKeyExistResponse.json()
         setApiKeyExist(responseData.exist)
       } catch (err){
-        // toast.dismiss(downloadInprogressToastID)
-        toast.error('Error creating API Key.')
+        toast.error('Error checking API Key.')
       } finally {
         setIsLoading(false)
       }
@@ -76,60 +88,87 @@ function DeveloperPage() {
 
   const handleRevokeAPIKey = async (e) => {
     e.preventDefault()
-    const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
-    const apiKey = process.env.NEXT_PUBLIC_API_KEY
-    const jwtToken = await appwriteService.getJWTToken()
+    const revokeInprogressToastID = toast.loading('Revoking API key...', {
+      duration: 9999999,
+    })
+    setAPIKeyChangeLoading(true)
+    try {
+      const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+      const apiKey = process.env.NEXT_PUBLIC_API_KEY
+      const jwtToken = await appwriteService.getJWTToken()
 
-    const apiKeyRevokeResponse = await fetch(
-      apiBaseURL + '/secured/developer/apikey',
-      {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          Authorization: 'Bearer ' + jwtToken.jwt,
+      const apiKeyRevokeResponse = await fetch(
+        apiBaseURL + '/secured/developer/apikey',
+        {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey,
+            Authorization: 'Bearer ' + jwtToken.jwt,
+          },
         },
-      },
-    )
-    if (!apiKeyRevokeResponse.ok) {
-      toast.error('User ID is not valid')
-      return
-    }
+      )
+      if (!apiKeyRevokeResponse.ok) {
+        toast.error('User ID is not valid')
+        return
+      }
 
-    const responseData = await apiKeyRevokeResponse.json()
-    setApiKeyExist(false)
-    toast.success('API key revoked successfully')
+      const responseData = await apiKeyRevokeResponse.json()
+      setApiKeyExist(false)
+      toast.dismiss(revokeInprogressToastID)
+      toast.success('API key revoked successfully')
+    } catch (err) {
+      toast.dismiss(revokeInprogressToastID)
+      toast.error('Error revoking API Key.')
+    } finally {
+      setAPIKeyChangeLoading(false)
+    }
+    
   }
 
   const handleGenerateAPIKey = async (e) => {
     e.preventDefault()
-    const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
-    const apiKey = process.env.NEXT_PUBLIC_API_KEY
-    const jwtToken = await appwriteService.getJWTToken()
+    const generateInprogressToastID = toast.loading('Generating API key...', {
+      duration: 9999999,
+    })
+    setAPIKeyChangeLoading(true)
+    try{
+      const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+      const apiKey = process.env.NEXT_PUBLIC_API_KEY
+      const jwtToken = await appwriteService.getJWTToken()
 
-    const apiKeyResponse = await fetch(
-      apiBaseURL + '/secured/developer/apikey',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          Authorization: 'Bearer ' + jwtToken.jwt,
+      const apiKeyResponse = await fetch(
+        apiBaseURL + '/secured/developer/apikey',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey,
+            Authorization: 'Bearer ' + jwtToken.jwt,
+          },
         },
-      },
-    )
-    if (!apiKeyResponse.ok) {
-      toast.error('User ID is not valid')
-      return
-    }
+      )
+      if (!apiKeyResponse.ok) {
+        toast.error('User ID is not valid')
+        return
+      }
 
-    const responseData = await apiKeyResponse.json()
-    setApiKeyExist(true)
-    toast.success('API key generated successfully')
+      const responseData = await apiKeyResponse.json()
+      setApiKeyExist(true)
+      setApiKey(responseData.api_key)
+      setOpenAPIKeyDialog(true)
+      toast.dismiss(generateInprogressToastID)
+    } catch (err) {
+      toast.dismiss(generateInprogressToastID)
+      toast.error('Error generating API Key.')
+    } finally{
+      setAPIKeyChangeLoading(false)
+    }
+    
   }
 
-  const handleCopy = async () => {
-    await navigator.clipboard.writeText(apiURL)
+  const handleCopy = async (text: string) => {
+    await navigator.clipboard.writeText(text)
     setIsCopied(true)
     setTimeout(() => setIsCopied(false), 2000)
   }
@@ -166,7 +205,11 @@ function DeveloperPage() {
               ) : !authorised ? (
                 <div className="flex flex-col md:flex-row md:items-center justify-center">
                   <div className="flex items-center justify-center space-x-4">
-                    <Button size="sm" variant="ghost" onClick={() => router.push('/auth/login')}>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => router.push('/auth/login')}
+                    >
                       Sign in to Generate API Key
                     </Button>
                   </div>
@@ -197,9 +240,8 @@ function DeveloperPage() {
                     </svg>
                     <div className="flex flex-col md:flex-row items-start md:items-center">
                       {' '}
-                      {/* Adjusted alignment for small screens */}
-                      <p className="font-medium">Your API Key:</p>
-                      <p className="font-mono text-gray-500 dark:text-gray-400 pl-1">
+                      {/* <p className="font-medium">API Key:</p> */}
+                      <p className="font-mono select-none">
                         **********************
                       </p>
                     </div>
@@ -210,13 +252,16 @@ function DeveloperPage() {
                       variant="outline"
                       className="border-red-600 text-red-600"
                       onClick={handleRevokeAPIKey}
+                      disabled={apiKeyChangeLoading}
                     >
                       Revoke
                     </Button>
                     <Button
                       size="sm"
                       variant="default"
+                      className="bg-black hover:bg-slate-700"
                       onClick={handleGenerateAPIKey}
+                      disabled={apiKeyChangeLoading}
                     >
                       <svg
                         className="mr-1"
@@ -287,8 +332,8 @@ function DeveloperPage() {
                     <Button
                       type="submit"
                       size="sm"
-                      className="ml-2 p-2 bg-black hover:bg-black"
-                      onClick={handleCopy}
+                      className="ml-2 p-2 bg-black hover:bg-slate-700"
+                      onClick={() => handleCopy(apiURL)}
                     >
                       <span className="sr-only">Copy</span>
                       {!isCopied ? (
@@ -463,6 +508,54 @@ function DeveloperPage() {
           </section>
         </div>
       </main>
+      <Dialog
+        open={openAPIKeyDialog}
+        onOpenChange={() => {
+          setOpenAPIKeyDialog(false)
+        }}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="select-none">
+              Your API key is generated
+            </DialogTitle>
+            <DialogDescription className="select-none">
+              Please store it securely, as it will only be displayed once.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex items-center space-x-2">
+            <div className="grid flex-1 gap-2">
+              <Label htmlFor="link" className="sr-only">
+                Link
+              </Label>
+              <Input id="link" defaultValue={apiKey} readOnly />
+            </div>
+            <Button
+              type="submit"
+              size="sm"
+              className="px-3 bg-black hover:bg-slate-700"
+              onClick={() => handleCopy(apiKey)}
+            >
+              <span className="sr-only">Copy</span>
+              {!isCopied ? (
+                <CopyIcon className="h-4 w-4" />
+              ) : (
+                <CheckIcon className="h-4 w-4 text-white" />
+              )}
+            </Button>
+          </div>
+          <DialogFooter className="sm:justify-end">
+            <Button
+              type="button"
+              variant="default"
+              className="bg-black hover:bg-slate-700 justify-end"
+            >
+              Download CSV
+            </Button>
+            
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       {/* <Image
         style={{ position: 'absolute', right: '0' }}
         src={Waves}

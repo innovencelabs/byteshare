@@ -86,7 +86,9 @@ def create_apikey_return_apikey(token_data):
             "user_id": user_id,
             "apikey": api_key,
             "apikey_id": api_key_id,
-            "used": 0,
+            "used_per_apikey": 0,
+            "total_used": 0,
+            "last_used_per_apikey": "",
             "updated_at": "",
             "created_at": time_now.isoformat(),
         }
@@ -98,6 +100,8 @@ def create_apikey_return_apikey(token_data):
         update_data = {
             "apikey": api_key,
             "apikey_id": api_key_id,
+            "last_used_per_apikey": "",
+            "used_per_apikey": 0,
             "updated_at": time_now.isoformat(),
         }
         apikey_dynamodb.update_item(keys, update_data)
