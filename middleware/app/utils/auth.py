@@ -1,3 +1,4 @@
+import base64
 import os
 from typing import Optional
 
@@ -84,31 +85,51 @@ async def optional_authenticate(authorization: Optional[str] = Header(None)):
         return None
 
 
-async def authenticate_appwrite_webhook(
-    username: Optional[str] = Header(None),
-    password: Optional[str] = Header(None),
-):
-    if (
-        username == None
-        or password == None
-        or username != os.getenv("APPWRITE_WEBHOOK_USER")
-        or password != os.getenv("APPWRITE_WEBHOOK_PASS")
-    ):
+async def authenticate_appwrite_webhook(authorization: Optional[str] = Header(None)):
+    if authorization == None:
+        raise HTTPException(status_code=401, detail="Authorization header is missing")
+
+    try:
+        auth_type, encoded_credentials = authorization.split(" ")
+        if auth_type.lower() != "basic":
+            raise HTTPException(
+                status_code=401, detail="Only Basic authentication is supported"
+            )
+
+        decoded_credentials = base64.b64decode(encoded_credentials).decode("utf-8")
+        username, password = decoded_credentials.split(":")
+
+        if username != os.getenv("APPWRITE_WEBHOOK_USER") or password != os.getenv(
+            "APPWRITE_WEBHOOK_PASS"
+        ):
+            raise HTTPException(
+                status_code=401, detail="Invalid authentication credentials"
+            )
+    except ValueError:
         raise HTTPException(
-            status_code=401, detail="Invalid authentication credentials"
+            status_code=401, detail="Invalid authorization header format"
         )
 
 
-async def authenticate_scan(
-    username: Optional[str] = Header(None),
-    password: Optional[str] = Header(None),
-):
-    if (
-        username == None
-        or password == None
-        or username != os.getenv("SCAN_USER")
-        or password != os.getenv("SCAN_PASS")
-    ):
+async def authenticate_scan(authorization: Optional[str] = Header(None)):
+    if authorization == None:
+        raise HTTPException(status_code=401, detail="Authorization header is missing")
+
+    try:
+        auth_type, encoded_credentials = authorization.split(" ")
+        if auth_type.lower() != "basic":
+            raise HTTPException(
+                status_code=401, detail="Only Basic authentication is supported"
+            )
+
+        decoded_credentials = base64.b64decode(encoded_credentials).decode("utf-8")
+        username, password = decoded_credentials.split(":")
+
+        if username != os.getenv("SCAN_USER") or password != os.getenv("SCAN_PASS"):
+            raise HTTPException(
+                status_code=401, detail="Invalid authentication credentials"
+            )
+    except ValueError:
         raise HTTPException(
-            status_code=401, detail="Invalid authentication credentials"
+            status_code=401, detail="Invalid authorization header format"
         )
