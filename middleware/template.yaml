@@ -30,7 +30,10 @@ Parameters:
     Type: String
   AppwriteWebhookPass:
     Type: String
-
+  ScanUser:
+    Type: String
+  ScanPass:
+    Type: String
 Globals:
   Function:
     Timeout: 900
@@ -71,6 +74,8 @@ Resources:
           ENVIRONMENT: !Ref Environment
           APPWRITE_WEBHOOK_USER: !Ref AppwriteWebhookUser
           APPWRITE_WEBHOOK_PASS: !Ref AppwriteWebhookPass
+          SCAN_USER: !Ref ScanUser
+          SCAN_PASS: !Ref ScanPass
       Events:
         HealthCheckApi:
           Type: Api

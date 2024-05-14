@@ -41,6 +41,8 @@ jobs:
         RABBITMQ_URL: ${{ secrets.RABBITMQ_URL }}
         APPWRITE_WEBHOOK_USER: ${{ secrets.APPWRITE_WEBHOOK_USER }}
         APPWRITE_WEBHOOK_PASS: ${{ secrets.APPWRITE_WEBHOOK_PASS }}
+        SCAN_USER: ${{ secrets.SCAN_USER }}
+        SCAN_PASS: ${{ secrets.SCAN_PASS }}
       run: |
         cd middleware
         pip install -r ./requirements.txt  --target ./python
@@ -48,6 +50,6 @@ jobs:
         zip -r python-site-packages.zip python
         rm -r python
         sam build
-        sam deploy --parameter-overrides Environment=production CorsOrigin=$CORS_ORIGIN AppwriteWebhookUser=$APPWRITE_WEBHOOK_USER AppwriteWebhookPass=$APPWRITE_WEBHOOK_PASS RabbitMQQueue=$RABBITMQ_QUEUE RabbitMQURL=$RABBITMQ_URL AWSDefaultRegion=$AWS_DEFAULT_REGION AppwriteURL=$APPWRITE_URL AppwriteProjectID=$APPWRITE_PROJECT_ID ResendAPIKey=$RESEND_API_KEY R2AccountID=$R2_ACCOUNT_ID R2AccessKey=$R2_ACCESS_KEY R2SecretKey=$R2_SECRET_KEY
+        sam deploy --parameter-overrides Environment=production CorsOrigin=$CORS_ORIGIN ScanUser=$SCAN_USER ScanPass=$SCAN_PASS AppwriteWebhookUser=$APPWRITE_WEBHOOK_USER AppwriteWebhookPass=$APPWRITE_WEBHOOK_PASS RabbitMQQueue=$RABBITMQ_QUEUE RabbitMQURL=$RABBITMQ_URL AWSDefaultRegion=$AWS_DEFAULT_REGION AppwriteURL=$APPWRITE_URL AppwriteProjectID=$APPWRITE_PROJECT_ID ResendAPIKey=$RESEND_API_KEY R2AccountID=$R2_ACCOUNT_ID R2AccessKey=$R2_ACCESS_KEY R2SecretKey=$R2_SECRET_KEY
         rm python-site-packages.zip
 

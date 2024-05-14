@@ -97,3 +97,18 @@ async def authenticate_appwrite_webhook(
         raise HTTPException(
             status_code=401, detail="Invalid authentication credentials"
         )
+
+
+async def authenticate_scan(
+    username: Optional[str] = Header(None),
+    password: Optional[str] = Header(None),
+):
+    if (
+        username == None
+        or password == None
+        or username != os.getenv("SCAN_USER")
+        or password != os.getenv("SCAN_PASS")
+    ):
+        raise HTTPException(
+            status_code=401, detail="Invalid authentication credentials"
+        )

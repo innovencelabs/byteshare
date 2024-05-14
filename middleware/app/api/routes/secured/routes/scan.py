@@ -1,7 +1,8 @@
 import api.services.secured.scan as scan_service
 import utils.logger as logger
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
+from utils.auth import authenticate_scan
 
 router = APIRouter()
 
@@ -14,7 +15,11 @@ class CompleteScan(BaseModel):
 
 
 @router.post("/finalise/{upload_id}")
-def finalise_scan_return_none(body: CompleteScan, upload_id: str):
+def finalise_scan_return_none(
+    body: CompleteScan,
+    upload_id: str,
+    token_data: None = Depends(authenticate_scan),
+):
     """
     Finalise scan from Moderation component.
     Will delete the upload if the file is not safe or make the scanned column to True if file is safe.
