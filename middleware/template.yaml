@@ -105,6 +105,8 @@ Resources:
               Ref: ByteShareAPIGW
             Path: /secured/{proxy+}
             Method: any
+            Auth:
+              Authorizer: AWS_IAM
         WebhookApi:
           Type: Api
           Properties:
