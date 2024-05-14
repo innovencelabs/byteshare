@@ -21,6 +21,8 @@ import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
 import useAuth from '@/context/useAuth'
 import { CheckIcon, CopyIcon } from '@radix-ui/react-icons'
+import { asBlob, generateCsv, mkConfig } from 'export-to-csv'
+import { saveAs } from 'file-saver'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -31,6 +33,7 @@ function DeveloperPage() {
   const [isCopied, setIsCopied] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [apiKeyChangeLoading, setAPIKeyChangeLoading] = useState(false)
+  const [downloadingCSV, setDownloadingCSV] = useState(false)
   const [apiKeyExist, setApiKeyExist] = useState(false)
   const [openAPIKeyDialog, setOpenAPIKeyDialog] = useState(false)
   const [apiKey, setApiKey] = useState('')
@@ -85,6 +88,35 @@ function DeveloperPage() {
     }
     fetchData()
   }, [])
+
+  const handleDownloadCSV = async(e) => {
+    e.preventDefault()
+    const downloadInprogressToastID = toast.loading('Downloading CSV...', {
+      duration: 9999999,
+    })
+    setDownloadingCSV(true)
+    
+    try{
+      const csvConfig = mkConfig({ useKeysAsHeaders: true, showTitle: false, useBom: true })
+
+      const data = [
+        {
+          "API Key": apiKey,
+        }
+      ];
+
+      const csvOutput = asBlob(csvConfig)(generateCsv(csvConfig)(data))
+      saveAs(csvOutput, "ByteShare_APIKey.csv")
+      toast.dismiss(downloadInprogressToastID)
+      
+    } catch(err){
+      toast.dismiss(downloadInprogressToastID)
+      toast.error('Error saving API Key to CSV.')
+    } finally{
+      setDownloadingCSV(false)
+    }
+    
+  }
 
   const handleRevokeAPIKey = async (e) => {
     e.preventDefault()
@@ -549,6 +581,8 @@ function DeveloperPage() {
               type="button"
               variant="default"
               className="bg-black hover:bg-slate-700 justify-end"
+              onClick={handleDownloadCSV}
+              disabled={downloadingCSV}
             >
               Download CSV
             </Button>
