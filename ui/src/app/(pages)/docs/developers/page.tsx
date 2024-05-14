@@ -1,6 +1,7 @@
 'use client'
 import appwriteService from '@/authentication/appwrite/config'
 import { Header } from '@/components/header'
+import { Icons } from '@/components/icons'
 import {
   Accordion,
   AccordionContent,
@@ -57,6 +58,7 @@ function DeveloperPage() {
 
   useEffect(() => {
     const fetchData = async () => {
+      if(statusLoaded && authorised){
       setIsLoading(true)
       try{
         const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
@@ -83,17 +85,14 @@ function DeveloperPage() {
       } finally {
         setIsLoading(false)
       }
-      
+      }
       
     }
     fetchData()
-  }, [])
+  }, [statusLoaded])
 
   const handleDownloadCSV = async(e) => {
     e.preventDefault()
-    const downloadInprogressToastID = toast.loading('Downloading CSV...', {
-      duration: 9999999,
-    })
     setDownloadingCSV(true)
     
     try{
@@ -107,10 +106,7 @@ function DeveloperPage() {
 
       const csvOutput = asBlob(csvConfig)(generateCsv(csvConfig)(data))
       saveAs(csvOutput, "ByteShare_APIKey.csv")
-      toast.dismiss(downloadInprogressToastID)
-      
     } catch(err){
-      toast.dismiss(downloadInprogressToastID)
       toast.error('Error saving API Key to CSV.')
     } finally{
       setDownloadingCSV(false)
@@ -584,7 +580,7 @@ function DeveloperPage() {
               onClick={handleDownloadCSV}
               disabled={downloadingCSV}
             >
-              Download CSV
+              {downloadingCSV? <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />:""} Download CSV
             </Button>
             
           </DialogFooter>
