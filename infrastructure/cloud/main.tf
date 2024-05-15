@@ -141,3 +141,55 @@ resource "aws_dynamodb_table" "byteshare-apikey" {
     type = "S"
   }
 }
+
+
+resource "aws_iam_role" "api_gateway_invoke_role" {
+  provider = aws.aws
+  name               = "ByteShareAPIInvokeRole"
+  assume_role_policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Principal" : {
+          "AWS" : aws_iam_user.unprivileged_user.arn
+        },
+        "Action" : "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy_attachment" "api_gateway_invoke_policy_attachment" {
+  provider = aws.aws
+  name = "api_gateway_invoke_policy_attachment"
+  policy_arn = "arn:aws:iam::aws:policy/AmazonAPIGatewayInvokeFullAccess"
+  roles       = [aws_iam_role.api_gateway_invoke_role.name]
+}
+
+resource "aws_iam_user" "unprivileged_user" {
+  provider = aws.aws
+  name = "byteshare-ui"
+}
+
+resource "aws_iam_policy" "assume_role_policy" {
+  provider = aws.aws
+  name        = "assume_role_policy"
+  description = "Allows user to assume the role"
+  policy      = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : "sts:AssumeRole",
+        "Resource" : aws_iam_role.api_gateway_invoke_role.arn
+      }
+    ]
+  })
+}
+
+resource "aws_iam_user_policy_attachment" "assume_role_policy_attachment" {
+  provider = aws.aws
+  user       = aws_iam_user.unprivileged_user.name
+  policy_arn = aws_iam_policy.assume_role_policy.arn
+}
