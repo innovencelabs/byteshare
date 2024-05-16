@@ -323,13 +323,13 @@ function HistoryPage() {
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="cursor-pointer">
+              <div className="">
                 {row.original.title.length > 30
                   ? `${row.original.title.slice(0, 30)}...`
                   : row.original.title}
               </div>
             </TooltipTrigger>
-            <TooltipContent className="text-white">
+            <TooltipContent className="bg-blue-800 text-white">
               <p>{row.original.title}</p>
             </TooltipContent>
           </Tooltip>

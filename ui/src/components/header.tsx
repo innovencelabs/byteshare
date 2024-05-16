@@ -1,3 +1,4 @@
+import { ChevronDownIcon, GitHubLogoIcon } from '@radix-ui/react-icons'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -11,7 +12,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from './ui/dropdown-menu'
-import GitHubButton from 'react-github-btn'
 import { Input } from './ui/input'
 import { Label } from './ui/label'
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
@@ -72,7 +72,7 @@ export const Header = ({ authorised, statusLoaded, name, email }) => {
   }
 
   return (
-    <nav className="bg-white border-gray-200 dark:bg-gray-900 z-10">
+    <nav className="bg-transparent border-gray-200 dark:bg-gray-900 z-10">
       <div className="flex flex-wrap items-center justify-between md:mx-10 p-3 sm:mx-auto">
         <Button
           onClick={() => router.push('/')}
@@ -85,23 +85,23 @@ export const Header = ({ authorised, statusLoaded, name, email }) => {
             width={32}
             height={32}
           />
-          <span className="hidden sm:block self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
+          <span className="text-white hidden sm:block self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
             ByteShare
           </span>
         </Button>
         <div className="flex md:order-2 space-x-2 md:space-x-0 rtl:space-x-reverse">
           {statusLoaded ? (
-            <span className="text-black hidden lg:flex focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-2 mx-2 py-1 text-center">
-              <GitHubButton
-                href="https://github.com/innovencelabs/ByteShare"
-                data-icon="octicon-star"
-                data-size="large"
-                data-show-count="false"
-                aria-label="Star innovencelabs/byteshare on GitHub"
-              >
-                Star
-              </GitHubButton>
-            </span>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                const githubURL = `https://github.com/innovencelabs/byteshare`
+                window.open(githubURL, '_blank')
+              }
+              }
+              className="text-white hidden lg:flex focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-2 mx-2 py-1 text-center"
+            >
+              <GitHubLogoIcon />
+            </Button>
           ) : (
             <></>
           )}
@@ -116,8 +116,11 @@ export const Header = ({ authorised, statusLoaded, name, email }) => {
           ) : statusLoaded ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="text-xs md:text-sm">
-                  {getFormattedName(name)}
+                <Button
+                  variant="ghost"
+                  className="text-white text-xs md:text-sm"
+                >
+                  {getFormattedName(name)} <ChevronDownIcon />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56">
@@ -174,13 +177,13 @@ export const Header = ({ authorised, statusLoaded, name, email }) => {
           {!statusLoaded ? (
             <></>
           ) : (
-            <ul className="flex flex-col font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+            <ul className="flex flex-col font-medium p-4 md:p-0 mt-4 border sm:rounded-md bg-slate-100 border-gray-100 rounded-lg md:bg-transparent md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
               <li>
                 <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
                   <PopoverTrigger asChild>
                     <Button
                       variant="ghost"
-                      className="block py-2 px-3 md:p-0 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
+                      className="block py-2 px-3 md:p-0 text-black  md:text-white rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-slate-300 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
                     >
                       Feedback
                     </Button>
@@ -235,7 +238,7 @@ export const Header = ({ authorised, statusLoaded, name, email }) => {
                 <Button
                   variant="ghost"
                   onClick={() => router.push('/help')}
-                  className="block py-2 px-3 md:p-0 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
+                  className="block py-2 px-3 md:p-0 text-black  md:text-white rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-slate-300 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
                 >
                   Help
                 </Button>
@@ -245,7 +248,7 @@ export const Header = ({ authorised, statusLoaded, name, email }) => {
                   <Button
                     variant="ghost"
                     onClick={() => router.push('/history')}
-                    className="block py-2 px-3 md:p-0 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
+                    className="block py-2 px-3 md:p-0 text-black  md:text-white rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-slate-300 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
                   >
                     History
                   </Button>
@@ -272,7 +275,7 @@ export const Header = ({ authorised, statusLoaded, name, email }) => {
                   <Button
                     variant="ghost"
                     onClick={() => router.push('/upgrade')}
-                    className="block py-2 px-3 md:p-0 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
+                    className="block py-2 px-3 md:p-0 text-black  md:text-white rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-slate-300 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
                   >
                     Pricing
                   </Button>
