@@ -15,19 +15,19 @@ load_dotenv()
 log = logger.get_logger()
 
 
-async def authenticate(authorization: Optional[str] = Header(None)):
+async def authenticate(x_auth_token: Optional[str] = Header(None)):
     FUNCTION_NAME = "authenticate()"
     log.info("Entering {}".format(FUNCTION_NAME))
 
-    if authorization is None:
+    if x_auth_token is None:
         raise HTTPException(
             status_code=401,
-            detail="Authorization header is missing",
+            detail="X-Auth-Token header is missing",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
     try:
-        token_type, token = authorization.split()
+        token_type, token = x_auth_token.split()
         if token_type.lower() != "bearer":
             raise HTTPException(
                 status_code=401,
@@ -56,15 +56,15 @@ async def authenticate(authorization: Optional[str] = Header(None)):
         )
 
 
-async def optional_authenticate(authorization: Optional[str] = Header(None)):
+async def optional_authenticate(x_auth_token: Optional[str] = Header(None)):
     FUNCTION_NAME = "optional_authenticate()"
     log.info("Entering {}".format(FUNCTION_NAME))
 
-    if authorization is None:
+    if x_auth_token is None:
         return None
 
     try:
-        token_type, token = authorization.split()
+        token_type, token = x_auth_token.split()
         if token_type.lower() != "bearer":
             return None
         client = Client()
@@ -111,12 +111,12 @@ async def authenticate_appwrite_webhook(authorization: Optional[str] = Header(No
         )
 
 
-async def authenticate_scan(authorization: Optional[str] = Header(None)):
-    if authorization == None:
-        raise HTTPException(status_code=401, detail="Authorization header is missing")
+async def authenticate_scan(x_auth_token: Optional[str] = Header(None)):
+    if x_auth_token == None:
+        raise HTTPException(status_code=401, detail="X-Auth-Token header is missing")
 
     try:
-        auth_type, encoded_credentials = authorization.split(" ")
+        auth_type, encoded_credentials = x_auth_token.split(" ")
         if auth_type.lower() != "basic":
             raise HTTPException(
                 status_code=401, detail="Only Basic authentication is supported"
@@ -131,5 +131,5 @@ async def authenticate_scan(authorization: Optional[str] = Header(None)):
             )
     except ValueError:
         raise HTTPException(
-            status_code=401, detail="Invalid authorization header format"
+            status_code=401, detail="Invalid X-Auth-Token header format"
         )

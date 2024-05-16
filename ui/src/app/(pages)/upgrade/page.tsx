@@ -1,10 +1,11 @@
 'use client'
-import appwriteService from '@/authentication/appwrite/config'
+import { getToken } from '@/authentication/aws/config'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import aws4 from 'aws4'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { useRouter } from 'next/navigation'
 
 function UpgradePage() {
   const [email, setEmail] = useState('')
@@ -13,22 +14,41 @@ function UpgradePage() {
 
   const handleSubscribe = async (e) => {
     e.preventDefault()
-    const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+    const apiURL = process.env.NEXT_PUBLIC_API_BASE_URL + '/secured/subscribe'
     const apiKey = process.env.NEXT_PUBLIC_API_KEY
-    const jwtToken = await appwriteService.getJWTToken()
 
     const subscribeJSON = {
       email: email,
     }
 
-    await fetch(apiBaseURL + '/secured/subscribe', {
+    const { REGION, AccessKeyId, SecretAccessKey, SessionToken } =
+      await getToken()
+    const url = new URL(apiURL)
+    const opts = {
+      host: url.host,
+      path: url.pathname + url.search,
+      service: 'execute-api',
+      region: REGION,
       method: 'POST',
-      body: JSON.stringify(subscribeJSON),
       headers: {
         'Content-Type': 'application/json',
         'x-api-key': apiKey,
-        Authorization: 'Bearer ' + jwtToken.jwt,
+        'X-Amz-Security-Token': SessionToken,
       },
+    }
+
+    aws4.sign(opts, {
+      accessKeyId: AccessKeyId,
+      secretAccessKey: SecretAccessKey,
+      sessionToken: SessionToken,
+    })
+
+    
+
+    await fetch(apiURL, {
+      method: 'POST',
+      body: JSON.stringify(subscribeJSON),
+      headers: opts.headers,
     })
     setEmail('')
     toast.success('You have been subscribed!')

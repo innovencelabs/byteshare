@@ -89,17 +89,14 @@ function HistoryPage() {
       const apiKey = process.env.NEXT_PUBLIC_API_KEY
       const jwtToken = await appwriteService.getJWTToken()
 
-      const historyResponse = await fetch(
-        apiBaseURL + '/upload/history',
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey,
-            Authorization: 'Bearer ' + jwtToken.jwt,
-          },
+      const historyResponse = await fetch(apiBaseURL + '/upload/history', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'X-Auth-Token': 'Bearer ' + jwtToken.jwt,
         },
-      )
+      })
       if (!historyResponse.ok) {
         toast.error('User ID is not valid')
         setIsLoading(false)
@@ -170,7 +167,7 @@ function HistoryPage() {
           headers: {
             'Content-Type': 'application/json',
             'x-api-key': apiKey,
-            Authorization: 'Bearer ' + jwtToken.jwt,
+            'X-Auth-Token': 'Bearer ' + jwtToken.jwt,
           },
         },
       )
@@ -240,7 +237,7 @@ function HistoryPage() {
         headers: {
           'Content-Type': 'application/json',
           'x-api-key': apiKey,
-          Authorization: 'Bearer ' + jwtToken.jwt,
+          'X-Auth-Token': 'Bearer ' + jwtToken.jwt,
         },
       },
     )
@@ -284,7 +281,7 @@ function HistoryPage() {
             headers: {
               'Content-Type': 'application/json',
               'x-api-key': apiKey,
-              Authorization: 'Bearer ' + jwtToken.jwt,
+              'X-Auth-Token': 'Bearer ' + jwtToken.jwt,
             },
           },
         )
