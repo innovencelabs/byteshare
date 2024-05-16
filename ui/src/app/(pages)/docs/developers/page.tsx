@@ -1,6 +1,5 @@
 'use client'
 import appwriteService from '@/authentication/appwrite/config'
-import { getToken } from '@/authentication/aws/config'
 import { Header } from '@/components/header'
 import { Icons } from '@/components/icons'
 import {
@@ -23,7 +22,6 @@ import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
 import useAuth from '@/context/useAuth'
 import { CheckIcon, CopyIcon } from '@radix-ui/react-icons'
-import aws4 from 'aws4'
 import { asBlob, generateCsv, mkConfig } from 'export-to-csv'
 import { saveAs } from 'file-saver'
 import { useRouter } from 'next/navigation'
@@ -65,35 +63,24 @@ function DeveloperPage() {
       try{
         const apiURL =
           process.env.NEXT_PUBLIC_API_BASE_URL + '/secured/developer/apikey'
-        const apiKey = process.env.NEXT_PUBLIC_API_KEY
         const jwtToken = await appwriteService.getJWTToken()
 
-        const { REGION, AccessKeyId, SecretAccessKey, SessionToken } = await getToken()
-        const url = new URL(apiURL)
-        const opts = {
-          host: url.host,
-          path: url.pathname + url.search,
-          service: 'execute-api',
-          region: REGION,
+        const securedAccessBody = {
+          jwtToken: jwtToken.jwt,
+          apiURL: apiURL,
           method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey,
-            'X-Auth-Token': 'Bearer ' + jwtToken.jwt,
-            'X-Amz-Security-Token': SessionToken,
-          },
         }
 
-        
-        aws4.sign(opts, {
-          accessKeyId: AccessKeyId,
-          secretAccessKey: SecretAccessKey,
-          sessionToken: SessionToken,
+        const securedAccessResponse = await fetch('/api/securedAccess', {
+          method: 'POST',
+          body: JSON.stringify(securedAccessBody)
         })
 
+        const securedAccessResponseJSON = await securedAccessResponse.json()
+        
         const apiKeyExistResponse = await fetch(apiURL, {
           method: 'GET',
-          headers: opts.headers
+          headers: securedAccessResponseJSON['headers'],
         })
         if (!apiKeyExistResponse.ok) {
           toast.error('User ID is not valid')
@@ -145,35 +132,26 @@ function DeveloperPage() {
     try {
       const apiURL =
         process.env.NEXT_PUBLIC_API_BASE_URL + '/secured/developer/apikey'
-      const apiKey = process.env.NEXT_PUBLIC_API_KEY
+      
       const jwtToken = await appwriteService.getJWTToken()
 
-      const { REGION, AccessKeyId, SecretAccessKey, SessionToken } =
-        await getToken()
-      const url = new URL(apiURL)
-      const opts = {
-        host: url.host,
-        path: url.pathname + url.search,
-        service: 'execute-api',
-        region: REGION,
+      const securedAccessBody = {
+        jwtToken: jwtToken.jwt,
+        apiURL: apiURL,
         method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'X-Auth-Token': 'Bearer ' + jwtToken.jwt,
-          'X-Amz-Security-Token': SessionToken,
-        },
       }
 
-      aws4.sign(opts, {
-        accessKeyId: AccessKeyId,
-        secretAccessKey: SecretAccessKey,
-        sessionToken: SessionToken,
+      const securedAccessResponse = await fetch('/api/securedAccess', {
+        method: 'POST',
+        body: JSON.stringify(securedAccessBody),
       })
+
+      const securedAccessResponseJSON = await securedAccessResponse.json()
+      
 
       const apiKeyRevokeResponse = await fetch(apiURL, {
         method: 'DELETE',
-        headers: opts.headers,
+        headers: securedAccessResponseJSON["headers"],
       })
       if (!apiKeyRevokeResponse.ok) {
         toast.error('User ID is not valid')
@@ -202,35 +180,25 @@ function DeveloperPage() {
     try{
       const apiURL =
         process.env.NEXT_PUBLIC_API_BASE_URL + '/secured/developer/apikey'
-      const apiKey = process.env.NEXT_PUBLIC_API_KEY
+      
       const jwtToken = await appwriteService.getJWTToken()
 
-      const { REGION, AccessKeyId, SecretAccessKey, SessionToken } =
-        await getToken()
-      const url = new URL(apiURL)
-      const opts = {
-        host: url.host,
-        path: url.pathname + url.search,
-        service: 'execute-api',
-        region: REGION,
+      const securedAccessBody = {
+        jwtToken: jwtToken.jwt,
+        apiURL: apiURL,
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'X-Auth-Token': 'Bearer ' + jwtToken.jwt,
-          'X-Amz-Security-Token': SessionToken,
-        },
       }
 
-      aws4.sign(opts, {
-        accessKeyId: AccessKeyId,
-        secretAccessKey: SecretAccessKey,
-        sessionToken: SessionToken,
+      const securedAccessResponse = await fetch('/api/securedAccess', {
+        method: 'POST',
+        body: JSON.stringify(securedAccessBody),
       })
+
+      const securedAccessResponseJSON = await securedAccessResponse.json()
 
       const apiKeyResponse = await fetch(apiURL, {
         method: 'POST',
-        headers: opts.headers,
+        headers: securedAccessResponseJSON["headers"],
       })
       if (!apiKeyResponse.ok) {
         toast.error('User ID is not valid')

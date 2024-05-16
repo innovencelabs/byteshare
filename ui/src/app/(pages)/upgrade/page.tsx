@@ -1,8 +1,6 @@
 'use client'
-import { getToken } from '@/authentication/aws/config'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import aws4 from 'aws4'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -15,40 +13,31 @@ function UpgradePage() {
   const handleSubscribe = async (e) => {
     e.preventDefault()
     const apiURL = process.env.NEXT_PUBLIC_API_BASE_URL + '/secured/subscribe'
-    const apiKey = process.env.NEXT_PUBLIC_API_KEY
+    
 
     const subscribeJSON = {
       email: email,
     }
 
-    const { REGION, AccessKeyId, SecretAccessKey, SessionToken } =
-      await getToken()
-    const url = new URL(apiURL)
-    const opts = {
-      host: url.host,
-      path: url.pathname + url.search,
-      service: 'execute-api',
-      region: REGION,
+    const securedAccessBody = {
+      jwtToken: "",
+      apiURL: apiURL,
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'X-Amz-Security-Token': SessionToken,
-      },
     }
 
-    aws4.sign(opts, {
-      accessKeyId: AccessKeyId,
-      secretAccessKey: SecretAccessKey,
-      sessionToken: SessionToken,
+    const securedAccessResponse = await fetch('/api/securedAccess', {
+      method: 'POST',
+      body: JSON.stringify(securedAccessBody),
     })
+
+    const securedAccessResponseJSON = await securedAccessResponse.json()
 
     
 
     await fetch(apiURL, {
       method: 'POST',
       body: JSON.stringify(subscribeJSON),
-      headers: opts.headers,
+      headers: securedAccessResponseJSON["headers"],
     })
     setEmail('')
     toast.success('You have been subscribed!')
