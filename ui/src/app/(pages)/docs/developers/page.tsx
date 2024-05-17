@@ -41,8 +41,6 @@ function DeveloperPage() {
   
   const { authorised, statusLoaded } = useAuth()
 
-  const apiURL = "https://api.byteshare.io"
-
   const router = useRouter()
 
   useEffect(() => {
@@ -71,10 +69,18 @@ function DeveloperPage() {
           method: 'GET',
         }
 
-        const securedAccessResponse = await fetch('/api/securedAccess', {
-          method: 'POST',
-          body: JSON.stringify(securedAccessBody)
-        })
+        const securedAccessResponse = await fetch(
+          process.env.NEXT_PUBLIC_API_BASE_URL + '/access/aws',
+          {
+            method: 'POST',
+            body: JSON.stringify(securedAccessBody),
+            headers: {
+              'Content-Type': 'application/json',
+              'x-api-key': apiKey,
+              'X-Auth-Token': 'Bearer ' + jwtToken.jwt,
+            },
+          },
+        )
 
         const securedAccessResponseJSON = await securedAccessResponse.json()
         
@@ -141,10 +147,18 @@ function DeveloperPage() {
         method: 'DELETE',
       }
 
-      const securedAccessResponse = await fetch('/api/securedAccess', {
-        method: 'POST',
-        body: JSON.stringify(securedAccessBody),
-      })
+      const securedAccessResponse = await fetch(
+        process.env.NEXT_PUBLIC_API_BASE_URL + '/access/aws',
+        {
+          method: 'POST',
+          body: JSON.stringify(securedAccessBody),
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey,
+            'X-Auth-Token': 'Bearer ' + jwtToken.jwt,
+          },
+        },
+      )
 
       const securedAccessResponseJSON = await securedAccessResponse.json()
       
@@ -189,10 +203,18 @@ function DeveloperPage() {
         method: 'POST',
       }
 
-      const securedAccessResponse = await fetch('/api/securedAccess', {
-        method: 'POST',
-        body: JSON.stringify(securedAccessBody),
-      })
+      const securedAccessResponse = await fetch(
+        process.env.NEXT_PUBLIC_API_BASE_URL + '/access/aws',
+        {
+          method: 'POST',
+          body: JSON.stringify(securedAccessBody),
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey,
+            'X-Auth-Token': 'Bearer ' + jwtToken.jwt,
+          },
+        },
+      )
 
       const securedAccessResponseJSON = await securedAccessResponse.json()
 
@@ -380,12 +402,12 @@ function DeveloperPage() {
                 <div>
                   <h3 className="text-lg font-semibold mb-2">Base URL</h3>
                   <p className="text-slate-600 dark:text-slate-600">
-                    {apiURL}{' '}
+                    {process.env.NEXT_PUBLIC_API_BASE_URL}{' '}
                     <Button
                       type="submit"
                       size="sm"
                       className="ml-2 p-2 bg-black hover:bg-slate-700"
-                      onClick={() => handleCopy(apiURL)}
+                      onClick={() => handleCopy(process.env.NEXT_PUBLIC_API_BASE_URL)}
                     >
                       <span className="sr-only">Copy</span>
                       {!isCopied ? (

@@ -34,6 +34,16 @@ Parameters:
     Type: String
   ScanPass:
     Type: String
+  AWSApiKey:
+    Type: String
+  AWSApiAccessRoleArn:
+    Type: String
+  AWSApiAccessKeyId:
+    Type: String
+  AWSApiAccessSecretAccessKey:
+    Type: String
+  AWSApiAccessRegion:
+    Type: String
 Globals:
   Function:
     Timeout: 900
@@ -76,6 +86,11 @@ Resources:
           APPWRITE_WEBHOOK_PASS: !Ref AppwriteWebhookPass
           SCAN_USER: !Ref ScanUser
           SCAN_PASS: !Ref ScanPass
+          AWS_API_ACCESS_ACCESS_KEY: !Ref AWSApiAccessKeyId
+          AWS_API_ACCESS_SECRET_ACCESS_KEY: !Ref AWSApiAccessSecretAccessKey
+          AWS_API_ACCESS_REGION: !Ref AWSApiAccessRegion
+          AWS_API_ACCESS_ROLE_ARN: !Ref AWSApiAccessRoleArn
+          AWS_API_KEY: !Ref AWSApiKey
       Events:
         HealthCheckApi:
           Type: Api
@@ -98,6 +113,20 @@ Resources:
               Ref: ByteShareAPIGW
             Path: /download/{proxy+}
             Method: any
+        FeedbackApi:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: ByteShareAPIGW
+            Path: /feedback/{proxy+}
+            Method: any
+        SubscribeApi:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: ByteShareAPIGW
+            Path: /subscribe/{proxy+}
+            Method: any
         SecuredApi:
           Type: Api
           Properties:
@@ -113,6 +142,13 @@ Resources:
             RestApiId:
               Ref: ByteShareAPIGW
             Path: /webhook/{proxy+}
+            Method: any
+        AccessApi:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: ByteShareAPIGW
+            Path: /access/{proxy+}
             Method: any
   ByteShareAPIGW:
     Type: AWS::Serverless::Api

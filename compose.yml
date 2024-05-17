@@ -30,6 +30,11 @@ services:
       - AWS_APP_SECRET_ACCESS_KEY
       - RABBITMQ_QUEUE
       - RABBITMQ_URL
+      - AWS_API_ACCESS_ACCESS_KEY
+      - AWS_API_ACCESS_SECRET_ACCESS_KEY
+      - AWS_API_ACCESS_REGION
+      - AWS_API_ACCESS_ROLE_ARN
+      - AWS_API_KEY=${NEXT_PUBLIC_API_KEY}
     ports:
       - 8000:8000
     networks:

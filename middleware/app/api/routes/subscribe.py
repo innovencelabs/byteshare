@@ -1,4 +1,4 @@
-import api.services.secured.subscribe as subscribe_service
+import api.services.subscribe as subscribe_service
 import utils.logger as logger
 from fastapi import APIRouter
 from pydantic import BaseModel

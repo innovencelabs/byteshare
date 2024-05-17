@@ -12,32 +12,21 @@ function UpgradePage() {
 
   const handleSubscribe = async (e) => {
     e.preventDefault()
-    const apiURL = process.env.NEXT_PUBLIC_API_BASE_URL + '/secured/subscribe'
+    const apiURL = process.env.NEXT_PUBLIC_API_BASE_URL + '/subscribe'
+    const apiKey = process.env.NEXT_PUBLIC_API_KEY
     
 
     const subscribeJSON = {
       email: email,
     }
 
-    const securedAccessBody = {
-      jwtToken: "",
-      apiURL: apiURL,
-      method: 'POST',
-    }
-
-    const securedAccessResponse = await fetch('/api/securedAccess', {
-      method: 'POST',
-      body: JSON.stringify(securedAccessBody),
-    })
-
-    const securedAccessResponseJSON = await securedAccessResponse.json()
-
-    
-
     await fetch(apiURL, {
       method: 'POST',
       body: JSON.stringify(subscribeJSON),
-      headers: securedAccessResponseJSON["headers"],
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+      },
     })
     setEmail('')
     toast.success('You have been subscribed!')
