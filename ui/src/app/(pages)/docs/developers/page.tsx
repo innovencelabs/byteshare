@@ -62,6 +62,7 @@ function DeveloperPage() {
       try{
         const apiURL =
           process.env.NEXT_PUBLIC_API_BASE_URL + '/secured/developer/apikey'
+        const apiKey = process.env.NEXT_PUBLIC_API_KEY
         const jwtToken = await appwriteService.getJWTToken()
 
         const securedAccessBody = {
@@ -139,6 +140,7 @@ function DeveloperPage() {
     try {
       const apiURL =
         process.env.NEXT_PUBLIC_API_BASE_URL + '/secured/developer/apikey'
+      const apiKey = process.env.NEXT_PUBLIC_API_KEY
       
       const jwtToken = await appwriteService.getJWTToken()
 
@@ -195,6 +197,7 @@ function DeveloperPage() {
     try{
       const apiURL =
         process.env.NEXT_PUBLIC_API_BASE_URL + '/secured/developer/apikey'
+      const apiKey = process.env.NEXT_PUBLIC_API_KEY
       
       const jwtToken = await appwriteService.getJWTToken()
 
@@ -999,16 +1002,11 @@ function DeveloperPage() {
             <Button
               type="button"
               variant="default"
-              className="bg-black hover:bg-slate-700 justify-end"
+              className="bg-black hover:bg-slate-700 justify-center"
               onClick={handleDownloadCSV}
               disabled={downloadingCSV}
             >
-              {downloadingCSV ? (
-                <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                ''
-              )}{' '}
-              Download CSV
+              {downloadingCSV? <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />:""} Download CSV
             </Button>
           </DialogFooter>
         </DialogContent>
