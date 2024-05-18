@@ -85,13 +85,13 @@ class DynamoDBManager:
                 )
             )
 
-    def read_items(self, key_name, key_value):
+    def read_items(self, key_name, key_value, index_name):
         FUNCTION_NAME = "read_items()"
         log.info("Entering {}".format(FUNCTION_NAME))
 
         try:
             response = self.table.query(
-                IndexName="userid-gsi",
+                IndexName=index_name,
                 KeyConditionExpression=key_name + " = :key_value",
                 ExpressionAttributeValues={":key_value": key_value},
             )

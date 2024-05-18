@@ -1,11 +1,12 @@
+import os
 from enum import Enum as PythonEnum
-from typing import List
+from typing import List, Optional
 
 import api.services.upload as upload_service
 import utils.logger as logger
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Header, HTTPException, Request
 from pydantic import BaseModel
-from utils.auth import authenticate
+from utils.auth import optional_authenticate, preprocess_external_call
 
 router = APIRouter()
 
@@ -36,7 +37,8 @@ class EditTitle(BaseModel):
 def initiate_upload(
     body: InitiateUpload,
     request: Request,
-    token_data: None = Depends(authenticate),
+    x_api_key: Optional[str] = Header(None),
+    token_data: None = Depends(optional_authenticate),
 ):
     """
     Batch initiate upload to Storage.
@@ -53,6 +55,16 @@ def initiate_upload(
     FUNCTION_NAME = "initiate_upload()"
     log.info("Entering {}".format(FUNCTION_NAME))
 
+    if x_api_key != os.getenv("AWS_API_KEY"):
+        token_data = preprocess_external_call(x_api_key)
+
+    if token_data is None:
+        raise HTTPException(
+            status_code=401,
+            detail="Not authorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
     response = upload_service.initiate_upload(token_data, body, request)
 
     log.info("Exiting {}".format(FUNCTION_NAME))
@@ -61,7 +73,10 @@ def initiate_upload(
 
 @router.post("/finalise/{upload_id}")
 def post_upload_return_link_qr(
-    body: FinaliseUpload, upload_id: str, token_data: None = Depends(authenticate)
+    body: FinaliseUpload,
+    upload_id: str,
+    x_api_key: Optional[str] = Header(None),
+    token_data: None = Depends(optional_authenticate),
 ):
     """
     Post upload to Storage.
@@ -78,6 +93,16 @@ def post_upload_return_link_qr(
     FUNCTION_NAME = "post_upload_return_link_qr()"
     log.info("Entering {}".format(FUNCTION_NAME))
 
+    if x_api_key != os.getenv("AWS_API_KEY"):
+        token_data = preprocess_external_call(x_api_key)
+
+    if token_data is None:
+        raise HTTPException(
+            status_code=401,
+            detail="Not authorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
     response = upload_service.post_upload_return_link_qr(token_data, body, upload_id)
 
     log.info("Exiting {}".format(FUNCTION_NAME))
@@ -85,7 +110,11 @@ def post_upload_return_link_qr(
 
 
 @router.delete("/{upload_id}")
-def delete_upload_return_done(upload_id: str, token_data: None = Depends(authenticate)):
+def delete_upload_return_done(
+    upload_id: str,
+    x_api_key: Optional[str] = Header(None),
+    token_data: None = Depends(optional_authenticate),
+):
     """
     Delete the upload of the user
     Reads the DB to find the upload and deletes.
@@ -99,6 +128,16 @@ def delete_upload_return_done(upload_id: str, token_data: None = Depends(authent
     FUNCTION_NAME = "delete_upload_return_done()"
     log.info("Entering {}".format(FUNCTION_NAME))
 
+    if x_api_key != os.getenv("AWS_API_KEY"):
+        token_data = preprocess_external_call(x_api_key)
+
+    if token_data is None:
+        raise HTTPException(
+            status_code=401,
+            detail="Not authorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
     response = upload_service.delete_upload_return_done(token_data, upload_id)
 
     log.info("Exiting {}".format(FUNCTION_NAME))
@@ -107,7 +146,10 @@ def delete_upload_return_done(upload_id: str, token_data: None = Depends(authent
 
 @router.put("/{upload_id}/title")
 def update_upload_title_return_done(
-    body: EditTitle, upload_id: str, token_data: None = Depends(authenticate)
+    body: EditTitle,
+    upload_id: str,
+    x_api_key: Optional[str] = Header(None),
+    token_data: None = Depends(optional_authenticate),
 ):
     """
     Edit the upload title
@@ -123,6 +165,16 @@ def update_upload_title_return_done(
     FUNCTION_NAME = "update_upload_title_return_done()"
     log.info("Entering {}".format(FUNCTION_NAME))
 
+    if x_api_key != os.getenv("AWS_API_KEY"):
+        token_data = preprocess_external_call(x_api_key)
+
+    if token_data is None:
+        raise HTTPException(
+            status_code=401,
+            detail="Not authorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
     response = upload_service.update_upload_title_return_done(
         token_data, body, upload_id
     )
@@ -132,7 +184,10 @@ def update_upload_title_return_done(
 
 
 @router.get("/history")
-def get_history_return_all_shares_list(token_data: None = Depends(authenticate)):
+def get_history_return_all_shares_list(
+    x_api_key: Optional[str] = Header(None),
+    token_data: None = Depends(optional_authenticate),
+):
     """
     Get history for a given User.
     Reads the DB to find all the shares made by the user.
@@ -145,6 +200,16 @@ def get_history_return_all_shares_list(token_data: None = Depends(authenticate))
     """
     FUNCTION_NAME = "get_history_return_all_shares_list()"
     log.info("Entering {}".format(FUNCTION_NAME))
+
+    if x_api_key != os.getenv("AWS_API_KEY"):
+        token_data = preprocess_external_call(x_api_key)
+
+    if token_data is None:
+        raise HTTPException(
+            status_code=401,
+            detail="Not authorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
     response = upload_service.get_history_return_all_shares_list(token_data)
 

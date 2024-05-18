@@ -351,7 +351,9 @@ def get_history_return_all_shares_list(token_data):
     # if(user==None):
     #     raise HTTPException(status_code=400, detail="User does not exist")
 
-    upload_metadatas = dynamodb.read_items("creator_id", token_data["$id"])
+    upload_metadatas = dynamodb.read_items(
+        "creator_id", token_data["$id"], "userid-gsi"
+    )
     for upload_metadata in upload_metadatas:
         upload = {
             "upload_id": upload_metadata["upload_id"],

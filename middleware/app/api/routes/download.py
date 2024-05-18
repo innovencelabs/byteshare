@@ -1,9 +1,11 @@
+import os
 from enum import Enum as PythonEnum
+from typing import Optional
 
 import api.services.download as download_service
 import utils.logger as logger
-from fastapi import APIRouter, Depends
-from utils.auth import optional_authenticate
+from fastapi import APIRouter, Depends, Header
+from utils.auth import optional_authenticate, preprocess_external_call
 
 router = APIRouter()
 
@@ -18,7 +20,9 @@ class StatusEnum(PythonEnum):
 
 @router.get("/{upload_id}")
 def get_file_url_return_name_link(
-    upload_id: str, token_data: None = Depends(optional_authenticate)
+    upload_id: str,
+    x_api_key: Optional[str] = Header(None),
+    token_data: None = Depends(optional_authenticate),
 ):
     """
     Get download url from Storage.
@@ -33,6 +37,9 @@ def get_file_url_return_name_link(
     """
     FUNCTION_NAME = "get_file_url_return_name_link()"
     log.info("Entering {}".format(FUNCTION_NAME))
+
+    if x_api_key != os.getenv("AWS_API_KEY"):
+        token_data = preprocess_external_call(x_api_key)
 
     response = download_service.get_file_url_return_name_link(token_data, upload_id)
 

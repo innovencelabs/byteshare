@@ -140,6 +140,17 @@ resource "aws_dynamodb_table" "byteshare-apikey" {
     name = "user_id"
     type = "S"
   }
+  attribute {
+    name = "apikey"
+    type = "S"
+  }
+  
+
+  global_secondary_index {
+    name               = "apikey-gsi"
+    hash_key           = "apikey"
+    projection_type    = "ALL"
+  }
 }
 
 

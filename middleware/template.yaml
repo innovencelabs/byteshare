@@ -44,13 +44,15 @@ Parameters:
     Type: String
   AWSApiAccessRegion:
     Type: String
+  AppwriteApiKey:
+    Type: String
 Globals:
   Function:
     Timeout: 900
   Api:
     Cors:
       AllowMethods: "'OPTIONS,GET,POST,PUT,DELETE'"
-      AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,File-Length'"
+      AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,File-Length,X-Auth-Token'"
       AllowOrigin: "'*'"
 Resources:
   ByteShareFunction:
@@ -91,6 +93,7 @@ Resources:
           AWS_API_ACCESS_REGION: !Ref AWSApiAccessRegion
           AWS_API_ACCESS_ROLE_ARN: !Ref AWSApiAccessRoleArn
           AWS_API_KEY: !Ref AWSApiKey
+          APPWRITE_API_KEY: !Ref AppwriteApiKey
       Events:
         HealthCheckApi:
           Type: Api

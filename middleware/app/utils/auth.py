@@ -1,10 +1,13 @@
 import base64
 import os
+from datetime import datetime, timezone
 from typing import Optional
 
 import utils.logger as logger
 from appwrite.client import Client
 from appwrite.services.account import Account
+from appwrite.services.users import Users
+from database.db import DynamoDBManager
 from dotenv import load_dotenv
 from fastapi import Header, HTTPException
 
@@ -14,8 +17,14 @@ load_dotenv()
 # Logger instance
 log = logger.get_logger()
 
+# DynamoDB
+table_name = "byteshare-apikey"
+apikey_dynamodb = DynamoDBManager(table_name)
 
-async def authenticate(x_auth_token: Optional[str] = Header(None)):
+
+async def authenticate(
+    x_auth_token: Optional[str] = Header(None), x_api_key: Optional[str] = Header(None)
+):
     FUNCTION_NAME = "authenticate()"
     log.info("Entering {}".format(FUNCTION_NAME))
 
@@ -24,6 +33,11 @@ async def authenticate(x_auth_token: Optional[str] = Header(None)):
             status_code=401,
             detail="X-Auth-Token header is missing",
             headers={"WWW-Authenticate": "Bearer"},
+        )
+    if x_api_key != os.getenv("AWS_API_KEY"):
+        raise HTTPException(
+            status_code=403,
+            detail="Given API Key not allowed",
         )
 
     try:
@@ -133,3 +147,37 @@ async def authenticate_scan(x_auth_token: Optional[str] = Header(None)):
         raise HTTPException(
             status_code=401, detail="Invalid X-Auth-Token header format"
         )
+
+
+async def preprocess_external_call(api_key: str):
+    if api_key == os.getenv("AWS_API_KEY"):
+        raise HTTPException(
+            status_code=401,
+            detail="Given API Key not allowed",
+        )
+
+    client = Client()
+    client.set_endpoint(os.getenv("APPWRITE_URL"))
+    client.set_project(os.getenv("APPWRITE_PROJECT_ID"))
+    client.set_key(os.getenv("APPWRITE_API_KEY"))
+
+    users = Users(client)
+
+    apikey_metadatas = apikey_dynamodb.read_items("apikey", api_key, "apikey-gsi")
+
+    user_id = apikey_metadatas[0]["user_id"]
+    used_per_apikey = apikey_metadatas[0]["used_per_apikey"]
+    total_used = apikey_metadatas[0]["total_used"]
+
+    result = users.get(user_id=user_id)
+    time_now = datetime.now(timezone.utc)
+
+    keys = {"user_id": user_id}
+    update_data = {
+        "used_per_apikey": used_per_apikey + 1,
+        "total_used": total_used + 1,
+        "last_used_per_apikey": time_now.isoformat(),
+    }
+    apikey_dynamodb.update_item(keys, update_data)
+
+    return result
