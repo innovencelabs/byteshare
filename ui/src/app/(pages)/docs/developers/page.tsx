@@ -2,6 +2,7 @@
 import appwriteService from '@/authentication/appwrite/config'
 import { Header } from '@/components/header'
 import { Icons } from '@/components/icons'
+import HorizontalLine from '@/components/line'
 import {
   Accordion,
   AccordionContent,
@@ -407,7 +408,9 @@ function DeveloperPage() {
                       type="submit"
                       size="sm"
                       className="ml-2 p-2 bg-black hover:bg-slate-700"
-                      onClick={() => handleCopy(process.env.NEXT_PUBLIC_API_BASE_URL)}
+                      onClick={() =>
+                        handleCopy(process.env.NEXT_PUBLIC_API_BASE_URL)
+                      }
                     >
                       <span className="sr-only">Copy</span>
                       {!isCopied ? (
@@ -438,10 +441,58 @@ function DeveloperPage() {
                                   GET
                                 </span>
                                 /health
+                                <span className="hidden md:inline-block text-slate-600 font-semibold ml-4 text-xxs">
+                                  Health Check
+                                </span>
                               </span>
                             </AccordionTrigger>
-                            <AccordionContent>
-                              Description of the API.
+                            <AccordionContent className="mt-3">
+                              <p>
+                                Perform checks to verify system health. For
+                                instance, check database connection, external
+                                services, etc.
+                              </p>
+                              <p className="mt-4 font-bold">Request</p>
+                              <HorizontalLine />
+                              <p className="mt-2 font-semibold">URL</p>
+                              <ul>
+                                <li className="bg-black mt-1 p-2 font-mono rounded-sm text-white">
+                                  {process.env.NEXT_PUBLIC_API_BASE_URL +
+                                    '/health'}
+                                </li>
+                              </ul>
+                              <p className="mt-2 font-semibold">
+                                Headers (including X-API-Key)
+                              </p>
+
+                              <ul>
+                                <li>No Headers</li>
+                              </ul>
+                              <p className="mt-2 font-semibold">
+                                Path Variable
+                              </p>
+
+                              <ul>
+                                <li>No Path Variable</li>
+                              </ul>
+                              <p className="mt-2 font-semibold">Body</p>
+
+                              <ul>
+                                <li>No Body</li>
+                              </ul>
+                              <p className="mt-4 font-bold">Response</p>
+                              <HorizontalLine />
+                              <ul>
+                                <li>
+                                  Status of application and external services
+                                </li>
+                                <li className="mt-3">Body</li>
+                                <li className="bg-black p-1 rounded-sm">
+                                  <pre className="text-white py-1 rounded-md font-mono p-2">
+                                    {`{\n  'status': 'ok',\n  'details': 'Service is running'\n}`}
+                                  </pre>
+                                </li>
+                              </ul>
                             </AccordionContent>
                           </AccordionItem>
                         </Accordion>
@@ -464,10 +515,72 @@ function DeveloperPage() {
                                   POST
                                 </span>
                                 /upload/initiate
+                                <span className="hidden md:inline-block text-slate-600 font-semibold ml-4 text-xxs">
+                                  Initiate Upload
+                                </span>
                               </span>
                             </AccordionTrigger>
-                            <AccordionContent>
-                              Description of the API.
+                            <AccordionContent className="mt-3">
+                              <p>
+                                Batch initiate upload. Generate upload URLs.
+                              </p>
+                              <p className="mt-4 font-bold">Request</p>
+                              <HorizontalLine />
+                              <p className="mt-2 font-semibold">URL</p>
+                              <ul>
+                                <li className="bg-black mt-1 p-2 font-mono rounded-sm text-white">
+                                  {process.env.NEXT_PUBLIC_API_BASE_URL +
+                                    '/upload/initiate'}
+                                </li>
+                              </ul>
+                              <p className="mt-2 font-semibold">
+                                Headers (including X-API-Key)
+                              </p>
+
+                              <ul>
+                                <li>No Headers</li>
+                              </ul>
+                              <p className="mt-2 font-semibold">
+                                Path Variable
+                              </p>
+                              <ul>
+                                <li>No Path Variable</li>
+                              </ul>
+                              <p className="mt-2 font-semibold">Body</p>
+
+                              <ul>
+                                <li>
+                                  •{' '}
+                                  <span className="font-medium">
+                                    file_names
+                                  </span>
+                                  : List of files names to be uploaded
+                                </li>
+                                <li>
+                                  •{' '}
+                                  <span className="font-medium">
+                                    share_email_as_source: Whether to show
+                                    sender email to receiver
+                                  </span>
+                                </li>
+
+                                <li className="mt-3 bg-black p-1 rounded-sm">
+                                  <pre className="text-white py-1 rounded-md font-mono p-2">
+                                    {`{\n  "file_names": ["string"],\n  "share_email_as_source": true\n}`}
+                                  </pre>
+                                </li>
+                              </ul>
+                              <p className="mt-4 font-bold">Response</p>
+                              <HorizontalLine />
+                              <ul>
+                                <li>UploadID and Upload URLs for each file</li>
+
+                                <li className="mt-3 bg-black p-1 rounded-sm">
+                                  <pre className="text-white py-1 rounded-md font-mono p-2">
+                                    {`{\n  "upload_id": "<Upload ID>",\n  "upload_urls": {\n    "<File Name>": "<Upload URL>",\n    "<File Name>": "<Upload URL>"\n  }\n}`}
+                                  </pre>
+                                </li>
+                              </ul>
                             </AccordionContent>
                           </AccordionItem>
                         </Accordion>
@@ -483,10 +596,78 @@ function DeveloperPage() {
                                   POST
                                 </span>
                                 /upload/finalise/[upload_id]
+                                <span className="hidden md:inline-block text-slate-600 font-semibold ml-4 text-xxs">
+                                  Post Upload
+                                </span>
                               </span>
                             </AccordionTrigger>
-                            <AccordionContent>
-                              Description of the API.
+                            <AccordionContent className="mt-3">
+                              <p>
+                                Finalise the upload. Process the upload and
+                                generate QR code and Share link.
+                              </p>
+                              <p className="mt-4 font-bold">Request</p>
+                              <HorizontalLine />
+                              <p className="mt-2 font-semibold">URL</p>
+                              <ul>
+                                <li className="bg-black mt-1 p-2 font-mono rounded-sm text-white">
+                                  {process.env.NEXT_PUBLIC_API_BASE_URL +
+                                    '/upload/finalise/[upload_id]'}
+                                </li>
+                              </ul>
+                              <p className="mt-2 font-semibold">
+                                Headers (including X-API-Key)
+                              </p>
+
+                              <ul>
+                                <li>No Headers</li>
+                              </ul>
+                              <p className="mt-2 font-semibold">
+                                Path Variable
+                              </p>
+
+                              <ul>
+                                <li>
+                                  •{' '}
+                                  <span className="font-medium">upload_id</span>
+                                  : Upload ID to finalise the upload.
+                                </li>
+                              </ul>
+                              <p className="mt-2 font-semibold">Body</p>
+
+                              <ul>
+                                <li>
+                                  •{' '}
+                                  <span className="font-medium">
+                                    file_names
+                                  </span>
+                                  : List of files names being uploaded
+                                </li>
+                                <li>
+                                  •{' '}
+                                  <span className="font-medium">
+                                    receiver_email: Receiver email address (keep
+                                    it blank if none)
+                                  </span>
+                                </li>
+
+                                <li className="mt-3 bg-black p-1 rounded-sm">
+                                  <pre className="text-white py-1 rounded-md font-mono p-2">
+                                    {`{\n  "file_names": ["string"],\n  "receiver_email": "string"\n}`}
+                                  </pre>
+                                </li>
+                              </ul>
+                              <p className="mt-4 font-bold">Response</p>
+                              <HorizontalLine />
+                              <ul>
+                                <li>Share link and QR code with upload info</li>
+
+                                <li className="mt-3 bg-black p-1 rounded-sm">
+                                  <pre className="text-white py-1 rounded-md font-mono p-2">
+                                    {`{\n  "url": "<Share URL>",\n  "QR": "<QR Code Link>",\n  "expiration_date": "<Expiration Date>",\n  "downloads_allowed": "<Max Download Allowed>"\n}`}
+                                  </pre>
+                                </li>
+                              </ul>
                             </AccordionContent>
                           </AccordionItem>
                         </Accordion>
@@ -502,10 +683,56 @@ function DeveloperPage() {
                                   DELETE
                                 </span>
                                 /upload/[upload_id]
+                                <span className="hidden md:inline-block text-slate-600 font-semibold ml-4 text-xxs">
+                                  Delete Upload
+                                </span>
                               </span>
                             </AccordionTrigger>
-                            <AccordionContent>
-                              Description of the API.
+                            <AccordionContent className="mt-3">
+                              <p>Delete the upload for the given UploadID.</p>
+                              <p className="mt-4 font-bold">Request</p>
+                              <HorizontalLine />
+                              <p className="mt-2 font-semibold">URL</p>
+                              <ul>
+                                <li className="bg-black mt-1 p-2 font-mono rounded-sm text-white">
+                                  {process.env.NEXT_PUBLIC_API_BASE_URL +
+                                    '/upload/[upload_id]'}
+                                </li>
+                              </ul>
+                              <p className="mt-2 font-semibold">
+                                Headers (including X-API-Key)
+                              </p>
+
+                              <ul>
+                                <li>No Headers</li>
+                              </ul>
+                              <p className="mt-2 font-semibold">
+                                Path Variable
+                              </p>
+
+                              <ul>
+                                <li>
+                                  •{' '}
+                                  <span className="font-medium">upload_id</span>
+                                  : Upload ID to delete the upload.
+                                </li>
+                              </ul>
+                              <p className="mt-2 font-semibold">Body</p>
+
+                              <ul>
+                                <li>No Body</li>
+                              </ul>
+                              <p className="mt-4 font-bold">Response</p>
+                              <HorizontalLine />
+                              <ul>
+                                <li>Status of deletion</li>
+
+                                <li className="mt-3 bg-black p-1 rounded-sm">
+                                  <pre className="text-white py-1 rounded-md font-mono p-2">
+                                    {`{\n  "status":"Done"\n}`}
+                                  </pre>
+                                </li>
+                              </ul>
                             </AccordionContent>
                           </AccordionItem>
                         </Accordion>
@@ -521,10 +748,65 @@ function DeveloperPage() {
                                   PUT
                                 </span>
                                 /upload/[upload_id]/title
+                                <span className="hidden md:inline-block text-slate-600 font-semibold ml-4 text-xxs">
+                                  Edit Upload Title
+                                </span>
                               </span>
                             </AccordionTrigger>
-                            <AccordionContent>
-                              Description of the API.
+                            <AccordionContent className="mt-3">
+                              <p>Modify upload title.</p>
+                              <p className="mt-4 font-bold">Request</p>
+                              <HorizontalLine />
+                              <p className="mt-2 font-semibold">URL</p>
+                              <ul>
+                                <li className="bg-black mt-1 p-2 font-mono rounded-sm text-white">
+                                  {process.env.NEXT_PUBLIC_API_BASE_URL +
+                                    '/upload/[upload_id]/title'}
+                                </li>
+                              </ul>
+                              <p className="mt-2 font-semibold">
+                                Headers (including X-API-Key)
+                              </p>
+
+                              <ul>
+                                <li>No Headers</li>
+                              </ul>
+                              <p className="mt-2 font-semibold">
+                                Path Variable
+                              </p>
+
+                              <ul>
+                                <li>
+                                  •{' '}
+                                  <span className="font-medium">upload_id</span>
+                                  : Upload ID to modify the upload title.
+                                </li>
+                              </ul>
+                              <p className="mt-2 font-semibold">Body</p>
+
+                              <ul>
+                                <li>
+                                  • <span className="font-medium">title</span>:
+                                  New title
+                                </li>
+
+                                <li className="mt-3 bg-black p-1 rounded-sm">
+                                  <pre className="text-white py-1 rounded-md font-mono p-2">
+                                    {`{\n  "title": "string"\n}`}
+                                  </pre>
+                                </li>
+                              </ul>
+                              <p className="mt-4 font-bold">Response</p>
+                              <HorizontalLine />
+                              <ul>
+                                <li>Status of title update</li>
+
+                                <li className="mt-3 bg-black p-1 rounded-sm">
+                                  <pre className="text-white py-1 rounded-md font-mono p-2">
+                                    {`{\n  "status":"Done"\n}`}
+                                  </pre>
+                                </li>
+                              </ul>
                             </AccordionContent>
                           </AccordionItem>
                         </Accordion>
@@ -540,10 +822,54 @@ function DeveloperPage() {
                                   GET
                                 </span>
                                 /upload/history
+                                <span className="hidden md:inline-block text-slate-600 font-semibold ml-4 text-xxs">
+                                  Upload History
+                                </span>
                               </span>
                             </AccordionTrigger>
-                            <AccordionContent>
-                              Description of the API.
+                            <AccordionContent className="mt-3">
+                              <p>
+                                Retrieve upload history for the current user.
+                              </p>
+                              <p className="mt-4 font-bold">Request</p>
+                              <HorizontalLine />
+                              <p className="mt-2 font-semibold">URL</p>
+                              <ul>
+                                <li className="bg-black mt-1 p-2 font-mono rounded-sm text-white">
+                                  {process.env.NEXT_PUBLIC_API_BASE_URL +
+                                    '/upload/history'}
+                                </li>
+                              </ul>
+                              <p className="mt-2 font-semibold">
+                                Headers (including X-API-Key)
+                              </p>
+
+                              <ul>
+                                <li>No Headers</li>
+                              </ul>
+                              <p className="mt-2 font-semibold">
+                                Path Variable
+                              </p>
+
+                              <ul>
+                                <li>No Path Variable</li>
+                              </ul>
+                              <p className="mt-2 font-semibold">Body</p>
+
+                              <ul>
+                                <li>No Body</li>
+                              </ul>
+                              <p className="mt-4 font-bold">Response</p>
+                              <HorizontalLine />
+                              <ul>
+                                <li>Upload history</li>
+
+                                <li className="mt-3 bg-black p-1 rounded-sm">
+                                  <pre className="text-white py-1 rounded-md font-mono p-2">
+                                    {`[\n  {\n    "upload_id": "<Upload ID>",\n    "title": "<Title>",\n    "created_at": "<Creation Time>",\n    "downloaded": 0,\n    "max_download": <Max Download Allowed>,\n    "total_size": "<Total Size>"\n  },\n  {\n    "upload_id": "<Upload ID>",\n    "title": "<Title>",\n    "created_at": "<Creation Time>",\n    "downloaded": 0,\n    "max_download": <Max Download Allowed>,\n    "total_size": "<Total Size>"\n  }\n]`}
+                                  </pre>
+                                </li>
+                              </ul>
                             </AccordionContent>
                           </AccordionItem>
                         </Accordion>
@@ -566,10 +892,61 @@ function DeveloperPage() {
                                   GET
                                 </span>
                                 /download/[upload_id]
+                                <span className="hidden md:inline-block text-slate-600 font-semibold ml-4 text-xxs">
+                                  Download files
+                                </span>
                               </span>
                             </AccordionTrigger>
-                            <AccordionContent>
-                              Description of the API.
+                            <AccordionContent className="mt-3">
+                              <p>
+                                Retrieve file details and download links for a
+                                specified UploadID.
+                              </p>
+                              <p className="mt-4 font-bold">Request</p>
+                              <HorizontalLine />
+                              <p className="mt-2 font-semibold">URL</p>
+                              <ul>
+                                <li className="bg-black mt-1 p-2 font-mono rounded-sm text-white">
+                                  {process.env.NEXT_PUBLIC_API_BASE_URL +
+                                    '/download/[upload_id]'}
+                                </li>
+                              </ul>
+                              <p className="mt-2 font-semibold">
+                                Headers (including X-API-Key)
+                              </p>
+
+                              <ul>
+                                <li>No Headers</li>
+                              </ul>
+                              <p className="mt-2 font-semibold">
+                                Path Variable
+                              </p>
+
+                              <ul>
+                                <li>
+                                  •{' '}
+                                  <span className="font-medium">upload_id</span>
+                                  : Upload ID to get the download link.
+                                </li>
+                              </ul>
+                              <p className="mt-2 font-semibold">Body</p>
+
+                              <ul>
+                                <li>No Body</li>
+                              </ul>
+                              <p className="mt-4 font-bold">Response</p>
+                              <HorizontalLine />
+                              <ul>
+                                <li>
+                                  Files download link and sender email
+                                </li>
+
+                                <li className="mt-3 bg-black p-1 rounded-sm">
+                                  <pre className="text-white py-1 rounded-md font-mono p-2">
+                                    {`{\n  "user_email": "<Sender email>",\n  "<File Name>": {\n    "format": "<Format>",\n    "size": "<File Size>",\n    "download_url": "<Download URL>"\n  },\n  "<File Name>": {\n    "format": "<Format>",\n    "size": "<File Size>",\n    "download_url": "<Download URL>"\n  }\n}`}
+                                  </pre>
+                                </li>
+                              </ul>
                             </AccordionContent>
                           </AccordionItem>
                         </Accordion>
@@ -626,9 +1003,13 @@ function DeveloperPage() {
               onClick={handleDownloadCSV}
               disabled={downloadingCSV}
             >
-              {downloadingCSV? <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />:""} Download CSV
+              {downloadingCSV ? (
+                <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                ''
+              )}{' '}
+              Download CSV
             </Button>
-            
           </DialogFooter>
         </DialogContent>
       </Dialog>
