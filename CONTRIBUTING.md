@@ -94,10 +94,17 @@ git pull
 ├── middeware               # Backend application
 │   └── app                 # Source code
 │       ├── api             # APIs
-│       │   ├── routes      # API endpoint
-│       │   └── services    # API business logic
+│       │   ├── routes      # API endpoint routes
+│       │   │   ├── access      # Secured API access endpoints routes
+│       │   │   ├── secured      # Secured API endpoints routes
+│       │   │   └── webhook      # Webhook API endpoints routes
+│       │   └── services    # API service code
+│       │       ├── access      # Secured API access service code
+│       │       ├── secured      # Secured API service code
+│       │       └── webhook      # Webhook API service code
 │       ├── database        # Database code
-│       └── storage         # Storage code
+│       ├── storage         # Storage code
+│       └── utils           # Utility code
 └── infrastructure          # Terraform scripts for cloud and local(docker version)
     ├── cloud               # For clouds
     └── local               # For docker containers

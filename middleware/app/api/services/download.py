@@ -33,14 +33,14 @@ def get_file_url_return_name_link(token_data, upload_id: str):
     upload_metadata = dynamodb.read_item({"upload_id": upload_id})
     if upload_metadata == None:
         log.warning(
-            "BAD REQUEST for UploadID: {}\nERROR: {}".format(
+            "BAD REQUEST for UploadID: {} ERROR: {}".format(
                 upload_id, "Upload ID not valid."
             )
         )
         raise HTTPException(status_code=400, detail="Upload ID not valid")
     if upload_metadata["status"] != StatusEnum.uploaded.name:
         log.warning(
-            "BAD REQUEST for UploadID: {}\nERROR: {}".format(
+            "BAD REQUEST for UploadID: {} ERROR: {}".format(
                 upload_id, "Incomplete upload."
             )
         )
@@ -49,7 +49,7 @@ def get_file_url_return_name_link(token_data, upload_id: str):
     expires_at = upload_metadata["expires_at"]
     if time_now > expires_at:
         log.warning(
-            "BAD REQUEST for UploadID: {}\nERROR: {}".format(
+            "BAD REQUEST for UploadID: {} ERROR: {}".format(
                 upload_id, "Link is expired."
             )
         )
@@ -60,7 +60,7 @@ def get_file_url_return_name_link(token_data, upload_id: str):
     if token_data == None or upload_metadata["creator_id"] != token_data["$id"]:
         if download_count >= max_count:
             log.warning(
-                "BAD REQUEST for UploadID: {}\nERROR: {}".format(
+                "BAD REQUEST for UploadID: {} ERROR: {}".format(
                     upload_id, "Download limit exceeded"
                 )
             )

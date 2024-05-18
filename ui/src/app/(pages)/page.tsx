@@ -352,7 +352,7 @@ export default function Home() {
           'File-Length': fileLength.toString(),
           'Content-Type': 'application/json',
           'x-api-key': apiKey,
-          Authorization: 'Bearer ' + jwtToken.jwt,
+          'X-Auth-Token': 'Bearer ' + jwtToken.jwt,
         },
       },
     )
@@ -380,7 +380,7 @@ export default function Home() {
         headers: {
           'Content-Type': 'application/json',
           'x-api-key': apiKey,
-          Authorization: 'Bearer ' + jwtToken.jwt,
+          'X-Auth-Token': 'Bearer ' + jwtToken.jwt,
         },
       },
     )

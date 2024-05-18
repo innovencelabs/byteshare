@@ -74,17 +74,17 @@ def initiate_upload(
     client_ip = request.headers.get("x-forwarded-for") or request.client.host
     content_length = int(request.headers.get("File-Length"))
     if content_length is None:
-        log.warning("BAD REQUEST\nERROR: {}".format("file-Length header not found."))
+        log.warning("BAD REQUEST: {}".format("file-Length header not found."))
         raise HTTPException(status_code=400, detail="file-Length header not found.")
 
     max_file_size = 2 * 1024 * 1024 * 1024  # 2GB
 
     if len(body.file_names) == 0:
-        log.warning("BAD REQUEST\nERROR: {}".format("No files present."))
+        log.warning("BAD REQUEST: {}".format("No files present."))
         raise HTTPException(status_code=400, detail="No files present.")
 
     if int(content_length) > max_file_size:
-        log.warning("BAD REQUEST\nERROR: {}".format("File size exceeds the limit."))
+        log.warning("BAD REQUEST: {}".format("File size exceeds the limit."))
         raise HTTPException(status_code=400, detail="File size exceeds the limit.")
 
     file_names = body.file_names
@@ -153,14 +153,14 @@ def post_upload_return_link_qr(token_data, body: FinaliseUpload, upload_id: str)
     upload_metadata = dynamodb.read_item({"upload_id": upload_id})
     if upload_metadata == None:
         log.warning(
-            "BAD REQUEST for UploadID: {}\nERROR: {}".format(
+            "BAD REQUEST for UploadID: {} ERROR: {}".format(
                 upload_id, "Upload ID not valid."
             )
         )
         raise HTTPException(status_code=400, detail="Upload ID not valid")
     if upload_metadata["status"] == StatusEnum.uploaded.name:
         log.warning(
-            "BAD REQUEST for UploadID: {}\nERROR: {}".format(
+            "BAD REQUEST for UploadID: {} ERROR: {}".format(
                 upload_id, "Upload already completed."
             )
         )
@@ -174,7 +174,7 @@ def post_upload_return_link_qr(token_data, body: FinaliseUpload, upload_id: str)
         is_file_present = storage.is_file_present(file_path)
         if not is_file_present:
             log.warning(
-                "BAD REQUEST for UploadID: {}\nERROR: {}".format(
+                "BAD REQUEST for UploadID: {} ERROR: {}".format(
                     upload_id, "Upload not found."
                 )
             )
@@ -290,7 +290,7 @@ def delete_upload_return_done(token_data, upload_id: str):
     upload_metadata = dynamodb.read_item({"upload_id": upload_id})
     if upload_metadata["creator_id"] != token_data["$id"]:
         log.warning(
-            "BAD REQUEST for UploadID: {}\nERROR: {}".format(
+            "BAD REQUEST for UploadID: {} ERROR: {}".format(
                 upload_id, "User is not the owner of the upload."
             )
         )
@@ -312,7 +312,7 @@ def update_upload_title_return_done(token_data, body: EditTitle, upload_id: str)
     upload_metadata = dynamodb.read_item({"upload_id": upload_id})
     if upload_metadata["creator_id"] != token_data["$id"]:
         log.warning(
-            "BAD REQUEST for UploadID: {}\nERROR: {}".format(
+            "BAD REQUEST for UploadID: {} ERROR: {}".format(
                 upload_id, "User is not the owner of the upload."
             )
         )
@@ -321,7 +321,7 @@ def update_upload_title_return_done(token_data, body: EditTitle, upload_id: str)
         )
     if not body.title:
         log.warning(
-            "BAD REQUEST for UploadID: {}\nERROR: {}".format(
+            "BAD REQUEST for UploadID: {} ERROR: {}".format(
                 upload_id, "Title is not valid."
             )
         )
@@ -351,7 +351,9 @@ def get_history_return_all_shares_list(token_data):
     # if(user==None):
     #     raise HTTPException(status_code=400, detail="User does not exist")
 
-    upload_metadatas = dynamodb.read_items("creator_id", token_data["$id"])
+    upload_metadatas = dynamodb.read_items(
+        "creator_id", token_data["$id"], "userid-gsi"
+    )
     for upload_metadata in upload_metadatas:
         upload = {
             "upload_id": upload_metadata["upload_id"],

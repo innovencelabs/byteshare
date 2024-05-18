@@ -1,7 +1,11 @@
+import os
+from typing import Optional
+
 import api.services.feedback as feedback_service
 import utils.logger as logger
-from fastapi import APIRouter
+from fastapi import APIRouter, Header
 from pydantic import BaseModel
+from utils.auth import preprocess_external_call
 
 router = APIRouter()
 
@@ -16,7 +20,10 @@ class Feedback(BaseModel):
 
 
 @router.post("/")
-def post_feedback_return_none(body: Feedback):
+def post_feedback_return_none(
+    body: Feedback,
+    x_api_key: Optional[str] = Header(None),
+):
     """
     Add feedback received from users to DB
 
@@ -31,6 +38,9 @@ def post_feedback_return_none(body: Feedback):
     """
     FUNCTION_NAME = "post_feedback_return_none()"
     log.info("Entering {}".format(FUNCTION_NAME))
+
+    if x_api_key != os.getenv("AWS_API_KEY"):
+        preprocess_external_call(x_api_key)
 
     feedback_service.post_feedback_return_none(body)
 

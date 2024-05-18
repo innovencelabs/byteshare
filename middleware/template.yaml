@@ -20,24 +20,39 @@ Parameters:
     Type: String
   AWSDefaultRegion:
     Type: String
-  AWSAppAccessKey:
-    Type: String
-  AWSAppSecretAccessKey:
-    Type: String
   RabbitMQQueue:
     Type: String
   RabbitMQURL:
     Type: String
   Environment:
     Type: String
-
+  AppwriteWebhookUser:
+    Type: String
+  AppwriteWebhookPass:
+    Type: String
+  ScanUser:
+    Type: String
+  ScanPass:
+    Type: String
+  AWSApiKey:
+    Type: String
+  AWSApiAccessRoleArn:
+    Type: String
+  AWSApiAccessKeyId:
+    Type: String
+  AWSApiAccessSecretAccessKey:
+    Type: String
+  AWSApiAccessRegion:
+    Type: String
+  AppwriteApiKey:
+    Type: String
 Globals:
   Function:
     Timeout: 900
   Api:
     Cors:
       AllowMethods: "'OPTIONS,GET,POST,PUT,DELETE'"
-      AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,File-Length'"
+      AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,File-Length,X-Auth-Token'"
       AllowOrigin: "'*'"
 Resources:
   ByteShareFunction:
@@ -54,6 +69,8 @@ Resources:
       Policies:
         - AWSLambdaBasicExecutionRole
         - AWSXrayWriteOnlyAccess
+        - AmazonAPIGatewayAdministrator
+        - AmazonDynamoDBFullAccess
       Environment:
         Variables:
           R2_ACCOUNT_ID: !Ref R2AccountID
@@ -64,11 +81,19 @@ Resources:
           APPWRITE_URL: !Ref AppwriteURL
           APPWRITE_PROJECT_ID: !Ref AppwriteProjectID
           AWS_APP_REGION: !Ref AWSDefaultRegion
-          AWS_APP_ACCESS_KEY: !Ref AWSAppAccessKey
-          AWS_APP_SECRET_ACCESS_KEY: !Ref AWSAppSecretAccessKey
           RABBITMQ_QUEUE: !Ref RabbitMQQueue
           RABBITMQ_URL: !Ref RabbitMQURL
           ENVIRONMENT: !Ref Environment
+          APPWRITE_WEBHOOK_USER: !Ref AppwriteWebhookUser
+          APPWRITE_WEBHOOK_PASS: !Ref AppwriteWebhookPass
+          SCAN_USER: !Ref ScanUser
+          SCAN_PASS: !Ref ScanPass
+          AWS_API_ACCESS_ACCESS_KEY: !Ref AWSApiAccessKeyId
+          AWS_API_ACCESS_SECRET_ACCESS_KEY: !Ref AWSApiAccessSecretAccessKey
+          AWS_API_ACCESS_REGION: !Ref AWSApiAccessRegion
+          AWS_API_ACCESS_ROLE_ARN: !Ref AWSApiAccessRoleArn
+          AWS_API_KEY: !Ref AWSApiKey
+          APPWRITE_API_KEY: !Ref AppwriteApiKey
       Events:
         HealthCheckApi:
           Type: Api
@@ -105,19 +130,28 @@ Resources:
               Ref: ByteShareAPIGW
             Path: /subscribe/{proxy+}
             Method: any
-        UserApi:
+        SecuredApi:
           Type: Api
           Properties:
             RestApiId:
               Ref: ByteShareAPIGW
-            Path: /user/{proxy+}
+            Path: /secured/{proxy+}
             Method: any
-        ScanApi:
+            Auth:
+              Authorizer: AWS_IAM
+        WebhookApi:
           Type: Api
           Properties:
             RestApiId:
               Ref: ByteShareAPIGW
-            Path: /scan/{proxy+}
+            Path: /webhook/{proxy+}
+            Method: any
+        AccessApi:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: ByteShareAPIGW
+            Path: /access/{proxy+}
             Method: any
   ByteShareAPIGW:
     Type: AWS::Serverless::Api
@@ -127,7 +161,7 @@ Resources:
       TracingEnabled: true
       Cors:
         AllowMethods: "'OPTIONS,GET,POST,PUT,DELETE'"
-        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,x-api-key,X-Amz-Security-Token,File-Length'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,x-api-key,X-Amz-Security-Token,File-Length,X-Auth-Token'"
         AllowOrigin: !Sub
           - "'${CorsOrigin}'"
           - CorsOrigin: !Ref CorsOrigin
@@ -148,6 +182,19 @@ Resources:
       ApiStages:
         - ApiId: !Ref ByteShareAPIGW
           Stage: prod
+  ByteShareDevUsagePlan:
+    Type: AWS::ApiGateway::UsagePlan
+    Properties:
+      ApiStages:
+        - ApiId: !Ref ByteShareAPIGW
+          Stage: prod
+      Quota:
+        Limit: 20
+        Offset: 0
+        Period: DAY
+      Throttle:
+        BurstLimit: 5
+        RateLimit: 10
   ByteShareApiKey:
     Type: AWS::ApiGateway::ApiKey
     Properties:

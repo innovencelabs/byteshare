@@ -75,7 +75,7 @@ function SharePage({ params }: Params) {
         ? {
             'Content-Type': 'application/json',
             'x-api-key': apiKey,
-            Authorization: 'Bearer ' + jwtToken.jwt,
+            'X-Auth-Token': 'Bearer ' + jwtToken.jwt,
           }
         : {
             'Content-Type': 'application/json',

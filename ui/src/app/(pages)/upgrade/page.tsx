@@ -1,30 +1,31 @@
 'use client'
-import appwriteService from '@/authentication/appwrite/config'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
 function UpgradePage() {
   const [email, setEmail] = useState('')
 
+  const router = useRouter()
+
   const handleSubscribe = async (e) => {
     e.preventDefault()
-    const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+    const apiURL = process.env.NEXT_PUBLIC_API_BASE_URL + '/subscribe'
     const apiKey = process.env.NEXT_PUBLIC_API_KEY
-    const jwtToken = await appwriteService.getJWTToken()
+    
 
     const subscribeJSON = {
       email: email,
     }
 
-    await fetch(apiBaseURL + '/subscribe', {
+    await fetch(apiURL, {
       method: 'POST',
       body: JSON.stringify(subscribeJSON),
       headers: {
         'Content-Type': 'application/json',
         'x-api-key': apiKey,
-        Authorization: 'Bearer ' + jwtToken.jwt,
       },
     })
     setEmail('')
@@ -49,10 +50,24 @@ function UpgradePage() {
                 className="bg-white"
                 required
               />
-              <Button className="bg-black hover:bg-slate-800" type="submit">
+              <Button
+                className="bg-blue-600 hover:bg-blue-400 text-white"
+                type="submit"
+              >
                 Subscribe
               </Button>
             </div>
+            <Button
+              
+              className="flex justify-center mx-auto mt-5 w-[100%] bg-slate-700 hover:bg-slate-800 text-slate-300 hover:text-slate-400"
+              onClick={(e) => {
+                e.preventDefault() 
+                router.push("/")
+              }
+              }
+            >
+              Go to Home
+            </Button>
           </div>
         </div>
       </form>
