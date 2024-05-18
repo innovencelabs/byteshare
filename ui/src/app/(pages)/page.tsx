@@ -490,8 +490,10 @@ export default function Home() {
                 >
                   Experience seamless file sharing with ByteShare.
                   <br />
-                  Send files effortlessly,{' '}
-                  <Highlight className="text-black dark:text-white">
+                  <span className="block sm:inline-block mr-1">
+                    Send files effortlessly,{' '}
+                  </span>
+                  <Highlight className="text-black dark:text-white block sm:inline-block">
                     keeping data safe and manageable.
                   </Highlight>
                 </motion.h1>
