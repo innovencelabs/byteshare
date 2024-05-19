@@ -406,8 +406,7 @@ function DeveloperPage() {
                 <div>
                   <h3 className="text-lg font-semibold mb-2">Limits</h3>
                   <p className="text-gray-500 dark:text-gray-400">
-                    Access for API Key is throttled to a maximum of{' '}
-                    <b>20 </b>
+                    Access for API Key is throttled to a maximum of <b>20 </b>
                     requests per day.
                   </p>
                 </div>
@@ -549,7 +548,13 @@ function DeveloperPage() {
                               </p>
 
                               <ul>
-                                <li>No Headers</li>
+                                <li>
+                                  •{' '}
+                                  <span className="font-medium">
+                                    File-Length
+                                  </span>
+                                  : Total file size in bytes
+                                </li>
                               </ul>
                               <p className="mt-2 font-semibold">
                                 Path Variable

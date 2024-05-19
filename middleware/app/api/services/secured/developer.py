@@ -51,7 +51,7 @@ def create_apikey_return_apikey(token_data):
 
     user_id = token_data["$id"]
 
-    api_key_response = api_gateway.create_api_key(name=str(uuid.uuid4()))
+    api_key_response = api_gateway.create_api_key(name=str(uuid.uuid4()), enabled=True)
 
     api_key = api_key_response["value"]
     api_key_id = api_key_response["id"]
