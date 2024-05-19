@@ -170,8 +170,6 @@ Resources:
       StageName: prod
       OpenApiVersion: "3.0.0"
       TracingEnabled: true
-      Auth:
-        ApiKeyRequired: true
       Cors:
         AllowMethods: "'OPTIONS,GET,POST,PUT,DELETE'"
         AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,x-api-key,X-Amz-Security-Token,File-Length,X-Auth-Token'"
