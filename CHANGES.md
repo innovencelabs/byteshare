@@ -1,3 +1,14 @@
+# Version 0.4.0
+## What's Changed
+### Features
+* Header transparent and other UI changes by @ambujraj in https://github.com/innovencelabs/byteshare/pull/226
+* Add API Key access for users by @ambujraj in https://github.com/innovencelabs/byteshare/pull/229
+
+### Miscellaneous
+* No user related info as input by @ambujraj in https://github.com/innovencelabs/byteshare/pull/220
+
+**Full Changelog**: https://github.com/innovencelabs/byteshare/compare/0.3.2...0.4.0
+
 # Version 0.3.2
 
 ## What's Changed
