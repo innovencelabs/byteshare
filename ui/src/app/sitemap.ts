@@ -32,6 +32,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
         url: `${baseURL}/auth/terms`,
         lastModified: new Date(),
         priority: 0.5,
+    },
+    {
+        url: `${baseURL}/docs/developers`,
+        lastModified: new Date(),
+        priority: 0.8,
     }
   ]
 }

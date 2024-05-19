@@ -404,6 +404,14 @@ function DeveloperPage() {
                   </p>
                 </div>
                 <div>
+                  <h3 className="text-lg font-semibold mb-2">Limits</h3>
+                  <p className="text-gray-500 dark:text-gray-400">
+                    Access for API Key is throttled to a maximum of{' '}
+                    <b>20 </b>
+                    requests per day.
+                  </p>
+                </div>
+                <div>
                   <h3 className="text-lg font-semibold mb-2">Base URL</h3>
                   <p className="text-slate-600 dark:text-slate-600">
                     {process.env.NEXT_PUBLIC_API_BASE_URL}{' '}
@@ -940,9 +948,7 @@ function DeveloperPage() {
                               <p className="mt-4 font-bold">Response</p>
                               <HorizontalLine />
                               <ul>
-                                <li>
-                                  Files download link and sender email
-                                </li>
+                                <li>Files download link and sender email</li>
 
                                 <li className="mt-3 bg-black p-1 rounded-sm">
                                   <pre className="text-white py-1 rounded-md font-mono p-2">
@@ -1006,7 +1012,12 @@ function DeveloperPage() {
               onClick={handleDownloadCSV}
               disabled={downloadingCSV}
             >
-              {downloadingCSV? <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />:""} Download CSV
+              {downloadingCSV ? (
+                <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                ''
+              )}{' '}
+              Download CSV
             </Button>
           </DialogFooter>
         </DialogContent>
