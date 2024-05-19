@@ -164,6 +164,8 @@ Resources:
               Ref: ByteShareAPIGW
             Path: /access/{proxy+}
             Method: any
+            Auth:
+              ApiKeyRequired: true
   ByteShareAPIGW:
     Type: AWS::Serverless::Api
     Properties:
