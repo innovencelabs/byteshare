@@ -102,6 +102,8 @@ Resources:
               Ref: ByteShareAPIGW
             Path: /health
             Method: any
+            Auth:
+              ApiKeyRequired: true
         UploadApi:
           Type: Api
           Properties:
@@ -109,6 +111,8 @@ Resources:
               Ref: ByteShareAPIGW
             Path: /upload/{proxy+}
             Method: any
+            Auth:
+              ApiKeyRequired: true
         DownloadApi:
           Type: Api
           Properties:
@@ -116,6 +120,8 @@ Resources:
               Ref: ByteShareAPIGW
             Path: /download/{proxy+}
             Method: any
+            Auth:
+              ApiKeyRequired: true
         FeedbackApi:
           Type: Api
           Properties:
@@ -123,6 +129,8 @@ Resources:
               Ref: ByteShareAPIGW
             Path: /feedback
             Method: any
+            Auth:
+              ApiKeyRequired: true
         SubscribeApi:
           Type: Api
           Properties:
@@ -130,6 +138,8 @@ Resources:
               Ref: ByteShareAPIGW
             Path: /subscribe
             Method: any
+            Auth:
+              ApiKeyRequired: true
         SecuredApi:
           Type: Api
           Properties:
@@ -139,6 +149,7 @@ Resources:
             Method: any
             Auth:
               Authorizer: AWS_IAM
+              ApiKeyRequired: true
         WebhookApi:
           Type: Api
           Properties:
@@ -159,6 +170,8 @@ Resources:
       StageName: prod
       OpenApiVersion: "3.0.0"
       TracingEnabled: true
+      Auth:
+        ApiKeyRequired: true
       Cors:
         AllowMethods: "'OPTIONS,GET,POST,PUT,DELETE'"
         AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,x-api-key,X-Amz-Security-Token,File-Length,X-Auth-Token'"
