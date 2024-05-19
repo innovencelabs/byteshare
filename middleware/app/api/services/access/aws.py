@@ -1,3 +1,4 @@
+import datetime
 import os
 
 import boto3
@@ -39,11 +40,15 @@ def post_secured_access_aws_return_header(body: Options):
     access_key, secret_key, session_token = _get_token()
     api_key = os.getenv("AWS_API_KEY")
 
+    now = datetime.datetime.now(datetime.timezone.utc)
+    utc_string = now.strftime("%a, %d %b %Y %H:%M:%S %Z")
+
     headers = CaseInsensitiveDict()
     headers["Content-Type"] = "application/json"
     headers["X-API-Key"] = api_key
     headers["X-Amz-Security-Token"] = session_token
     headers["X-Auth-Token"] = "Bearer " + body.jwtToken
+    headers["X-Amz-Date"] = utc_string
 
     signed_request = _create_signed_request(
         url=body.apiURL,
