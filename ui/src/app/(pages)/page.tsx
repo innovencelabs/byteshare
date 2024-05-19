@@ -486,7 +486,7 @@ export default function Home() {
                     duration: 0.5,
                     ease: [0.4, 0.0, 0.2, 1],
                   }}
-                  className="px-4 text-xs lg:text-lg  font-bold text-white dark:text-white max-w-xl leading-relaxed lg:leading-snug text-center mx-auto "
+                  className="px-4 text-xs md:text-base lg:text-lg font-bold text-white dark:text-white max-w-xl leading-relaxed lg:leading-snug text-center mx-auto"
                 >
                   Experience seamless file sharing with ByteShare.
                   <br />

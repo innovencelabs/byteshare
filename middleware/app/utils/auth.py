@@ -22,7 +22,7 @@ table_name = "byteshare-apikey"
 apikey_dynamodb = DynamoDBManager(table_name)
 
 
-async def authenticate(
+def authenticate(
     x_auth_token: Optional[str] = Header(None), x_api_key: Optional[str] = Header(None)
 ):
     FUNCTION_NAME = "authenticate()"
@@ -70,7 +70,7 @@ async def authenticate(
         )
 
 
-async def optional_authenticate(x_auth_token: Optional[str] = Header(None)):
+def optional_authenticate(x_auth_token: Optional[str] = Header(None)):
     FUNCTION_NAME = "optional_authenticate()"
     log.info("Entering {}".format(FUNCTION_NAME))
 
@@ -99,7 +99,7 @@ async def optional_authenticate(x_auth_token: Optional[str] = Header(None)):
         return None
 
 
-async def authenticate_appwrite_webhook(authorization: Optional[str] = Header(None)):
+def authenticate_appwrite_webhook(authorization: Optional[str] = Header(None)):
     if authorization == None:
         raise HTTPException(status_code=401, detail="Authorization header is missing")
 
@@ -125,7 +125,7 @@ async def authenticate_appwrite_webhook(authorization: Optional[str] = Header(No
         )
 
 
-async def authenticate_scan(x_auth_token: Optional[str] = Header(None)):
+def authenticate_scan(x_auth_token: Optional[str] = Header(None)):
     if x_auth_token == None:
         raise HTTPException(status_code=401, detail="X-Auth-Token header is missing")
 
@@ -149,7 +149,7 @@ async def authenticate_scan(x_auth_token: Optional[str] = Header(None)):
         )
 
 
-async def preprocess_external_call(api_key: str):
+def preprocess_external_call(api_key: str):
     if api_key == os.getenv("AWS_API_KEY"):
         raise HTTPException(
             status_code=401,
