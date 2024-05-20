@@ -20,7 +20,7 @@
 Meet ByteShare, your go-to platform for seamless and secure file sharing. Designed for simplicity, ByteShare offers easy generation of shareable links and QR codes, making file sharing a breeze. Whether it's a single document or a collection of files, ByteShare streamlines the process, ensuring a user-friendly experience for all.
 
 <p align="center">
-    <img alt="Product Introduction" src="https://github.com/ambujraj/ByteShare/assets/29935993/640607c8-1139-4156-8973-16fd66cbab76">
+    <img alt="Product Introduction" src="https://github.com/innovencelabs/byteshare/assets/29935993/2b004094-59b8-4e24-a0a4-6c9777b56b26">
 </p>
 
   
