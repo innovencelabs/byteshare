@@ -243,7 +243,7 @@ export const Header = ({ authorised, statusLoaded, name, email, dark = true }) =
                     </PopoverContent>
                   </Popover>
                 </li>
-                <li>
+                {environment != 'app' ? <li>
                   <Button
                     variant="ghost"
                     onClick={() => router.push('/apps')}
@@ -251,7 +251,8 @@ export const Header = ({ authorised, statusLoaded, name, email, dark = true }) =
                   >
                     Apps
                   </Button>
-                </li>
+                </li>: <></>
+                }
                 <li>
                   <Button
                     variant="ghost"
