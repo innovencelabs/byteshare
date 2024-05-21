@@ -1,0 +1,28 @@
+name: Build Tauri App
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        platform: [macos-latest, ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v3
+
+      
+      - uses: actions/setup-node@v3
+      - uses: dtolnay/rust-toolchain@stable
+      - swatinem/rust-cache@v2
+
+      
+      - run: npm install
+
+      
+      - uses: tauri-apps/tauri-action@v0
+        with:
+          args: [--release]  
+          target: ${{ matrix.platform }}  

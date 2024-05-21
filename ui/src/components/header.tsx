@@ -24,6 +24,8 @@ export const Header = ({ authorised, statusLoaded, name, email }) => {
   const [popoverOpen, setPopoverOpen] = useState(false)
   const router = useRouter()
 
+  const environment = process.env.NEXT_PUBLIC_ENVIRONMENT || 'production'
+
   useEffect(() => {
     const script = document.createElement('script')
     script.src = 'https://unpkg.com/flowbite@1.5.1/dist/flowbite.js'
@@ -90,7 +92,7 @@ export const Header = ({ authorised, statusLoaded, name, email }) => {
           </span>
         </Button>
         <div className="flex md:order-2 space-x-2 md:space-x-0 rtl:space-x-reverse">
-          {statusLoaded ? (
+          {statusLoaded && (environment!="app")? (
             <span className="text-black hidden lg:flex focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-2 mx-2 py-1 text-center">
               <GitHubButton
                 href="https://github.com/innovencelabs/ByteShare"
@@ -231,13 +233,23 @@ export const Header = ({ authorised, statusLoaded, name, email }) => {
                   </PopoverContent>
                 </Popover>
               </li>
+
+              {(environment!="app") ? <li>
+                <Button
+                  variant="ghost"
+                  onClick={() => router.push('/apps')}
+                  className="block py-2 px-3 md:p-0 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
+                >
+                  Apps
+                </Button>
+              </li> : <></>}
               <li>
                 <Button
                   variant="ghost"
-                  onClick={() => router.push('/help')}
+                  onClick={() => router.push('/developers')}
                   className="block py-2 px-3 md:p-0 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
                 >
-                  Help
+                  Developers
                 </Button>
               </li>
               {authorised ? (
