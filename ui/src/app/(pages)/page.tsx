@@ -74,6 +74,7 @@ export default function Home() {
   const [filesSizeExceededColor, setFilesSizeExceededColor] = useState(false)
   const [disabledViewSelected, setDisabledViewSelected] = useState(true)
   const audioRef = useRef(null)
+  const fileAddRef = useRef(null)
 
   const playSound = () => {
     if (audioRef.current) {
@@ -152,6 +153,43 @@ export default function Home() {
     setSelectedFiles(Array.from(files))
     setSubmitDisabled(false)
   }, [selectedFiles])
+
+  const handleAddFile = (event) => {
+    const files = Array.from(event.target.files)
+
+    setSubmitDisabled(true)
+    setFilesSizeExceededColor(false)
+    setSelectedFiles((prevFiles) => {
+      const newFiles = files.filter(
+        (file) =>
+          !prevFiles.some(
+            (prevFile) =>
+              prevFile.name === file.name && prevFile.size === file.size,
+          ),
+      )
+      return [...prevFiles, ...newFiles]
+    })
+
+    let totalSize = selectedFiles.reduce((total, file) => total + file.size, 0)
+
+    if (totalSize == 0) {
+      setSubmitDisabled(true)
+      setDisabledViewSelected(true)
+      setUploadSize('0 KB')
+      
+      return
+    } else if (totalSize >= 2 * 1024 * 1024 * 1024) {
+      setUploadSize((totalSize / (1024 * 1024 * 1024)).toFixed(2) + ' GB')
+      setSubmitDisabled(true)
+      setFilesSizeExceededColor(true)
+      
+      return
+    } else {
+      setUploadSize(formatSize(totalSize))
+    }
+    
+    setSubmitDisabled(false)
+  }
 
   const handleDrawerClose = () => {
     setUploadSize('0 KB')
@@ -442,8 +480,8 @@ export default function Home() {
     const extension = fileName.slice(extensionIndex)
     let truncatedName = fileName.slice(0, extensionIndex)
 
-    if (truncatedName.length > 12) {
-      truncatedName = truncatedName.slice(0, 12) + '...'
+    if (truncatedName.length > 18) {
+      truncatedName = truncatedName.slice(0, 18) + '...'
     }
 
     return truncatedName + extension
@@ -498,7 +536,6 @@ export default function Home() {
                   </Highlight>
                 </motion.h1>
               </HeroHighlight>
-              
             </span>
           </div>
           <DrawerTrigger asChild>
@@ -565,7 +602,7 @@ export default function Home() {
             {!uploading && !uploaded ? (
               <>
                 <form onSubmit={handleUploadSubmit}>
-                  <div className="p-4">
+                  <div className="p-2">
                     <Label
                       htmlFor="files"
                       className={`${filesSizeExceededColor ? 'text-red-500' : 'text-black'}`}
@@ -576,6 +613,7 @@ export default function Home() {
                           <Button
                             variant="link"
                             disabled={disabledViewSelected}
+                            className='px-2'
                           >
                             View selected
                           </Button>
@@ -584,7 +622,14 @@ export default function Home() {
                           <DialogHeader>
                             <DialogTitle>View Selected</DialogTitle>
                             <DialogDescription>
-                              {selectedFiles.length} file ({uploadSize})
+                              {selectedFiles.length} file ({uploadSize}){' '}
+                              <Button
+                                variant="link"
+                                onClick={() => fileAddRef.current.click()}
+                                className='px-1'
+                              >
+                                Add More
+                              </Button>
                             </DialogDescription>
                           </DialogHeader>
                           <ScrollArea className="h-fit w-full px-3">
@@ -771,6 +816,12 @@ export default function Home() {
         style={{ position: 'absolute', right: '0' }}
         src={Waves}
         alt="box"
+      />
+      <input
+        type="file"
+        ref={fileAddRef}
+        style={{ display: 'none' }}
+        onChange={handleAddFile}
       />
       {/* <div className="absolute inset-0">
         <Image
