@@ -13,3 +13,4 @@ ui-bkp
 ui/.next
 issue.txt
 terraform.tfvars
+**/.vscode

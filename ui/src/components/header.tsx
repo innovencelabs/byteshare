@@ -25,6 +25,8 @@ export const Header = ({ authorised, statusLoaded, name, email, dark = true }) =
   const [popoverOpen, setPopoverOpen] = useState(false)
   const router = useRouter()
 
+  const environment = process.env.NEXT_PUBLIC_ENVIRONMENT || 'production'
+
   useEffect(() => {
     const script = document.createElement('script')
     script.src = 'https://unpkg.com/flowbite@1.5.1/dist/flowbite.js'
@@ -94,7 +96,7 @@ export const Header = ({ authorised, statusLoaded, name, email, dark = true }) =
             </span>
           </Button>
           <div className="flex md:order-2 space-x-2 md:space-x-0 rtl:space-x-reverse">
-            {statusLoaded ? (
+            {statusLoaded && environment != 'app' ? (
               <Button
                 variant="ghost"
                 onClick={() => {

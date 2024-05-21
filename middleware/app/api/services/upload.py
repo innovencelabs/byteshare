@@ -181,7 +181,7 @@ def post_upload_return_link_qr(token_data, body: FinaliseUpload, upload_id: str)
             raise HTTPException(status_code=400, detail="Upload not found")
 
     # Generate share link
-    file_url = web_base_url + "/share/" + upload_id
+    file_url = web_base_url + "/share?id=" + upload_id
 
     time_now = datetime.now(timezone.utc)
     upload_expiration_time = 604800  # 7 days

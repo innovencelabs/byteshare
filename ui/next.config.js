@@ -11,6 +11,7 @@ const nextConfig = {
     ],
   },
   ...(environment === 'dev' && { output: 'standalone' }),
+  ...(environment === 'app' && { output: 'export', images: { unoptimized: true } }),
 }
 
 module.exports = nextConfig
