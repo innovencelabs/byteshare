@@ -270,9 +270,16 @@ def post_upload_return_link_qr(token_data, body: FinaliseUpload, upload_id: str)
         resend.Emails.send(params)
 
     if os.getenv("ENVIRONMENT") == "production":
-        channel.basic_publish(
-            exchange="", routing_key=os.getenv("RABBITMQ_QUEUE"), body=upload_id
-        )
+        try:
+            channel.basic_publish(
+                exchange="", routing_key=os.getenv("RABBITMQ_QUEUE"), body=upload_id
+            )
+        except Exception as e:
+            log.error(
+                "EXCEPTION occurred in RabbitMQ for Upload ID: {} ERROR:{}".format(
+                    upload_id, str(e)
+                )
+            )
 
     log.info("Exiting {}".format(FUNCTION_NAME))
     return {
