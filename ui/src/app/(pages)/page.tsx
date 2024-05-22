@@ -157,38 +157,17 @@ export default function Home() {
   const handleAddFile = (event) => {
     const files = Array.from(event.target.files)
 
-    setSubmitDisabled(true)
-    setFilesSizeExceededColor(false)
-    setSelectedFiles((prevFiles) => {
-      const newFiles = files.filter(
-        (file) =>
-          !prevFiles.some(
-            (prevFile) =>
-              prevFile.name === file.name && prevFile.size === file.size,
-          ),
-      )
-      return [...prevFiles, ...newFiles]
-    })
+    const newFiles = files.filter(
+      (file) =>
+        !selectedFiles.some(
+          (prevFile) =>
+            prevFile.name === file.name && prevFile.size === file.size,
+        ),
+    )
+    const updatedFiles =  [...selectedFiles, ...newFiles]
 
-    let totalSize = selectedFiles.reduce((total, file) => total + file.size, 0)
+    handleUploadChange(updatedFiles)
 
-    if (totalSize == 0) {
-      setSubmitDisabled(true)
-      setDisabledViewSelected(true)
-      setUploadSize('0 KB')
-      
-      return
-    } else if (totalSize >= 2 * 1024 * 1024 * 1024) {
-      setUploadSize((totalSize / (1024 * 1024 * 1024)).toFixed(2) + ' GB')
-      setSubmitDisabled(true)
-      setFilesSizeExceededColor(true)
-      
-      return
-    } else {
-      setUploadSize(formatSize(totalSize))
-    }
-    
-    setSubmitDisabled(false)
   }
 
   const handleDrawerClose = () => {
