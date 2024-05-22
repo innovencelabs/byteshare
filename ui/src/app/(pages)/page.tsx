@@ -801,6 +801,7 @@ export default function Home() {
         ref={fileAddRef}
         style={{ display: 'none' }}
         onChange={handleAddFile}
+        multiple
       />
       {/* <div className="absolute inset-0">
         <Image
