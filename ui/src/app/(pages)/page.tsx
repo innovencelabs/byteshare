@@ -167,7 +167,7 @@ export default function Home() {
     const files = Array.from(event.target.files)
 
     const newFiles = files.filter(
-      (file) =>
+      (file: any) =>
         !selectedFiles.some(
           (prevFile) =>
             prevFile.name === file.name && prevFile.size === file.size,
