@@ -33,6 +33,12 @@ import { Label } from '@/components/ui/label'
 import { Progress } from '@/components/ui/progress'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 import useAuth from '@/context/useAuth'
 import { cn } from '@/lib/utils'
 import {
@@ -851,7 +857,7 @@ export default function Home() {
         onChange={handleAddFile}
         multiple
       />
-      {/* <TooltipProvider>
+      <TooltipProvider>
         <Tooltip open={isRecieveTooltipVisible}>
           <TooltipTrigger asChild>
             <button
@@ -885,44 +891,9 @@ export default function Home() {
             <p>Receive files</p>
           </TooltipContent>
         </Tooltip>
-      </TooltipProvider> */}
+      </TooltipProvider>
       <Dialog onOpenChange={() => setReceiveCode('')}>
         <DialogTrigger asChild>
-          {/* <TooltipProvider>
-            <Tooltip open={isRecieveTooltipVisible}>
-              <TooltipTrigger asChild>
-                <button
-                  className="
-                fixed 
-                font-semibold
-                text-md 
-                shadow-2
-                bottom-4 
-                right-4
-                bg-primary
-                text-white
-                p-4
-                rounded-md 
-                shadow-lg 
-                hover:bg-blue-900 
-                focus:outline-none 
-                focus:ring-2 
-                focus:ring-blue-400
-                focus:ring-opacity-75
-                transition 
-                transform 
-                hover:pointer
-                hover:scale-110
-              "
-                >
-                  <DownloadIcon />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent className="bg-[#87CEEB] text-black">
-                <p>Receive files</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider> */}
           <button
             className="
                 fixed 
