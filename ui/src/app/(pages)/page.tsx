@@ -30,9 +30,11 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import useAuth from '@/context/useAuth'
 import { cn } from '@/lib/utils'
 import {
+  ArrowDownIcon,
   CheckIcon,
   CopyIcon,
   Cross2Icon,
+  DownloadIcon,
   UploadIcon,
 } from '@radix-ui/react-icons'
 import axios from 'axios'
@@ -581,7 +583,9 @@ export default function Home() {
                 <>
                   <DrawerTitle className="text-center">Send Files</DrawerTitle>
                   <DrawerDescription className="text-center">
-                    {activeMode == "normal" ? "You can select multiple files to share upto 2GB, active upto 7 days" : "You can select multiple files to share of any size, active upto 10 mins"}
+                    {activeMode == 'normal'
+                      ? 'You can select multiple files to share upto 2GB, active upto 7 days'
+                      : 'You can select multiple files to share of any size, active upto 10 mins'}
                   </DrawerDescription>
                   <Tabs
                     value={activeMode}
@@ -697,7 +701,7 @@ export default function Home() {
                       placeholder="Email address of receiver (optional)"
                       required={false}
                       onPointerDown={(e) => e.stopPropagation()}
-                      disabled={activeMode == "1to1"}
+                      disabled={activeMode == '1to1'}
                     />
 
                     {/* <div className="mt-2 border-l-4 border-slate-100 bg-gradient-linear bg-cover bg-no-repeat bg-left-bottom w-full h-0.5">
@@ -823,15 +827,34 @@ export default function Home() {
         onChange={handleAddFile}
         multiple
       />
-      {/* <div className="absolute inset-0">
-        <Image
-          src="/background.jpg"
-          alt="Background Image"
-          layout="fill"
-          objectFit="cover"
-          className="z-0"
-        />
-      </div> */}
+      <button
+        className="
+        fixed 
+        font-semibold 
+        text-md 
+        shadow-2
+        bottom-4 
+        right-4
+        bg-primary
+        text-white 
+        p-4
+        rounded-md 
+        shadow-lg 
+        hover:bg-blue-900 
+        focus:outline-none 
+        focus:ring-2 
+        focus:ring-blue-400 
+        focus:ring-opacity-75 
+        transition 
+        transform 
+        hover:pointer
+        
+        hover:scale-110
+      "
+      >
+        <DownloadIcon />
+      </button>
+      
     </div>
   )
 }
