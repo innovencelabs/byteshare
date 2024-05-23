@@ -91,7 +91,7 @@ function SharePage({ params }: Params) {
       )
       if (!downloadResponse.ok) {
         toast.dismiss()
-        toast.error('Upload ID is not valid')
+        toast.error('Link not valid or expired')
         setIsLoading(false)
         return
       }
