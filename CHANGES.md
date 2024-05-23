@@ -1,4 +1,17 @@
+# Version 0.4.1
+
+## What's Changed
+### Features
+* Add option to add more files in View Selected by @ambujraj in https://github.com/innovencelabs/byteshare/pull/250
+
+### Bug Fixes
+* RabbitMQ optional by @ambujraj in https://github.com/innovencelabs/byteshare/pull/254
+
+
+**Full Changelog**: https://github.com/innovencelabs/byteshare/compare/0.4.0...0.4.1
+
 # Version 0.4.0
+
 ## What's Changed
 ### Features
 * Header transparent and other UI changes by @ambujraj in https://github.com/innovencelabs/byteshare/pull/226
