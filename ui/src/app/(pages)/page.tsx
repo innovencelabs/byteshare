@@ -9,7 +9,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
+  DialogTrigger
 } from '@/components/ui/dialog'
 import {
   Drawer,
@@ -23,6 +23,12 @@ import {
 } from '@/components/ui/drawer'
 import { HeroHighlight, Highlight } from '@/components/ui/hero-highlight'
 import { Input } from '@/components/ui/input'
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+} from '@/components/ui/input-otp'
 import { Label } from '@/components/ui/label'
 import { Progress } from '@/components/ui/progress'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -30,12 +36,11 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import useAuth from '@/context/useAuth'
 import { cn } from '@/lib/utils'
 import {
-  ArrowDownIcon,
   CheckIcon,
   CopyIcon,
   Cross2Icon,
   DownloadIcon,
-  UploadIcon,
+  UploadIcon
 } from '@radix-ui/react-icons'
 import axios from 'axios'
 import { formatInTimeZone } from 'date-fns-tz'
@@ -77,8 +82,26 @@ export default function Home() {
   const [filesSizeExceededColor, setFilesSizeExceededColor] = useState(false)
   const [disabledViewSelected, setDisabledViewSelected] = useState(true)
   const [activeMode, setActiveMode] = useState('normal')
+  const [isRecieveTooltipVisible, setIsRecieveTooltipVisible] = useState(true)
+  const [receiveCode, setReceiveCode] = useState('')
   const audioRef = useRef(null)
   const fileAddRef = useRef(null)
+  
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsRecieveTooltipVisible(false)
+    }, 10000) 
+
+    return () => clearTimeout(timer)
+  }, [])
+
+  useEffect(() => {
+    if (receiveCode.length === 6) {
+      
+      console.log('OTP is complete:', receiveCode)
+    }
+  }, [receiveCode])
   
 
   const handleModeChange = (value) => {
@@ -347,6 +370,7 @@ export default function Home() {
         setBatchCount(0)
         setTotalBatch(0)
         setWillShareEmail(false)
+        setActiveMode('normal')
       }
     }
   }
@@ -827,34 +851,132 @@ export default function Home() {
         onChange={handleAddFile}
         multiple
       />
-      <button
-        className="
-        fixed 
-        font-semibold 
-        text-md 
-        shadow-2
-        bottom-4 
-        right-4
-        bg-primary
-        text-white 
-        p-4
-        rounded-md 
-        shadow-lg 
-        hover:bg-blue-900 
-        focus:outline-none 
-        focus:ring-2 
-        focus:ring-blue-400 
-        focus:ring-opacity-75 
-        transition 
-        transform 
-        hover:pointer
-        
-        hover:scale-110
-      "
-      >
-        <DownloadIcon />
-      </button>
-      
+      {/* <TooltipProvider>
+        <Tooltip open={isRecieveTooltipVisible}>
+          <TooltipTrigger asChild>
+            <button
+              className="
+                fixed 
+                font-semibold
+                text-md 
+                shadow-2
+                bottom-4 
+                right-4
+                bg-primary
+                text-white
+                p-4
+                rounded-md 
+                shadow-lg 
+                hover:bg-blue-900 
+                focus:outline-none 
+                focus:ring-2 
+                focus:ring-blue-400
+                focus:ring-opacity-75
+                transition 
+                transform 
+                hover:pointer
+                hover:scale-110
+              "
+            >
+              <DownloadIcon />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent className="bg-[#87CEEB] text-black">
+            <p>Receive files</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider> */}
+      <Dialog onOpenChange={() => setReceiveCode('')}>
+        <DialogTrigger asChild>
+          {/* <TooltipProvider>
+            <Tooltip open={isRecieveTooltipVisible}>
+              <TooltipTrigger asChild>
+                <button
+                  className="
+                fixed 
+                font-semibold
+                text-md 
+                shadow-2
+                bottom-4 
+                right-4
+                bg-primary
+                text-white
+                p-4
+                rounded-md 
+                shadow-lg 
+                hover:bg-blue-900 
+                focus:outline-none 
+                focus:ring-2 
+                focus:ring-blue-400
+                focus:ring-opacity-75
+                transition 
+                transform 
+                hover:pointer
+                hover:scale-110
+              "
+                >
+                  <DownloadIcon />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent className="bg-[#87CEEB] text-black">
+                <p>Receive files</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider> */}
+          <button
+            className="
+                fixed 
+                font-semibold
+                text-md 
+                shadow-2
+                bottom-4 
+                right-4
+                bg-primary
+                text-white
+                p-4
+                rounded-md 
+                shadow-lg 
+                hover:bg-blue-900 
+                focus:outline-none 
+                focus:ring-2 
+                focus:ring-blue-400
+                focus:ring-opacity-75
+                transition 
+                transform 
+                hover:pointer
+                hover:scale-110
+              "
+          >
+            <DownloadIcon />
+          </button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="text-center">
+              Enter receive code
+            </DialogTitle>
+          </DialogHeader>
+          <div className="">
+            <InputOTP
+              maxLength={6}
+              value={receiveCode}
+              onChange={(value) => setReceiveCode(value)}
+            >
+              <InputOTPGroup>
+                <InputOTPSlot index={0} />
+                <InputOTPSlot index={1} />
+                <InputOTPSlot index={2} />
+              </InputOTPGroup>
+              <InputOTPSeparator />
+              <InputOTPGroup>
+                <InputOTPSlot index={3} />
+                <InputOTPSlot index={4} />
+                <InputOTPSlot index={5} />
+              </InputOTPGroup>
+            </InputOTP>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
