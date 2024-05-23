@@ -1,6 +1,7 @@
 'use client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { ArrowLeftIcon } from '@radix-ui/react-icons'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -58,14 +59,15 @@ function UpgradePage() {
               </Button>
             </div>
             <Button
-              
-              className="flex justify-center mx-auto mt-5 w-[100%] bg-slate-700 hover:bg-slate-800 text-slate-300 hover:text-slate-400"
+              variant="ghost"
+              className="flex justify-center mx-auto mt-5 w-[100%] text-slate-300"
               onClick={(e) => {
                 e.preventDefault() 
                 router.push("/")
               }
               }
             >
+              <ArrowLeftIcon className="mr-1"/>
               Go to Home
             </Button>
           </div>

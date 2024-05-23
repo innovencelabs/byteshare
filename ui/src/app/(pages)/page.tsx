@@ -26,6 +26,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Progress } from '@/components/ui/progress'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import useAuth from '@/context/useAuth'
 import { cn } from '@/lib/utils'
 import {
@@ -73,8 +74,14 @@ export default function Home() {
   const [totalBatch, setTotalBatch] = useState(0)
   const [filesSizeExceededColor, setFilesSizeExceededColor] = useState(false)
   const [disabledViewSelected, setDisabledViewSelected] = useState(true)
+  const [activeMode, setActiveMode] = useState('normal')
   const audioRef = useRef(null)
   const fileAddRef = useRef(null)
+  
+
+  const handleModeChange = (value) => {
+    setActiveMode(value)
+  }
 
   const playSound = () => {
     if (audioRef.current) {
@@ -189,6 +196,7 @@ export default function Home() {
     setBatchCount(0)
     setTotalBatch(0)
     setWillShareEmail(false)
+    setActiveMode("normal")
   }
 
   const handleCopy = async () => {
@@ -573,8 +581,18 @@ export default function Home() {
                 <>
                   <DrawerTitle className="text-center">Send Files</DrawerTitle>
                   <DrawerDescription className="text-center">
-                    You can select multiple files to share upto 2GB.
+                    {activeMode == "normal" ? "You can select multiple files to share upto 2GB, active upto 7 days" : "You can select multiple files to share of any size, active upto 10 mins"}
                   </DrawerDescription>
+                  <Tabs
+                    value={activeMode}
+                    onValueChange={handleModeChange}
+                    className="w-full pt-2"
+                  >
+                    <TabsList className="grid w-full grid-cols-2 bg-blue-200">
+                      <TabsTrigger value="normal">Normal</TabsTrigger>
+                      <TabsTrigger value="1to1">1:1 Mode</TabsTrigger>
+                    </TabsList>
+                  </Tabs>
                 </>
               )}
             </DrawerHeader>{' '}
@@ -592,7 +610,7 @@ export default function Home() {
                           <Button
                             variant="link"
                             disabled={disabledViewSelected}
-                            className='px-2'
+                            className="px-2"
                           >
                             View selected
                           </Button>
@@ -605,7 +623,7 @@ export default function Home() {
                               <Button
                                 variant="link"
                                 onClick={() => fileAddRef.current.click()}
-                                className='px-1'
+                                className="px-1"
                               >
                                 Add More
                               </Button>
@@ -679,7 +697,9 @@ export default function Home() {
                       placeholder="Email address of receiver (optional)"
                       required={false}
                       onPointerDown={(e) => e.stopPropagation()}
+                      disabled={activeMode == "1to1"}
                     />
+
                     {/* <div className="mt-2 border-l-4 border-slate-100 bg-gradient-linear bg-cover bg-no-repeat bg-left-bottom w-full h-0.5">
                       <div className="bg-gradient-linear bg-cover bg-no-repeat bg-left-bottom w-full h-0.5 bg-slate-200"></div>
                     </div>
