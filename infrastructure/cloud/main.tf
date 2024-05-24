@@ -153,6 +153,24 @@ resource "aws_dynamodb_table" "byteshare-apikey" {
   }
 }
 
+resource "aws_dynamodb_table" "byteshare-queue" {
+  provider = aws.aws
+  name         = "byteshare-queue"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "code"
+
+  attribute {
+    name = "code"
+    type = "S"
+  }
+
+  ttl {
+    attribute_name = "expires_at"
+    enabled        = true
+  }
+  
+}
+
 
 resource "aws_iam_role" "api_gateway_invoke_role" {
   provider = aws.aws

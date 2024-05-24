@@ -1,5 +1,6 @@
 import concurrent.futures
 import os
+import time
 import uuid
 from datetime import datetime, timedelta, timezone
 from enum import Enum as PythonEnum
@@ -45,6 +46,16 @@ class EditTitle(BaseModel):
     title: str
 
 
+class FileMetadata(BaseModel):
+    name: str
+    size: int
+
+
+class InitiateRealtimeUpload(BaseModel):
+    files_metadata: List[FileMetadata]
+    peer_id: str
+
+
 # Storage
 BUCKET_NAME = "byteshare-blob"
 storage = CloudflareR2Manager(BUCKET_NAME)
@@ -52,6 +63,9 @@ storage = CloudflareR2Manager(BUCKET_NAME)
 # DynamoDB
 table_name = "byteshare-upload-metadata"
 dynamodb = DynamoDBManager(table_name)
+
+queue_table_name = "byteshare-queue"
+queue_dynamodb = DynamoDBManager(queue_table_name)
 
 # RabbitMQ
 if os.getenv("ENVIRONMENT") == "production":
@@ -135,6 +149,7 @@ def initiate_upload(
         "continue_id": continue_id,
         "total_size": content_length,
         "storage_file_names": body.file_names,
+        "mode": "normal",
         "storage_qr_name": "",
         "expires_at": "",
         "updated_at": "",
@@ -290,6 +305,46 @@ def post_upload_return_link_qr(token_data, body: FinaliseUpload, upload_id: str)
     }
 
 
+def initate_realtime_upload_return_code(
+    token_data, body: InitiateRealtimeUpload, request: Request
+):
+    FUNCTION_NAME = "initate_realtime_upload_return_code()"
+    log.info("Entering {}".format(FUNCTION_NAME))
+
+    client_ip = request.headers.get("x-forwarded-for") or request.client.host
+    content_length = sum(file_metadata.size for file_metadata in body.files_metadata)
+
+    code, expires_at = _generate_receive_code(token_data["$id"], body.peer_id)
+    if code is None:
+        raise HTTPException(status_code=500, detail="Server is busy")
+
+    upload_id = uuid.uuid4().hex
+    time_now = datetime.now(timezone.utc)
+    files_metadata = body.files_metadata
+
+    upload_metadata = {
+        "upload_id": upload_id,
+        "title": "Upload with " + files_metadata[0]["name"],
+        "creator_id": token_data["$id"],
+        "creator_email": token_data["email"],
+        "creator_ip": client_ip,
+        "receiver_email": "",
+        "download_count": 0,
+        "max_download": 1,
+        "total_size": content_length,
+        "file_metadata": body.files_metadata,
+        "mode": "realtime",
+        "sender_peer_id": body.peer_id,
+        "expires_at": datetime.fromtimestamp(expires_at).isoformat(),
+        "updated_at": "",
+        "created_at": time_now.isoformat(),
+    }
+    dynamodb.create_item(upload_metadata)
+
+    log.info("Exiting {}".format(FUNCTION_NAME))
+    return {"code": code, "expires_at": expires_at}
+
+
 def delete_upload_return_done(token_data, upload_id: str):
     FUNCTION_NAME = "delete_upload_return_done()"
     log.info("Entering {}".format(FUNCTION_NAME))
@@ -398,3 +453,30 @@ def _generate(upload_id, file_name):
 
 def _sort_by_date_desc(upload):
     return upload["created_at"]
+
+
+def _generate_receive_code(user_id, peer_id):
+    max_attempts = 5
+    for attempt in range(max_attempts):
+        code = helper.generate_sixdigit_code()
+        if _is_code_unique(code):
+            expires_at = int(
+                (datetime.now(timezone.utc) + timedelta(minutes=10)).timestamp()
+            )
+            queue_dynamodb.put_item(
+                Item={
+                    "code": code,
+                    "sender_user_id": user_id,
+                    "sender_peer_id": peer_id,
+                    "expires_at": expires_at,
+                }
+            )
+            return code, expires_at
+        else:
+            time.sleep(0.1)
+    return None
+
+
+def _is_code_unique(code: str) -> bool:
+    response = queue_dynamodb.get_item(Key={"code": code})
+    return "Item" not in response

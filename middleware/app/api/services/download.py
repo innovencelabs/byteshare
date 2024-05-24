@@ -18,6 +18,9 @@ storage = CloudflareR2Manager(BUCKET_NAME)
 table_name = "byteshare-upload-metadata"
 dynamodb = DynamoDBManager(table_name)
 
+queue_table_name = "byteshare-queue"
+queue_dynamodb = DynamoDBManager(queue_table_name)
+
 
 class StatusEnum(PythonEnum):
     initiated = "initiated"
@@ -95,3 +98,31 @@ def get_file_url_return_name_link(token_data, upload_id: str):
 
     log.info("Exiting {}".format(FUNCTION_NAME))
     return file_data
+
+
+def get_sender_return_peer_id(token_data, code: str):
+    FUNCTION_NAME = "get_sender_return_peer_id()"
+    log.info("Entering {}".format(FUNCTION_NAME))
+
+    queue_response = queue_dynamodb.read_item({"code": code})
+    if queue_response == None:
+        log.warning(
+            "BAD REQUEST for Code: {} ERROR: {}".format(
+                code, "Code not valid or expired."
+            )
+        )
+        raise HTTPException(status_code=400, detail="Code not valid or expired")
+
+    time_now = datetime.now(timezone.utc)
+
+    keys = {"code": code}
+    update_data = {
+        "download_count": 1,
+        "updated_at": time_now.isoformat(),
+    }
+    dynamodb.update_item(keys, update_data)
+
+    sender_peer_id = queue_response["sender_peer_id"]
+
+    log.info("Exiting {}".format(FUNCTION_NAME))
+    return {"sender_peer_id": sender_peer_id}

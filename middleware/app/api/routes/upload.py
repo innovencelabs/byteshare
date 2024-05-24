@@ -6,7 +6,8 @@ import api.services.upload as upload_service
 import utils.logger as logger
 from fastapi import APIRouter, Depends, Header, HTTPException, Request
 from pydantic import BaseModel
-from utils.auth import optional_authenticate, preprocess_external_call
+from utils.auth import (authenticate, optional_authenticate,
+                        preprocess_external_call)
 
 router = APIRouter()
 
@@ -31,6 +32,16 @@ class FinaliseUpload(BaseModel):
 
 class EditTitle(BaseModel):
     title: str
+
+
+class FileMetadata(BaseModel):
+    name: str
+    size: int
+
+
+class InitiateRealtimeUpload(BaseModel):
+    files_metadata: List[FileMetadata]
+    peer_id: str
 
 
 @router.post("/initiate")
@@ -104,6 +115,34 @@ def post_upload_return_link_qr(
         )
 
     response = upload_service.post_upload_return_link_qr(token_data, body, upload_id)
+
+    log.info("Exiting {}".format(FUNCTION_NAME))
+    return response
+
+
+@router.post("/realtime/initiate")
+def initate_realtime_upload_return_code(
+    body: InitiateRealtimeUpload,
+    request: Request,
+    token_data: None = Depends(authenticate),
+):
+    """
+    Initiate the Realtime peer to peer filesharing.
+    Generate the receive code and add to queue table and metadata table in DB
+
+    Parameters:
+    - peer_id: sender peer id
+    - files_metadata: list of file metadata
+
+    Returns:
+    - Recieve code and expires at
+    """
+    FUNCTION_NAME = "initate_realtime_upload_return_code()"
+    log.info("Entering {}".format(FUNCTION_NAME))
+
+    response = upload_service.initate_realtime_upload_return_code(
+        token_data, body, request
+    )
 
     log.info("Exiting {}".format(FUNCTION_NAME))
     return response
