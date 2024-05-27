@@ -121,7 +121,7 @@ def post_upload_return_link_qr(
 
 
 @router.post("/realtime/initiate")
-def initate_realtime_upload_return_code(
+def initiate_realtime_upload_return_code(
     body: InitiateRealtimeUpload,
     request: Request,
     token_data: None = Depends(authenticate),
@@ -137,10 +137,10 @@ def initate_realtime_upload_return_code(
     Returns:
     - Recieve code and expires at
     """
-    FUNCTION_NAME = "initate_realtime_upload_return_code()"
+    FUNCTION_NAME = "initiate_realtime_upload_return_code()"
     log.info("Entering {}".format(FUNCTION_NAME))
 
-    response = upload_service.initate_realtime_upload_return_code(
+    response = upload_service.initiate_realtime_upload_return_code(
         token_data, body, request
     )
 

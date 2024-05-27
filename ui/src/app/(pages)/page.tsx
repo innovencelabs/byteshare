@@ -1,7 +1,10 @@
 'use client'
 import appwriteService from '@/authentication/appwrite/config'
 import { Header } from '@/components/header'
+import { Icons } from '@/components/icons'
 import LoadingText from '@/components/loading'
+import RealtimeTimer from '@/components/realtime-timer'
+import { ReceiverCode } from '@/components/receiver-code'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -26,7 +29,6 @@ import { Input } from '@/components/ui/input'
 import {
   InputOTP,
   InputOTPGroup,
-  InputOTPSeparator,
   InputOTPSlot,
 } from '@/components/ui/input-otp'
 import { Label } from '@/components/ui/label'
@@ -90,6 +92,11 @@ export default function Home() {
   const [activeMode, setActiveMode] = useState('normal')
   const [isRecieveTooltipVisible, setIsRecieveTooltipVisible] = useState(true)
   const [receiveCode, setReceiveCode] = useState('')
+  const [realtimeInitiated, setRealtimeInitiated] = useState(false)
+  const [senderCode, setSenderCode] = useState('')
+  const [senderCodeexpiresAt, setSenderCodeexpiresAt] = useState('')
+  const [sendingRealtime, setSendingRealtime] = useState(false)
+  const [realtimeInitiating, setRealtimeInitiating] = useState(false)
   const audioRef = useRef(null)
   const fileAddRef = useRef(null)
   
@@ -97,7 +104,7 @@ export default function Home() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsRecieveTooltipVisible(false)
-    }, 10000) 
+    }, 5000) 
 
     return () => clearTimeout(timer)
   }, [])
@@ -228,6 +235,11 @@ export default function Home() {
     setTotalBatch(0)
     setWillShareEmail(false)
     setActiveMode("normal")
+    setRealtimeInitiated(false)
+    setSenderCode('')
+    setSenderCodeexpiresAt('')
+    setRealtimeInitiating(false)
+    setSendingRealtime(false)
   }
 
   const handleCopy = async () => {
@@ -242,6 +254,7 @@ export default function Home() {
 
   const handleUploadSubmit = async (event) => {
     event.preventDefault()
+    if(activeMode == "normal"){
     setProgress(0)
     setSubmitDisabled(true)
     setDisabledViewSelected(true)
@@ -378,6 +391,97 @@ export default function Home() {
         setWillShareEmail(false)
         setActiveMode('normal')
       }
+      }
+  } else if (activeMode == "realtime") {
+    setSubmitDisabled(true)
+    setDisabledViewSelected(true)
+    setRealtimeInitiating(true)
+
+    let filesMetadata = []
+    for (const file of selectedFiles) {
+      const fileMetadata = {
+        "name": file.name,
+        "size": file.size,
+      }
+      filesMetadata.push(fileMetadata)
+    }
+
+    
+    setRealtimeInitiated(false)
+
+    if (selectedFiles.length > 0) {
+      try {
+        const apiURL =
+          process.env.NEXT_PUBLIC_API_BASE_URL + '/upload/realtime/initiate'
+        const apiKey = process.env.NEXT_PUBLIC_API_KEY
+        const jwtToken = await appwriteService.getJWTToken()
+
+        const securedAccessBody = {
+          jwtToken: jwtToken.jwt,
+          apiURL: apiURL,
+          method: 'POST',
+        }
+
+        const securedAccessResponse = await fetch(
+          process.env.NEXT_PUBLIC_API_BASE_URL + '/access/aws',
+          {
+            method: 'POST',
+            body: JSON.stringify(securedAccessBody),
+            headers: {
+              'Content-Type': 'application/json',
+              'x-api-key': apiKey,
+              'X-Auth-Token': 'Bearer ' + jwtToken.jwt,
+            },
+          },
+        )
+
+        const securedAccessResponseJSON = await securedAccessResponse.json()
+        
+        const initiateRealtimeBody = {
+          files_metadata: filesMetadata,
+          peer_id: "123456343",
+        }
+
+        const initiateRealtimeResponse = await fetch(apiURL, {
+          method: 'POST',
+          body: JSON.stringify(initiateRealtimeBody),
+          headers: securedAccessResponseJSON['headers'],
+        })
+        if (!initiateRealtimeResponse.ok) {
+          toast.error('User ID is not valid')
+          
+          return
+        }
+        const responseData = await initiateRealtimeResponse.json()
+        const code = responseData.code
+        const expiresAt = responseData.expires_at
+        setSenderCode(code)
+        setSenderCodeexpiresAt(expiresAt)
+        
+        setRealtimeInitiated(true)
+
+        
+      } catch (err) {
+        setIsDrawerOpen(false)
+
+        toast.error('Something went wrong.')
+      } finally {
+        setRealtimeInitiating(false)
+        setUploading(false)
+        setPostProcessing(false)
+        setSubmitDisabled(true)
+        setDisabledViewSelected(true)
+        setFilesSizeExceededColor(false)
+        setUploadSize('0 KB')
+        setSelectedFiles([])
+        setBatchCount(0)
+        setTotalBatch(0)
+        setWillShareEmail(false)
+        setActiveMode('normal')
+        
+      }
+    }
+
     }
   }
 
@@ -573,16 +677,7 @@ export default function Home() {
                 />
               </span>
             </Button>
-
-            {/* </div> */}
           </DrawerTrigger>
-
-          {/* <Button
-            className="font-semibold text-3xl shadow-lg ml-10 px-20 py-20 bg-slate-200 text-blue-800 hover:bg-blue-100 hover:text-blue-800 rounded-2xl"
-            onClick={() => handleSend()}
-          >
-            Recieve
-          </Button> */}
         </div>
 
         <DrawerContent>
@@ -609,6 +704,16 @@ export default function Home() {
                     />
                   </DrawerTitle>
                 </>
+              ) : realtimeInitiated ? (
+                <>
+                  <DrawerTitle className="text-center">
+                    Congratulation!
+                  </DrawerTitle>
+                  <DrawerDescription className="text-center">
+                    Your receiver code has been generated. Keep this open till
+                    the share is completed.
+                  </DrawerDescription>
+                </>
               ) : (
                 <>
                   <DrawerTitle className="text-center">Send Files</DrawerTitle>
@@ -620,17 +725,39 @@ export default function Home() {
                   <Tabs
                     value={activeMode}
                     onValueChange={handleModeChange}
-                    className="w-full pt-2"
+                    className="w-full pt-1"
                   >
                     <TabsList className="grid w-full grid-cols-2 bg-blue-200">
-                      <TabsTrigger value="normal">Normal</TabsTrigger>
-                      <TabsTrigger value="1to1">1:1 Mode</TabsTrigger>
+                      <TabsTrigger value="normal" disabled={realtimeInitiating}>
+                        Normal
+                      </TabsTrigger>
+                      <TabsTrigger value="realtime" disabled={realtimeInitiating}>
+                        1:1 Mode
+                      </TabsTrigger>
                     </TabsList>
                   </Tabs>
                 </>
               )}
             </DrawerHeader>{' '}
-            {!uploading && !uploaded ? (
+            {realtimeInitiated ? (
+              <>
+                <div className="pt-4 mx-auto text-center">
+                  <ReceiverCode code={senderCode} />
+                  <div className="flex justify-center text-xs mt-1">
+                    <span className="font-normal mr-1">Expires in: </span>
+                    <span className="font-normal">
+                      <RealtimeTimer expiresAt={senderCodeexpiresAt} />
+                    </span>
+                  </div>
+
+                  <DrawerFooter>
+                    <DrawerClose asChild onClick={() => setIsDrawerOpen(false)}>
+                      <Button variant="ghost">Close</Button>
+                    </DrawerClose>
+                  </DrawerFooter>
+                </div>
+              </>
+            ) : !uploading && !uploaded && !realtimeInitiated ? (
               <>
                 <form onSubmit={handleUploadSubmit}>
                   <div className="p-2">
@@ -677,7 +804,7 @@ export default function Home() {
                         </DialogContent>
                       </Dialog>
                     </Label>
-                    <Dropzone onDrop={handleUploadChange} multiple>
+                    <Dropzone onDrop={handleUploadChange} multiple disabled={realtimeInitiating}>
                       {({ getRootProps, getInputProps, isDragActive }) => (
                         <div
                           {...getRootProps()}
@@ -731,7 +858,7 @@ export default function Home() {
                       placeholder="Email address of receiver (optional)"
                       required={false}
                       onPointerDown={(e) => e.stopPropagation()}
-                      disabled={activeMode == '1to1'}
+                      disabled={activeMode == 'realtime'}
                     />
 
                     {/* <div className="mt-2 border-l-4 border-slate-100 bg-gradient-linear bg-cover bg-no-repeat bg-left-bottom w-full h-0.5">
@@ -764,6 +891,9 @@ export default function Home() {
                   </div>
                   <DrawerFooter>
                     <Button disabled={submitDisabled} type="submit">
+                      {realtimeInitiating && (
+                        <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                      )}
                       Submit
                     </Button>
                     <DrawerClose asChild onClick={() => setIsDrawerOpen(false)}>
@@ -924,7 +1054,7 @@ export default function Home() {
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle className="text-center">
-              Enter receive code
+              Enter receiver code
             </DialogTitle>
           </DialogHeader>
           <div className="">
@@ -932,14 +1062,12 @@ export default function Home() {
               maxLength={6}
               value={receiveCode}
               onChange={(value) => setReceiveCode(value)}
+              disabled={receiveCode.length == 6}
             >
               <InputOTPGroup>
                 <InputOTPSlot index={0} />
                 <InputOTPSlot index={1} />
                 <InputOTPSlot index={2} />
-              </InputOTPGroup>
-              <InputOTPSeparator />
-              <InputOTPGroup>
                 <InputOTPSlot index={3} />
                 <InputOTPSlot index={4} />
                 <InputOTPSlot index={5} />

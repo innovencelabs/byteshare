@@ -305,10 +305,10 @@ def post_upload_return_link_qr(token_data, body: FinaliseUpload, upload_id: str)
     }
 
 
-def initate_realtime_upload_return_code(
+def initiate_realtime_upload_return_code(
     token_data, body: InitiateRealtimeUpload, request: Request
 ):
-    FUNCTION_NAME = "initate_realtime_upload_return_code()"
+    FUNCTION_NAME = "initiate_realtime_upload_return_code()"
     log.info("Entering {}".format(FUNCTION_NAME))
 
     client_ip = request.headers.get("x-forwarded-for") or request.client.host
@@ -324,7 +324,7 @@ def initate_realtime_upload_return_code(
 
     upload_metadata = {
         "upload_id": upload_id,
-        "title": "Upload with " + files_metadata[0]["name"],
+        "title": "Upload with " + files_metadata[0].name,
         "creator_id": token_data["$id"],
         "creator_email": token_data["email"],
         "creator_ip": client_ip,
@@ -332,7 +332,7 @@ def initate_realtime_upload_return_code(
         "download_count": 0,
         "max_download": 1,
         "total_size": content_length,
-        "file_metadata": body.files_metadata,
+        "file_metadata": [file.dict() for file in body.files_metadata],
         "mode": "realtime",
         "sender_peer_id": body.peer_id,
         "expires_at": datetime.fromtimestamp(expires_at).isoformat(),
@@ -463,13 +463,15 @@ def _generate_receive_code(user_id, peer_id):
             expires_at = int(
                 (datetime.now(timezone.utc) + timedelta(minutes=10)).timestamp()
             )
-            queue_dynamodb.put_item(
-                Item={
-                    "code": code,
-                    "sender_user_id": user_id,
-                    "sender_peer_id": peer_id,
-                    "expires_at": expires_at,
-                }
+            queue_data = {
+                "id": uuid.uuid4().hex,
+                "code": code,
+                "sender_user_id": user_id,
+                "sender_peer_id": peer_id,
+                "expires_at": expires_at,
+            }
+            queue_dynamodb.create_item(
+                queue_data
             )
             return code, expires_at
         else:
@@ -478,5 +480,5 @@ def _generate_receive_code(user_id, peer_id):
 
 
 def _is_code_unique(code: str) -> bool:
-    response = queue_dynamodb.get_item(Key={"code": code})
-    return "Item" not in response
+    response = queue_dynamodb.read_items("code", code, "queue-gsi")
+    return len(response) == 0
