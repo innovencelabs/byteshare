@@ -472,7 +472,7 @@ function DeveloperPage() {
                                 </li>
                               </ul>
                               <p className="mt-2 font-semibold">
-                                Headers (including X-API-Key)
+                                Headers (X-API-Key not required)
                               </p>
 
                               <ul>
