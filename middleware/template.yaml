@@ -102,8 +102,6 @@ Resources:
               Ref: ByteShareAPIGW
             Path: /health
             Method: any
-            Auth:
-              ApiKeyRequired: true
         UploadApi:
           Type: Api
           Properties:
