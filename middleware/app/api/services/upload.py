@@ -54,11 +54,11 @@ table_name = "byteshare-upload-metadata"
 dynamodb = DynamoDBManager(table_name)
 
 # RabbitMQ
-if os.getenv("ENVIRONMENT") == "production":
-    params = pika.URLParameters(os.getenv("RABBITMQ_URL"))
-    connection = pika.BlockingConnection(params)
-    channel = connection.channel()
-    channel.queue_declare(queue=os.getenv("RABBITMQ_QUEUE"))
+# if os.getenv("ENVIRONMENT") == "production":
+#     params = pika.URLParameters(os.getenv("RABBITMQ_URL"))
+#     connection = pika.BlockingConnection(params)
+#     channel = connection.channel()
+#     channel.queue_declare(queue=os.getenv("RABBITMQ_QUEUE"))
 
 web_base_url = str(os.getenv("WEB_BASE_URL"))
 
@@ -269,17 +269,17 @@ def post_upload_return_link_qr(token_data, body: FinaliseUpload, upload_id: str)
 
         resend.Emails.send(params)
 
-    if os.getenv("ENVIRONMENT") == "production":
-        try:
-            channel.basic_publish(
-                exchange="", routing_key=os.getenv("RABBITMQ_QUEUE"), body=upload_id
-            )
-        except Exception as e:
-            log.error(
-                "EXCEPTION occurred in RabbitMQ for Upload ID: {} ERROR:{}".format(
-                    upload_id, str(e)
-                )
-            )
+    # if os.getenv("ENVIRONMENT") == "production":
+    #     try:
+    #         channel.basic_publish(
+    #             exchange="", routing_key=os.getenv("RABBITMQ_QUEUE"), body=upload_id
+    #         )
+    #     except Exception as e:
+    #         log.error(
+    #             "EXCEPTION occurred in RabbitMQ for Upload ID: {} ERROR:{}".format(
+    #                 upload_id, str(e)
+    #             )
+    #         )
 
     log.info("Exiting {}".format(FUNCTION_NAME))
     return {
