@@ -3,6 +3,7 @@ import appwriteService from '@/authentication/appwrite/config'
 import { Header } from '@/components/header'
 import LoadingText from '@/components/loading'
 import { Button } from '@/components/ui/button'
+import { debounce } from 'lodash'
 import {
   Dialog,
   DialogContent,
@@ -73,6 +74,7 @@ export default function Home() {
   const [totalBatch, setTotalBatch] = useState(0)
   const [filesSizeExceededColor, setFilesSizeExceededColor] = useState(false)
   const [disabledViewSelected, setDisabledViewSelected] = useState(true)
+  const [realtimeInitiating, setRealtimeInitiating] = useState(false)
   const audioRef = useRef(null)
   const fileAddRef = useRef(null)
 
@@ -123,7 +125,7 @@ export default function Home() {
     }
   }
 
-  const handleUploadChange = useCallback((files) => {
+  const handleUploadChange = useCallback(debounce((files) => {
     setSubmitDisabled(true)
     setDisabledViewSelected(false)
     setFilesSizeExceededColor(false)
@@ -152,7 +154,7 @@ export default function Home() {
     }
     setSelectedFiles(Array.from(files))
     setSubmitDisabled(false)
-  }, [selectedFiles])
+  }, 300), [])
 
   const handleAddFile = (event) => {
     const files = Array.from(event.target.files)
@@ -189,6 +191,7 @@ export default function Home() {
     setBatchCount(0)
     setTotalBatch(0)
     setWillShareEmail(false)
+    setRealtimeInitiating(false)
   }
 
   const handleCopy = async () => {
@@ -337,6 +340,7 @@ export default function Home() {
         setBatchCount(0)
         setTotalBatch(0)
         setWillShareEmail(false)
+        setRealtimeInitiating(false)
       }
     }
   }
@@ -625,7 +629,7 @@ export default function Home() {
                         </DialogContent>
                       </Dialog>
                     </Label>
-                    <Dropzone onDrop={handleUploadChange} multiple>
+                    <Dropzone onDrop={handleUploadChange} multiple disabled={realtimeInitiating}>
                       {({ getRootProps, getInputProps, isDragActive }) => (
                         <div
                           {...getRootProps()}
