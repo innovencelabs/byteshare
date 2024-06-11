@@ -24,8 +24,11 @@ class InitiateUpload(BaseModel):
     share_email_as_source: bool
 
 
-class FinaliseUpload(BaseModel):
+class VerifyUpload(BaseModel):
     file_names: list
+
+
+class FinaliseUpload(BaseModel):
     receiver_email: str
 
 
@@ -71,6 +74,43 @@ def initiate_upload(
     return response
 
 
+@router.post("/verify/{upload_id}")
+def verify_upload_return_done(
+    body: VerifyUpload,
+    upload_id: str,
+    x_api_key: Optional[str] = Header(None),
+    token_data: None = Depends(optional_authenticate),
+):
+    """
+    Verify upload to Storage.
+    Update verified status to DB, check for the file present in Storage
+
+    Parameters:
+    - upload_id: upload id of the upload process
+    - file_name: name of the file uploaded
+
+    Returns:
+    - Done
+    """
+    FUNCTION_NAME = "verify_upload_return_done()"
+    log.info("Entering {}".format(FUNCTION_NAME))
+
+    if x_api_key != os.getenv("AWS_API_KEY"):
+        token_data = preprocess_external_call(x_api_key)
+
+    if token_data is None:
+        raise HTTPException(
+            status_code=401,
+            detail="Not authorised",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    response = upload_service.verify_upload_return_done(token_data, body, upload_id)
+
+    log.info("Exiting {}".format(FUNCTION_NAME))
+    return response
+
+
 @router.post("/finalise/{upload_id}")
 def post_upload_return_link_qr(
     body: FinaliseUpload,
@@ -79,12 +119,11 @@ def post_upload_return_link_qr(
     token_data: None = Depends(optional_authenticate),
 ):
     """
-    Post upload to Storage.
-    Update status to DB, check for the file present in Storage, generate sharable link and QR, send the share link to email if given
+    Finalise upload to Storage.
+    Update status to DB, generate sharable link and QR, send the share link to email if given
 
     Parameters:
     - upload_id: upload id of the upload process
-    - file_name: name of the file uploaded
     - receiver_email: receiver email address
 
     Returns:

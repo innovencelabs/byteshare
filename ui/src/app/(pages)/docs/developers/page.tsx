@@ -593,7 +593,7 @@ function DeveloperPage() {
 
                                 <li className="mt-3 bg-black p-1 rounded-sm">
                                   <pre className="text-white py-1 rounded-md font-mono p-2">
-                                    {`{\n  "upload_id": "<Upload ID>",\n  "upload_urls": {\n    "<File Name>": "<Upload URL>",\n    "<File Name>": "<Upload URL>"\n  }\n}`}
+                                    {`{\n  "upload_id": "<Upload ID>",\n  "upload_urls": {\n    "<File Name>": "<Upload URL>",\n    "<File Name>": "<Upload URL>",\n    ....\n  }\n}`}
                                   </pre>
                                 </li>
                               </ul>
@@ -606,6 +606,83 @@ function DeveloperPage() {
                           className="bg-green-100 border border-green-600  px-2 w-full rounded-sm"
                         >
                           <AccordionItem value="upload-2">
+                            <AccordionTrigger>
+                              <span className="text-left outline-none w-[95%] text-green-600 p-1 mx-0 font-semibold">
+                                <span className="bg-green-600 py-1 px-3 rounded-sm text-white mr-2">
+                                  POST
+                                </span>
+                                /upload/verify/[upload_id]
+                                <span className="hidden md:inline-block text-slate-600 font-semibold ml-4 text-xxs">
+                                  Verify Upload
+                                </span>
+                              </span>
+                            </AccordionTrigger>
+                            <AccordionContent className="mt-3">
+                              <p>Verify the upload if all files are present.</p>
+                              <p className="mt-4 font-bold">Request</p>
+                              <HorizontalLine />
+                              <p className="mt-2 font-semibold">URL</p>
+                              <ul>
+                                <li className="bg-black mt-1 p-2 font-mono rounded-sm text-white">
+                                  {process.env.NEXT_PUBLIC_API_BASE_URL +
+                                    '/upload/verify/[upload_id]'}
+                                </li>
+                              </ul>
+                              <p className="mt-2 font-semibold">
+                                Headers (including X-API-Key)
+                              </p>
+
+                              <ul>
+                                <li>No Headers</li>
+                              </ul>
+                              <p className="mt-2 font-semibold">
+                                Path Variable
+                              </p>
+
+                              <ul>
+                                <li>
+                                  •{' '}
+                                  <span className="font-medium">upload_id</span>
+                                  : Upload ID to finalise the upload.
+                                </li>
+                              </ul>
+                              <p className="mt-2 font-semibold">Body</p>
+
+                              <ul>
+                                <li>
+                                  •{' '}
+                                  <span className="font-medium">
+                                    file_names
+                                  </span>
+                                  : List of files names being uploaded
+                                </li>
+
+                                <li className="mt-3 bg-black p-1 rounded-sm">
+                                  <pre className="text-white py-1 rounded-md font-mono p-2">
+                                    {`{\n  "file_names": ["string"]\n}`}
+                                  </pre>
+                                </li>
+                              </ul>
+                              <p className="mt-4 font-bold">Response</p>
+                              <HorizontalLine />
+                              <ul>
+                                <li>Status of verification</li>
+
+                                <li className="mt-3 bg-black p-1 rounded-sm">
+                                  <pre className="text-white py-1 rounded-md font-mono p-2">
+                                    {`{\n  "status":"Done"\n}`}
+                                  </pre>
+                                </li>
+                              </ul>
+                            </AccordionContent>
+                          </AccordionItem>
+                        </Accordion>
+                        <Accordion
+                          type="single"
+                          collapsible
+                          className="bg-green-100 border border-green-600  px-2 w-full rounded-sm"
+                        >
+                          <AccordionItem value="upload-3">
                             <AccordionTrigger>
                               <span className="text-left outline-none w-[95%] text-green-600 p-1 mx-0 font-semibold">
                                 <span className="bg-green-600 py-1 px-3 rounded-sm text-white mr-2">
@@ -655,13 +732,6 @@ function DeveloperPage() {
                                 <li>
                                   •{' '}
                                   <span className="font-medium">
-                                    file_names
-                                  </span>
-                                  : List of files names being uploaded
-                                </li>
-                                <li>
-                                  •{' '}
-                                  <span className="font-medium">
                                     receiver_email: Receiver email address (keep
                                     it blank if none)
                                   </span>
@@ -669,7 +739,7 @@ function DeveloperPage() {
 
                                 <li className="mt-3 bg-black p-1 rounded-sm">
                                   <pre className="text-white py-1 rounded-md font-mono p-2">
-                                    {`{\n  "file_names": ["string"],\n  "receiver_email": "string"\n}`}
+                                    {`{\n  "receiver_email": "string"\n}`}
                                   </pre>
                                 </li>
                               </ul>
@@ -692,7 +762,7 @@ function DeveloperPage() {
                           collapsible
                           className="bg-red-100 border border-red-600  px-2 w-full rounded-sm"
                         >
-                          <AccordionItem value="upload-3">
+                          <AccordionItem value="upload-4">
                             <AccordionTrigger>
                               <span className="text-left outline-none w-[95%] text-red-600 p-1 mx-0 font-semibold">
                                 <span className="bg-red-600 py-1 px-3 rounded-sm text-white mr-2">
@@ -757,7 +827,7 @@ function DeveloperPage() {
                           collapsible
                           className="bg-orange-100 border border-orange-600  px-2 w-full rounded-sm"
                         >
-                          <AccordionItem value="upload-4">
+                          <AccordionItem value="upload-5">
                             <AccordionTrigger>
                               <span className="text-left outline-none w-[95%] text-orange-600 p-1 mx-0 font-semibold">
                                 <span className="bg-orange-600 py-1 px-3 rounded-sm text-white mr-2">
@@ -831,7 +901,7 @@ function DeveloperPage() {
                           collapsible
                           className="bg-blue-100 border border-blue-600  px-2 w-full rounded-sm"
                         >
-                          <AccordionItem value="upload-5">
+                          <AccordionItem value="upload-6">
                             <AccordionTrigger>
                               <span className="text-left outline-none w-[95%] text-blue-600 p-1 mx-0 font-semibold">
                                 <span className="bg-blue-600 py-1 px-3 rounded-sm text-white mr-2">
@@ -882,7 +952,7 @@ function DeveloperPage() {
 
                                 <li className="mt-3 bg-black p-1 rounded-sm">
                                   <pre className="text-white py-1 rounded-md font-mono p-2">
-                                    {`[\n  {\n    "upload_id": "<Upload ID>",\n    "title": "<Title>",\n    "created_at": "<Creation Time>",\n    "downloaded": 0,\n    "max_download": <Max Download Allowed>,\n    "total_size": "<Total Size>"\n  },\n  {\n    "upload_id": "<Upload ID>",\n    "title": "<Title>",\n    "created_at": "<Creation Time>",\n    "downloaded": 0,\n    "max_download": <Max Download Allowed>,\n    "total_size": "<Total Size>"\n  }\n]`}
+                                    {`[\n  {\n    "upload_id": "<Upload ID>",\n    "title": "<Title>",\n    "created_at": "<Creation Time>",\n    "downloaded": 0,\n    "max_download": <Max Download Allowed>,\n    "total_size": "<Total Size>"\n  },\n  {\n    "upload_id": "<Upload ID>",\n    "title": "<Title>",\n    "created_at": "<Creation Time>",\n    "downloaded": 0,\n    "max_download": <Max Download Allowed>,\n    "total_size": "<Total Size>"\n  },\n  ....\n]`}
                                   </pre>
                                 </li>
                               </ul>
@@ -957,7 +1027,7 @@ function DeveloperPage() {
 
                                 <li className="mt-3 bg-black p-1 rounded-sm">
                                   <pre className="text-white py-1 rounded-md font-mono p-2">
-                                    {`{\n  "user_email": "<Sender email>",\n  "<File Name>": {\n    "format": "<Format>",\n    "size": "<File Size>",\n    "download_url": "<Download URL>"\n  },\n  "<File Name>": {\n    "format": "<Format>",\n    "size": "<File Size>",\n    "download_url": "<Download URL>"\n  }\n}`}
+                                    {`{\n  "user_email": "<Sender email>",\n  "<File Name>": {\n    "format": "<Format>",\n    "size": "<File Size>",\n    "download_url": "<Download URL>"\n  },\n  "<File Name>": {\n    "format": "<Format>",\n    "size": "<File Size>",\n    "download_url": "<Download URL>"\n  },\n  ....\n}`}
                                   </pre>
                                 </li>
                               </ul>

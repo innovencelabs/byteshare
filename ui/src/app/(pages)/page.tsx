@@ -3,7 +3,6 @@ import appwriteService from '@/authentication/appwrite/config'
 import { Header } from '@/components/header'
 import LoadingText from '@/components/loading'
 import { Button } from '@/components/ui/button'
-import { debounce } from 'lodash'
 import {
   Dialog,
   DialogContent,
@@ -38,6 +37,7 @@ import {
 import axios from 'axios'
 import { formatInTimeZone } from 'date-fns-tz'
 import { motion } from 'framer-motion'
+import { debounce } from 'lodash'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import Boxi from 'public/svg/box.svg'
@@ -140,11 +140,8 @@ export default function Home() {
       setUploadSize('0 KB')
       setSelectedFiles(Array.from(files))
       return
-    } else if (totalSize >= 2 * 1024 * 1024 * 1024) {
-      setUploadSize(
-        (totalSize / (1024 * 1024 * 1024)).toFixed(2) +
-          ' GB',
-      )
+    } else if (totalSize >= 2 * 1024 * 1024 * 1024 || files.length > 1000) {
+      setUploadSize(formatSize(totalSize))
       setSubmitDisabled(true)
       setFilesSizeExceededColor(true)
       setSelectedFiles(Array.from(files))
@@ -307,7 +304,11 @@ export default function Home() {
           filesUploaded += batchFiles.length
         }
         setPostProcessing(true)
-        const postUploadResponse = await postUpload(fileNames, uploadID)
+        const verifyUploadResponse = await verifyUpload(fileNames, uploadID)
+        if(verifyUploadResponse == false){
+          throw new Error("Upload not verified")
+        }
+        const postUploadResponse = await postUpload(uploadID)
         const shareURL = postUploadResponse.shareURL
         const shareQR = postUploadResponse.shareQR
         const shareExpirationDate = postUploadResponse.expirationDate
@@ -384,13 +385,41 @@ export default function Home() {
     return { uploadID, uploadURLs }
   }
 
-  const postUpload = async (fileNames, uploadID) => {
+  const verifyUpload = async (fileNames, uploadID) => {
     const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
     const apiKey = process.env.NEXT_PUBLIC_API_KEY
     const jwtToken = await appwriteService.getJWTToken()
 
     const fileJSON = {
       file_names: fileNames,
+      receiver_email: receiverEmail,
+    }
+    const verifyUploadResponse = await fetch(
+      apiBaseURL + '/upload/verify' + '/' + uploadID,
+      {
+        method: 'POST',
+        body: JSON.stringify(fileJSON),
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'X-Auth-Token': 'Bearer ' + jwtToken.jwt,
+        },
+      },
+    )
+    const statusCode = verifyUploadResponse.status
+    if(statusCode == 400){
+      return false
+    }
+
+    return true
+  }
+
+  const postUpload = async (uploadID) => {
+    const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+    const apiKey = process.env.NEXT_PUBLIC_API_KEY
+    const jwtToken = await appwriteService.getJWTToken()
+
+    const fileJSON = {
       receiver_email: receiverEmail,
     }
     const postUploadResponse = await fetch(
@@ -577,7 +606,7 @@ export default function Home() {
                 <>
                   <DrawerTitle className="text-center">Send Files</DrawerTitle>
                   <DrawerDescription className="text-center">
-                    You can select multiple files to share upto 2GB.
+                    You can select multiple files to share upto 2GB (max 1000 files).
                   </DrawerDescription>
                 </>
               )}
@@ -590,13 +619,13 @@ export default function Home() {
                       htmlFor="files"
                       className={`${filesSizeExceededColor ? 'text-red-500' : 'text-black'}`}
                     >
-                      Files (Size: {uploadSize})
+                      Files (Size: {uploadSize}, {selectedFiles.length} files)
                       <Dialog>
                         <DialogTrigger asChild>
                           <Button
                             variant="link"
                             disabled={disabledViewSelected}
-                            className='px-2'
+                            className="px-2"
                           >
                             View selected
                           </Button>
@@ -609,7 +638,7 @@ export default function Home() {
                               <Button
                                 variant="link"
                                 onClick={() => fileAddRef.current.click()}
-                                className='px-1'
+                                className="px-1"
                               >
                                 Add More
                               </Button>
@@ -629,7 +658,11 @@ export default function Home() {
                         </DialogContent>
                       </Dialog>
                     </Label>
-                    <Dropzone onDrop={handleUploadChange} multiple disabled={realtimeInitiating}>
+                    <Dropzone
+                      onDrop={handleUploadChange}
+                      multiple
+                      disabled={realtimeInitiating}
+                    >
                       {({ getRootProps, getInputProps, isDragActive }) => (
                         <div
                           {...getRootProps()}

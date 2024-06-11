@@ -5,7 +5,6 @@ from datetime import datetime, timedelta, timezone
 from enum import Enum as PythonEnum
 from typing import List
 
-import pika
 import qrcode
 import resend
 import utils.helper as helper
@@ -36,8 +35,11 @@ class InitiateUpload(BaseModel):
     share_email_as_source: bool
 
 
-class FinaliseUpload(BaseModel):
+class VerifyUpload(BaseModel):
     file_names: list
+
+
+class FinaliseUpload(BaseModel):
     receiver_email: str
 
 
@@ -96,9 +98,9 @@ def initiate_upload(
     result["upload_id"] = upload_id
     result["upload_urls"] = {}
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
         future_to_file_name = {
-            executor.submit(_generate, upload_id, file_name): file_name
+            executor.submit(_generate_upload_url, upload_id, file_name): file_name
             for file_name in file_names
         }
 
@@ -120,6 +122,8 @@ def initiate_upload(
 
     time_now = datetime.now(timezone.utc)
 
+    file_metadata = {name: {"verified": False} for name in body.file_names}
+
     upload_metadata = {
         "upload_id": upload_id,
         "status": StatusEnum.initiated.name,
@@ -134,7 +138,7 @@ def initiate_upload(
         "max_download": 5,
         "continue_id": continue_id,
         "total_size": content_length,
-        "storage_file_names": body.file_names,
+        "storage_file_metadata": file_metadata,
         "storage_qr_name": "",
         "expires_at": "",
         "updated_at": "",
@@ -144,6 +148,63 @@ def initiate_upload(
 
     log.info("Exiting {}".format(FUNCTION_NAME))
     return result
+
+
+def verify_upload_return_done(token_data, body: VerifyUpload, upload_id: str):
+    FUNCTION_NAME = "verify_upload_return_done()"
+    log.info("Entering {}".format(FUNCTION_NAME))
+
+    upload_metadata = dynamodb.read_item({"upload_id": upload_id})
+    if upload_metadata == None:
+        log.warning(
+            "BAD REQUEST for UploadID: {} ERROR: {}".format(
+                upload_id, "Upload ID not valid."
+            )
+        )
+        raise HTTPException(status_code=400, detail="Upload ID not valid")
+    if upload_metadata["creator_id"] != token_data["$id"]:
+        log.warning(
+            "BAD REQUEST for UploadID: {} ERROR: {}".format(
+                upload_id, "User is not the owner of the upload."
+            )
+        )
+        raise HTTPException(
+            status_code=400, detail="User is not the owner of the upload"
+        )
+
+    storage_file_metadata = upload_metadata["storage_file_metadata"]
+    file_names = body.file_names
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+        future_to_file_name = {
+            executor.submit(_verify_file, upload_id, file_name): file_name
+            for file_name in file_names
+        }
+        for future in concurrent.futures.as_completed(future_to_file_name):
+            file_name = future_to_file_name[future]
+            try:
+                verified = future.result()
+                if not verified:
+                    raise HTTPException(status_code=400, detail="File not found")
+                storage_file_metadata[file_name]["verified"] = True
+            except Exception as e:
+                log.error(
+                    "EXCEPTION occurred for Upload ID: {}\nFile {}: \nERROR:{}".format(
+                        upload_id, file_name, str(e)
+                    )
+                )
+
+    time_now = datetime.now(timezone.utc)
+
+    keys = {"upload_id": upload_id}
+    update_data = {
+        "storage_file_metadata": storage_file_metadata,
+        "updated_at": time_now.isoformat(),
+    }
+    dynamodb.update_item(keys, update_data)
+
+    log.info("Exiting {}".format(FUNCTION_NAME))
+    return {"status": "Done"}
 
 
 def post_upload_return_link_qr(token_data, body: FinaliseUpload, upload_id: str):
@@ -166,19 +227,25 @@ def post_upload_return_link_qr(token_data, body: FinaliseUpload, upload_id: str)
         )
         raise HTTPException(status_code=400, detail="Upload already completed")
 
-    file_names = body.file_names
-    for file_name in file_names:
-        file_path = upload_id + "/" + file_name
+    if upload_metadata["creator_id"] != token_data["$id"]:
+        log.warning(
+            "BAD REQUEST for UploadID: {} ERROR: {}".format(
+                upload_id, "User is not the owner of the upload."
+            )
+        )
+        raise HTTPException(
+            status_code=400, detail="User is not the owner of the upload"
+        )
 
-        # Check for file present in Storage
-        is_file_present = storage.is_file_present(file_path)
-        if not is_file_present:
+    storage_file_metadata = upload_metadata["storage_file_metadata"]
+    for file in storage_file_metadata:
+        if not storage_file_metadata[file]["verified"]:
             log.warning(
                 "BAD REQUEST for UploadID: {} ERROR: {}".format(
-                    upload_id, "Upload not found."
+                    upload_id, "Files are unverified."
                 )
             )
-            raise HTTPException(status_code=400, detail="Upload not found")
+            raise HTTPException(status_code=400, detail="Files are unverified")
 
     # Generate share link
     file_url = web_base_url + "/share/" + upload_id
@@ -380,8 +447,30 @@ def get_history_return_all_shares_list(token_data):
     return history
 
 
-def _generate(upload_id, file_name):
-    FUNCTION_NAME = "_generate()"
+def _verify_file(upload_id, file_name):
+    FUNCTION_NAME = "_verify_file()"
+    log.info("Entering {}".format(FUNCTION_NAME))
+
+    verified = True
+
+    file_path = upload_id + "/" + file_name
+
+    # Check for file present in Storage
+    is_file_present = storage.is_file_present(file_path)
+    if not is_file_present:
+        log.warning(
+            "BAD REQUEST for UploadID: {} ERROR: {}".format(
+                upload_id, "Upload not found."
+            )
+        )
+        verified = False
+
+    log.info("Exiting {}".format(FUNCTION_NAME))
+    return verified
+
+
+def _generate_upload_url(upload_id, file_name):
+    FUNCTION_NAME = "_generate_upload_url()"
     log.info("Entering {}".format(FUNCTION_NAME))
 
     expiration_time = 10800
