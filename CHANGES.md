@@ -1,3 +1,15 @@
+# Version 0.4.2
+
+## What's Changed
+### Bug Fixes
+* Fix multiple file selection delay issue by @ambujraj in https://github.com/innovencelabs/byteshare/pull/264
+* Add endpoint to verify upload by @ambujraj in https://github.com/innovencelabs/byteshare/pull/267
+
+### Miscellaneous
+* Made /health open for monitoring by @ambujraj in https://github.com/innovencelabs/byteshare/pull/260
+
+**Full Changelog**: https://github.com/innovencelabs/byteshare/compare/0.4.1...0.4.2
+
 # Version 0.4.1
 
 ## What's Changed
