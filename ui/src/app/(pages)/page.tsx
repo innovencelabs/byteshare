@@ -140,11 +140,8 @@ export default function Home() {
       setUploadSize('0 KB')
       setSelectedFiles(Array.from(files))
       return
-    } else if (totalSize >= 2 * 1024 * 1024 * 1024) {
-      setUploadSize(
-        (totalSize / (1024 * 1024 * 1024)).toFixed(2) +
-          ' GB',
-      )
+    } else if (totalSize >= 2 * 1024 * 1024 * 1024 || files.length > 1000) {
+      setUploadSize(formatSize(totalSize))
       setSubmitDisabled(true)
       setFilesSizeExceededColor(true)
       setSelectedFiles(Array.from(files))
@@ -609,7 +606,7 @@ export default function Home() {
                 <>
                   <DrawerTitle className="text-center">Send Files</DrawerTitle>
                   <DrawerDescription className="text-center">
-                    You can select multiple files to share upto 2GB.
+                    You can select multiple files to share upto 2GB (max 1000 files).
                   </DrawerDescription>
                 </>
               )}
@@ -622,13 +619,13 @@ export default function Home() {
                       htmlFor="files"
                       className={`${filesSizeExceededColor ? 'text-red-500' : 'text-black'}`}
                     >
-                      Files (Size: {uploadSize})
+                      Files (Size: {uploadSize}, {selectedFiles.length} files)
                       <Dialog>
                         <DialogTrigger asChild>
                           <Button
                             variant="link"
                             disabled={disabledViewSelected}
-                            className='px-2'
+                            className="px-2"
                           >
                             View selected
                           </Button>
@@ -641,7 +638,7 @@ export default function Home() {
                               <Button
                                 variant="link"
                                 onClick={() => fileAddRef.current.click()}
-                                className='px-1'
+                                className="px-1"
                               >
                                 Add More
                               </Button>
@@ -661,7 +658,11 @@ export default function Home() {
                         </DialogContent>
                       </Dialog>
                     </Label>
-                    <Dropzone onDrop={handleUploadChange} multiple disabled={realtimeInitiating}>
+                    <Dropzone
+                      onDrop={handleUploadChange}
+                      multiple
+                      disabled={realtimeInitiating}
+                    >
                       {({ getRootProps, getInputProps, isDragActive }) => (
                         <div
                           {...getRootProps()}
