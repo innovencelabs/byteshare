@@ -117,7 +117,7 @@ def _generate_download_url(upload_id, file_name):
     file_size = storage.get_file_info(file_path)
 
     download_expiration_time = 21600  # 6 hours
-    
+
     # Generate share download link
     file_url = storage.generate_download_url(file_path, download_expiration_time)
 
