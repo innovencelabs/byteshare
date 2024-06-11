@@ -1,3 +1,4 @@
+import concurrent.futures
 from datetime import datetime, timezone
 from enum import Enum as PythonEnum
 
@@ -66,24 +67,33 @@ def get_file_url_return_name_link(token_data, upload_id: str):
             )
             raise HTTPException(status_code=400, detail="Download limit exceeded")
 
-    file_names = set(upload_metadata["storage_file_names"])
-    for file_name in file_names:
-        file_path = upload_id + "/" + file_name
+    file_names = list(upload_metadata["storage_file_metadata"].keys())
 
-        file_format = helper.get_file_extension(file_name)
-        file_size = storage.get_file_info(file_path)
+    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+        future_to_file_name = {
+            executor.submit(_generate_download_url, upload_id, file_name): file_name
+            for file_name in file_names
+        }
+        for future in concurrent.futures.as_completed(future_to_file_name):
+            file_name = future_to_file_name[future]
+            try:
+                response = future.result()
+                # file_format, file_size, file_url = future.result()
 
-        download_expiration_time = 21600  # 6 hours
-        # Generate share download link
-        file_url = storage.generate_download_url(file_path, download_expiration_time)
-        if upload_metadata["share_email_as_source"]:
-            file_data["user_email"] = upload_metadata["creator_email"]
-        else:
-            file_data["user_email"] = None
-        file_data[file_name] = {}
-        file_data[file_name]["format"] = file_format
-        file_data[file_name]["size"] = helper.format_size(file_size)
-        file_data[file_name]["download_url"] = file_url
+                if upload_metadata["share_email_as_source"]:
+                    file_data["user_email"] = upload_metadata["creator_email"]
+                else:
+                    file_data["user_email"] = None
+                file_data[file_name] = {}
+                file_data[file_name]["format"] = response["file_format"]
+                file_data[file_name]["size"] = helper.format_size(response["file_size"])
+                file_data[file_name]["download_url"] = response["file_url"]
+            except Exception as e:
+                log.error(
+                    "EXCEPTION occurred for Upload ID: {}\nFile {}: \nERROR:{}".format(
+                        upload_id, file_name, str(e)
+                    )
+                )
 
     if token_data == None or upload_metadata["creator_id"] != token_data["$id"]:
         keys = {"upload_id": upload_id}
@@ -95,3 +105,22 @@ def get_file_url_return_name_link(token_data, upload_id: str):
 
     log.info("Exiting {}".format(FUNCTION_NAME))
     return file_data
+
+
+def _generate_download_url(upload_id, file_name):
+    FUNCTION_NAME = "_generate_download_url()"
+    log.info("Entering {}".format(FUNCTION_NAME))
+
+    file_path = upload_id + "/" + file_name
+
+    file_format = helper.get_file_extension(file_name)
+    file_size = storage.get_file_info(file_path)
+
+    download_expiration_time = 21600  # 6 hours
+    
+    # Generate share download link
+    file_url = storage.generate_download_url(file_path, download_expiration_time)
+
+    log.info("Exiting {}".format(FUNCTION_NAME))
+
+    return {"file_format": file_format, "file_size": file_size, "file_url": file_url}

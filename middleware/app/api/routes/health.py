@@ -1,10 +1,6 @@
-import os
-from typing import Optional
-
 import api.services.health as health_service
 import utils.logger as logger
-from fastapi import APIRouter, Header
-from utils.auth import preprocess_external_call
+from fastapi import APIRouter
 
 router = APIRouter()
 

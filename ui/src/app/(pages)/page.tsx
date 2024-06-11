@@ -3,7 +3,6 @@ import appwriteService from '@/authentication/appwrite/config'
 import { Header } from '@/components/header'
 import LoadingText from '@/components/loading'
 import { Button } from '@/components/ui/button'
-import { debounce } from 'lodash'
 import {
   Dialog,
   DialogContent,
@@ -38,6 +37,7 @@ import {
 import axios from 'axios'
 import { formatInTimeZone } from 'date-fns-tz'
 import { motion } from 'framer-motion'
+import { debounce } from 'lodash'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import Boxi from 'public/svg/box.svg'
@@ -307,7 +307,11 @@ export default function Home() {
           filesUploaded += batchFiles.length
         }
         setPostProcessing(true)
-        const postUploadResponse = await postUpload(fileNames, uploadID)
+        const verifyUploadResponse = await verifyUpload(fileNames, uploadID)
+        if(verifyUploadResponse == false){
+          throw new Error("Upload not verified")
+        }
+        const postUploadResponse = await postUpload(uploadID)
         const shareURL = postUploadResponse.shareURL
         const shareQR = postUploadResponse.shareQR
         const shareExpirationDate = postUploadResponse.expirationDate
@@ -384,13 +388,41 @@ export default function Home() {
     return { uploadID, uploadURLs }
   }
 
-  const postUpload = async (fileNames, uploadID) => {
+  const verifyUpload = async (fileNames, uploadID) => {
     const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
     const apiKey = process.env.NEXT_PUBLIC_API_KEY
     const jwtToken = await appwriteService.getJWTToken()
 
     const fileJSON = {
       file_names: fileNames,
+      receiver_email: receiverEmail,
+    }
+    const verifyUploadResponse = await fetch(
+      apiBaseURL + '/upload/verify' + '/' + uploadID,
+      {
+        method: 'POST',
+        body: JSON.stringify(fileJSON),
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'X-Auth-Token': 'Bearer ' + jwtToken.jwt,
+        },
+      },
+    )
+    const statusCode = verifyUploadResponse.status
+    if(statusCode == 400){
+      return false
+    }
+
+    return true
+  }
+
+  const postUpload = async (uploadID) => {
+    const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+    const apiKey = process.env.NEXT_PUBLIC_API_KEY
+    const jwtToken = await appwriteService.getJWTToken()
+
+    const fileJSON = {
       receiver_email: receiverEmail,
     }
     const postUploadResponse = await fetch(
