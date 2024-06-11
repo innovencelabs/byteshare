@@ -3,7 +3,7 @@ from typing import Optional
 
 import api.services.feedback as feedback_service
 import utils.logger as logger
-from fastapi import APIRouter, Header
+from fastapi import APIRouter, Header, Request
 from pydantic import BaseModel
 from utils.auth import preprocess_external_call
 
@@ -22,6 +22,7 @@ class Feedback(BaseModel):
 @router.post("/")
 def post_feedback_return_none(
     body: Feedback,
+    request: Request,
     x_api_key: Optional[str] = Header(None),
 ):
     """
@@ -39,7 +40,7 @@ def post_feedback_return_none(
     FUNCTION_NAME = "post_feedback_return_none()"
     log.info("Entering {}".format(FUNCTION_NAME))
 
-    if x_api_key != os.getenv("AWS_API_KEY"):
+    if x_api_key != os.getenv("AWS_API_KEY") or :
         preprocess_external_call(x_api_key)
 
     feedback_service.post_feedback_return_none(body)

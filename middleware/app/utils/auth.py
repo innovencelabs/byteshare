@@ -9,10 +9,12 @@ from appwrite.services.account import Account
 from appwrite.services.users import Users
 from database.db import DynamoDBManager
 from dotenv import load_dotenv
-from fastapi import Header, HTTPException
+from fastapi import Header, HTTPException, Request
 
 # Load Environment variables
 load_dotenv()
+
+ALLOWED_DOMAINS = os.getenv("ALLOWED_DOMAINS").split(",")
 
 # Logger instance
 log = logger.get_logger()
@@ -181,3 +183,12 @@ def preprocess_external_call(api_key: str):
     apikey_dynamodb.update_item(keys, update_data)
 
     return result
+
+def verify_referrer(request: Request, referrer: str):
+    if referrer is None or not any(
+        referrer.startswith(domain) for domain in ALLOWED_DOMAINS
+    ):
+        raise HTTPException(
+            status_code=403,
+            detail="Invalid referrer",
+        )
