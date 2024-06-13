@@ -553,7 +553,7 @@ export default function Home() {
           <DrawerTrigger asChild>
             {/* <div className="px-12 py-8 border-2 border-black rounded-2xl"> */}
             <Button
-              className="group animate-bounce font-semibold text-3xl shadow-2 py-10 bg-primary text-gray-100 hover:pointer hover:bg-blue-900 hover:text-white rounded-2xl hover:animate-none hover:opacity-80"
+              className="group animate-bounce font-semibold text-3xl shadow-2 py-10 bg-primary text-gray-100 hover:pointer hover:bg-blue-900 hover:text-white rounded-2xl hover:animate-none hover:opacity-80 z-10"
               onClick={() => handleSend()}
               disabled={sendDisabled}
             >
@@ -619,7 +619,7 @@ export default function Home() {
                       htmlFor="files"
                       className={`${filesSizeExceededColor ? 'text-red-500' : 'text-black'}`}
                     >
-                      Files (Size: {uploadSize}, {selectedFiles.length} files)
+                      Size: {uploadSize}, {selectedFiles.length} files
                       <Dialog>
                         <DialogTrigger asChild>
                           <Button
