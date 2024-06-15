@@ -69,7 +69,7 @@ def get_file_url_return_name_link(token_data, upload_id: str):
 
     file_names = list(upload_metadata["storage_file_metadata"].keys())
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=25) as executor:
         future_to_file_name = {
             executor.submit(_generate_download_url, upload_id, file_name): file_name
             for file_name in file_names

@@ -175,7 +175,7 @@ def verify_upload_return_done(token_data, body: VerifyUpload, upload_id: str):
     storage_file_metadata = upload_metadata["storage_file_metadata"]
     file_names = body.file_names
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=25) as executor:
         future_to_file_name = {
             executor.submit(_verify_file, upload_id, file_name): file_name
             for file_name in file_names
