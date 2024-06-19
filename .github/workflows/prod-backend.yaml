@@ -1,0 +1,61 @@
+name: Deploy SAM Backend to Prod
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up AWS CLI
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-2
+    
+    - name: Set up SAM CLI
+      uses: aws-actions/setup-sam@v1
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.10'
+
+    - name: Deploy Backend with SAM CLI
+      env:
+        AWS_DEFAULT_REGION: us-east-2
+        CORS_ORIGIN: ${{ secrets.CORS_ORIGIN }}
+        R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+        R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}
+        R2_SECRET_KEY: ${{ secrets.R2_SECRET_KEY }}
+        RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+        APPWRITE_URL: ${{ secrets.APPWRITE_URL }}
+        APPWRITE_PROJECT_ID: ${{ secrets.APPWRITE_PROJECT_ID }}
+        RABBITMQ_QUEUE: ${{ secrets.RABBITMQ_QUEUE }}
+        RABBITMQ_URL: ${{ secrets.RABBITMQ_URL }}
+        APPWRITE_WEBHOOK_USER: ${{ secrets.APPWRITE_WEBHOOK_USER }}
+        APPWRITE_WEBHOOK_PASS: ${{ secrets.APPWRITE_WEBHOOK_PASS }}
+        SCAN_USER: ${{ secrets.SCAN_USER }}
+        SCAN_PASS: ${{ secrets.SCAN_PASS }}
+        AWS_API_ACCESS_ACCESS_KEY: ${{ secrets.AWS_API_ACCESS_ACCESS_KEY }}
+        AWS_API_ACCESS_SECRET_ACCESS_KEY: ${{ secrets.AWS_API_ACCESS_SECRET_ACCESS_KEY }}
+        AWS_API_ACCESS_REGION: ${{ secrets.AWS_API_ACCESS_REGION }}
+        AWS_API_ACCESS_ROLE_ARN: ${{ secrets.AWS_API_ACCESS_ROLE_ARN }}
+        AWS_API_KEY: ${{ secrets.AWS_API_KEY }}
+        APPWRITE_API_KEY: ${{ secrets.APPWRITE_API_KEY }}
+      run: |
+        cd middleware
+        pip install -r ./requirements.txt  --target ./python
+        chmod 755 ./python
+        zip -r python-site-packages.zip python
+        rm -r python
+        sam build
+        sam deploy --parameter-overrides Environment=production CorsOrigin=$CORS_ORIGIN AppwriteApiKey=$APPWRITE_API_KEY AWSApiKey=$AWS_API_KEY AWSApiAccessRoleArn=$AWS_API_ACCESS_ROLE_ARN AWSApiAccessKeyId=$AWS_API_ACCESS_ACCESS_KEY AWSApiAccessSecretAccessKey=$AWS_API_ACCESS_SECRET_ACCESS_KEY AWSApiAccessRegion=$AWS_API_ACCESS_REGION ScanUser=$SCAN_USER ScanPass=$SCAN_PASS AppwriteWebhookUser=$APPWRITE_WEBHOOK_USER AppwriteWebhookPass=$APPWRITE_WEBHOOK_PASS RabbitMQQueue=$RABBITMQ_QUEUE RabbitMQURL=$RABBITMQ_URL AWSDefaultRegion=$AWS_DEFAULT_REGION AppwriteURL=$APPWRITE_URL AppwriteProjectID=$APPWRITE_PROJECT_ID ResendAPIKey=$RESEND_API_KEY R2AccountID=$R2_ACCOUNT_ID R2AccessKey=$R2_ACCESS_KEY R2SecretKey=$R2_SECRET_KEY
+        rm python-site-packages.zip
+

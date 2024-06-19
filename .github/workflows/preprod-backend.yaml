@@ -1,8 +1,9 @@
-name: Deploy SAM Backend
+name: Deploy SAM Backend to PreProd
 
 on:
-  release:
-    types: [created]
+  push:
+    branches:
+      - preprod
 
 jobs:
   deploy:
