@@ -1,5 +1,5 @@
 **/__pycache__
-middleware/.venv
+**/.venv
 ui/node_modules
 middleware/.aws-sam
 middleware/python-site-packages.zip
@@ -10,6 +10,6 @@ terraform.tfstate.backup
 **/.env
 todo.txt
 ui-bkp
-ui/.next
+**/.next
 issue.txt
 terraform.tfvars
