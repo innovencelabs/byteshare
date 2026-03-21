@@ -1,6 +1,4 @@
-<p align="center">
-  <img src="https://github.com/ambujraj/ByteShare/assets/29935993/17be8a31-71f3-4581-975c-9c1f6a8de2ef" alt="ByteShare logo" width="200" />
-</p>
+
 <h1 align="center">ByteShare</h1>
 
 <p align="center">
@@ -59,9 +57,6 @@ docker compose up --build
 ```
 
 #### By default, UI runs on port **3000** and Middleware runs on port **8000**
-
-## Architecture
-![architecture](https://github.com/ambujraj/ByteShare/assets/29935993/ced9c2cd-51ec-4285-a365-22cfde1c3826)
 
 
 ## Built with
